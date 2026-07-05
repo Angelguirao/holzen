@@ -1,14 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabasePauseRepository: { port: 'reflectPauseRepository' }
 }));
 
 import * as flowsIo from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository as flowsReflectPauseRepository,
@@ -16,7 +14,7 @@ import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeSaveFailedToast
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import * as moodIo from '@/features/pause/presentation/feel/pause-feel-io';
 import {
@@ -26,7 +24,7 @@ import {
   pauseInitialEmotionSkip,
   pauseInitialEmotionSkipWithRepository,
   reflectPauseRepository as moodReflectPauseRepository,
-  resolvePauseSessionChromeCloseAction,
+  resolvePauseSessionChromeCloseAction
 } from '@/features/pause/presentation/feel/pause-feel-io';
 
 /**
@@ -39,9 +37,7 @@ describe('pause-reflect-flows-io ↔ pause-feel-io sibling parity (application)'
   it('flows-io and mood-io are distinct presentation I/O surfaces', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecideAfterGeneration).toBe('function');
-    expect(typeof formatReinforcementQuoteFromSession).toBe('function');
     expect(typeof resolvePauseDecideOutcomeFlow).toBe('function');
-    expect(typeof getSessionQuote).toBe('function');
     expect(typeof buildPauseScoreImpacts).toBe('function');
     expect(typeof pauseReflectOutcomeLog).toBe('function');
     expect(typeof pauseReflectOutcomeLogWithRepository).toBe('function');
@@ -66,9 +62,7 @@ describe('pause-reflect-flows-io ↔ pause-feel-io sibling parity (application)'
     expect('pauseReflectOutcomeLogWithRepository' in moodIo).toBe(false);
     expect('resolvePauseSessionReflectAndDecidePreflight' in moodIo).toBe(false);
     expect('resolvePauseSessionReflectAndDecideAfterGeneration' in moodIo).toBe(false);
-    expect('formatReinforcementQuoteFromSession' in moodIo).toBe(false);
     expect('resolvePauseDecideOutcomeFlow' in moodIo).toBe(false);
-    expect('getSessionQuote' in moodIo).toBe(false);
     expect('buildPauseScoreImpacts' in moodIo).toBe(false);
     expect('showPauseOutcomeNotCompletedToast' in moodIo).toBe(false);
     expect('showPauseOutcomeSaveFailedToast' in moodIo).toBe(false);
@@ -79,9 +73,7 @@ describe('pause-reflect-flows-io ↔ pause-feel-io sibling parity (application)'
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseInitialEmotionSkip);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseInitialEmotionSelectWithRepository);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseInitialEmotionSkipWithRepository);
-    expect(formatReinforcementQuoteFromSession).not.toBe(buildFeelTilesMoodLogOptions);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(resolvePauseSessionChromeCloseAction);
-    expect(getSessionQuote).not.toBe(pauseInitialEmotionSelect);
     expect(buildPauseScoreImpacts).not.toBe(pauseInitialEmotionSkip);
     expect(showPauseOutcomeNotCompletedToast).not.toBe(buildFeelTilesMoodLogOptions);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(resolvePauseSessionChromeCloseAction);
@@ -92,9 +84,7 @@ describe('pause-reflect-flows-io ↔ pause-feel-io sibling parity (application)'
     expect(pauseInitialEmotionSkip).not.toBe(pauseReflectOutcomeLogWithRepository);
     expect(pauseInitialEmotionSelectWithRepository).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(pauseInitialEmotionSkipWithRepository).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
-    expect(buildFeelTilesMoodLogOptions).not.toBe(formatReinforcementQuoteFromSession);
     expect(resolvePauseSessionChromeCloseAction).not.toBe(resolvePauseDecideOutcomeFlow);
-    expect(pauseInitialEmotionSelect).not.toBe(getSessionQuote);
     expect(pauseInitialEmotionSkip).not.toBe(buildPauseScoreImpacts);
     expect(buildFeelTilesMoodLogOptions).not.toBe(showPauseOutcomeNotCompletedToast);
     expect(resolvePauseSessionChromeCloseAction).not.toBe(showPauseOutcomeSaveFailedToast);

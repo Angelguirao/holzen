@@ -41,6 +41,7 @@ What we chose (one or two short paragraphs).
 
 | Date | Title | File |
 |------|--------|------|
+| 2026-06-03 | Percent-based volatility triggers (not absolute price levels) | [2026-06-03-percent-volatility-triggers.md](2026-06-03-percent-volatility-triggers.md) |
 | 2026-05-23 | Render boundaries now; defer React Compiler and React 19 | [2026-05-23-render-boundaries-defer-react-compiler-19.md](2026-05-23-render-boundaries-defer-react-compiler-19.md) |
 | 2026-05-17 | Modular monolith + hexagonal client (pre-launch) | [2026-05-17-modular-monolith-hexagonal-client.md](2026-05-17-modular-monolith-hexagonal-client.md) |
 | 2026-05-16 | Pause-first shipped scope | [2026-05-16-pause-first-shipped-scope.md](2026-05-16-pause-first-shipped-scope.md) |

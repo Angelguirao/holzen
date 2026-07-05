@@ -12,7 +12,7 @@ Holzen reaches users through three channels on the active surface. This document
 |---------|---------|------------|---------------|---------------|
 | **In-app inbox** | Yes | Dismiss/read in bell (local + row `dismissed_at`) | `NotificationBell`, `notifications-inbox-query` | `notifications` table; rows from pause triggers (`notifications_from_pause_instances`) |
 | **Web push** | Yes | Settings → push toggle; browser permission | `usePushNotifications`, `register-push` | `check-volatility` sends after claim; `push_subscriptions` |
-| **Email** | Yes (pause/volatility) | `profiles.email_notifications` | Settings panel (via `useProfile` in **user**) | `check-volatility` → **Resend** via `_shared/notifications-deliver-pause-offer.ts`; `process-email-queue` cron |
+| **Email** | Yes (pause/volatility) | `profiles.email_notifications` + Edge secret `PAUSE_VOLATILITY_EMAIL_ENABLED` | Settings panel (via `useProfile` in **user**) | `check-volatility` → **Resend** via `_shared/notifications-deliver-pause-offer.ts`; `process-email-queue` cron |
 
 **Not scheduled post-cutover:** digest, letters, badge, night-reflection notification types (rows/types removed or cron off — see [active-surface.md](../ops/active-surface.md)).
 
@@ -51,6 +51,8 @@ Import rules: screens and app use `@/features/notifications/public-hooks` and `p
 ## Server delivery helper
 
 Post-claim **email + web push** for automatic pause offers: [`supabase/functions/_shared/notifications-deliver-pause-offer.ts`](../../supabase/functions/_shared/notifications-deliver-pause-offer.ts) (`deliverPauseOfferChannels`, `initWebPushVapidFromEnv`). Called from `check-volatility` after `pause_create_or_reuse_as`.
+
+**Pause-offer email kill switch:** set Edge secret `PAUSE_VOLATILITY_EMAIL_ENABLED=false` to stop volatility emails project-wide (default **on** when unset). Does not affect auth, welcome, checkout, referral, or push/in-app channels. See [resend-environment-setup.md](../ops/resend-environment-setup.md).
 
 Client policy mirror (which channels apply): `features/notifications/application/use-cases/delivery/pause-offer-policy.ts` (`channelsForPauseOffer`, `buildPauseOfferNotifyIntent`).
 

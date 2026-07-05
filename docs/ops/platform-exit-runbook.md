@@ -45,7 +45,7 @@ flowchart TB
 | Integration | Shipped usage | Replacement |
 |-------------|---------------|-------------|
 | **Google OAuth** | Was `@lovable.dev/cloud-auth-js` | **Supabase Auth** `signInWithOAuth('google')` — configure Google OAuth in Supabase Dashboard |
-| **AI (reflection + companions)** | `LOVABLE_API_KEY` → Lovable gateway | **`GOOGLE_AI_API_KEY`** (primary) + optional **`OPENROUTER_API_KEY`** (failover) via [`_shared/llm-gateway.ts`](../../supabase/functions/_shared/llm-gateway.ts) |
+| **AI (reflection + companions)** | `LOVABLE_API_KEY` → Lovable gateway | **`OPENROUTER_API_KEY`** (OpenRouter-only by default via [`_shared/llm-gateway.ts`](../../supabase/functions/_shared/llm-gateway.ts)); **`GOOGLE_AI_API_KEY`** only if you set **`LLM_PROVIDER_ORDER=google,openrouter`** |
 | **Transactional email** | `@lovable.dev/email-js` | **`RESEND_API_KEY`** via [`_shared/transactional-email.ts`](../../supabase/functions/_shared/transactional-email.ts) (Resend path) |
 | **Auth emails** | Lovable auth email webhook | **Supabase Auth Send Email Hook** → `auth-email-hook` (`SEND_EMAIL_HOOK_SECRET` + `RESEND_API_KEY`) |
 | **Bounce/suppression** | Lovable / Mailgun HMAC webhook | **Resend webhooks** → `handle-email-suppression` (`RESEND_WEBHOOK_SECRET`) |
@@ -77,7 +77,7 @@ See [staging-supabase-setup.md](staging-supabase-setup.md).
 
 **Secrets (staging minimum):**
 
-- `GOOGLE_AI_API_KEY` (Gemini)
+- `OPENROUTER_API_KEY` (see [llm-openrouter.md](llm-openrouter.md))
 - `PERPLEXITY_API_KEY`
 - `RESEND_API_KEY`
 - `STRIPE_*` (**test mode**)
@@ -91,13 +91,13 @@ GitHub Actions (see [`.github/workflows/`](../../.github/workflows/)):
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `ci.yml` | PR | `npm run test:ci` |
-| `staging-backend.yml` | `workflow_dispatch` / push `staging` | `db push` + edge deploy to staging |
-| `deploy-production.yml` | `workflow_dispatch` / push `main` | Preflight (`test:ci` + build) then prod `db push` + edge deploy (**`production`** environment approval recommended) |
+| `ci.yml` | PR; push `main` / `staging` / `dev` | `npm run test:ci` + build |
+| `staging-deploy.yml` | `workflow_dispatch` / push `staging` | Preflight → backend → Vercel preview |
+| `deploy-production.yml` | `workflow_dispatch` / push `main` | Preflight → backend → Vercel production (**`production`** environment approval recommended) |
 
-**GitHub secrets:** `SUPABASE_ACCESS_TOKEN`, `SUPABASE_STAGING_PROJECT_REF`, `SUPABASE_PROD_PROJECT_REF`, plus build-time `VITE_SUPABASE_*` for CI and frontend hosts.
+**GitHub secrets:** See [cicd-overview.md](cicd-overview.md) (Supabase, Vercel, `VITE_*` for preflight builds).
 
-**Setup guides:** [staging-supabase-setup.md](staging-supabase-setup.md), [production-supabase-setup.md](production-supabase-setup.md), [vercel-frontend-setup.md](vercel-frontend-setup.md).
+**Setup guides:** [staging-supabase-setup.md](staging-supabase-setup.md), [production-supabase-setup.md](production-supabase-setup.md), [vercel-frontend-setup.md](vercel-frontend-setup.md), [cicd-overview.md](cicd-overview.md).
 
 ---
 
@@ -149,7 +149,7 @@ Dashboard checklist (both projects):
 
 ```text
 Supabase → Edge Functions → Secrets → delete LOVABLE_API_KEY
-Verify: RESEND_API_KEY, SEND_EMAIL_HOOK_SECRET, RESEND_WEBHOOK_SECRET, GOOGLE_AI_API_KEY present
+Verify: RESEND_API_KEY, SEND_EMAIL_HOOK_SECRET, RESEND_WEBHOOK_SECRET, OPENROUTER_API_KEY present; remove unused `GOOGLE_AI_API_KEY` / `GEMINI_API_KEY` from Edge secrets
 ```
 
 ## Branch model (recommended)

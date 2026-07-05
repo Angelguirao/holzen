@@ -1,0 +1,17 @@
+meta {
+  name: 06 list-checkout-events
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/list-checkout-events
+  body: none
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}

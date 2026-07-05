@@ -10,11 +10,10 @@ import type { PauseSessionProviders } from './pause-session-providers-types';
 /** `/pause` route — pause home context + profile + presentation provider bag. */
 export function usePauseSessionProviders(): PauseSessionProviders {
   const pause = usePauseHomeContext();
-  const { mantra, companionPrefs, profileLoaded, trackedAssetId } = useProfile();
+  const { companionPrefs, profileLoaded, trackedAssetId } = useProfile();
   return usePauseSessionProvidersFromHolzenSlice(
     pickPauseHolzenProvidersSlice(
       buildPauseHolzenProvidersPickSource(pause, {
-        mantra,
         companionPrefs,
         profileLoaded,
         trackedAssetId,

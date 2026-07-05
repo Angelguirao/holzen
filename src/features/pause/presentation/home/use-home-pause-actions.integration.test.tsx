@@ -2,16 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useHomePauseActions } from './use-home-pause-actions';
 
-const { trackPauseOpenDismissedMock, trackHomePendingPauseBannerPauseOpenedMock } = vi.hoisted(
-  () => ({
-    trackPauseOpenDismissedMock: vi.fn(),
-    trackHomePendingPauseBannerPauseOpenedMock: vi.fn(),
-  }),
-);
+const { trackPauseOpenDismissedMock } = vi.hoisted(() => ({
+  trackPauseOpenDismissedMock: vi.fn(),
+}));
 
 vi.mock('@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io', () => ({
   trackPauseOpenDismissed: trackPauseOpenDismissedMock,
-  trackHomePendingPauseBannerPauseOpened: trackHomePendingPauseBannerPauseOpenedMock,
 }));
 
 const navigate = vi.fn();
@@ -29,13 +25,12 @@ describe('F2 — Home → start pause', () => {
     });
   });
 
-  it('navigates to /pause after “I need a pause” (no /tools)', async () => {
+  it('navigates to /pause depth picker immediately, then replaces state after manual open', async () => {
     const { result } = renderHook(() =>
       useHomePauseActions({
         message: null,
         context: null,
         lastPauseInstanceId: null,
-        openPauseState: null,
         companions: {} as never,
         companionPrefs: {} as never,
         severity: 'mild',
@@ -52,15 +47,27 @@ describe('F2 — Home → start pause', () => {
       await result.current.handleNeedAPause();
     });
 
-    expect(navigate).toHaveBeenCalledTimes(1);
-    expect(navigate).toHaveBeenCalledWith(
+    expect(navigate).toHaveBeenCalledTimes(2);
+    expect(navigate.mock.calls[0]).toEqual([
       '/pause',
       expect.objectContaining({
         state: expect.objectContaining({
-          pauseInstanceId: '00000000-0000-4000-8000-000000000099',
+          startAtDepthPicker: true,
+          openingManualPause: true,
         }),
       }),
-    );
+    ]);
+    expect(navigate.mock.calls[1]).toEqual([
+      '/pause',
+      expect.objectContaining({
+        replace: true,
+        state: expect.objectContaining({
+          pauseInstanceId: '00000000-0000-4000-8000-000000000099',
+          startAtDepthPicker: true,
+        }),
+      }),
+    ]);
+    expect(manualTrigger).toHaveBeenCalledWith(undefined, { skipHomePreview: true });
     for (const call of navigate.mock.calls) {
       expect(String(call[0])).not.toMatch(/\/tools/);
     }

@@ -25,7 +25,6 @@ export {
   type CompanionSlotLoadingSetters,
   type CompanionSlotTransitionStarters,
 } from './companion-slot-ui-state';
-export { resetInterventionIdempotency } from './intervention-idempotency';
 export {
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   type CompanionSlotAutosaveParams,
@@ -37,7 +36,3 @@ export {
   runCompanionSlotOrchestrate,
   type CompanionSlotOrchestrateMode,
 } from './run-companion-slot-orchestrate';
-export {
-  runCompanionInterventionBootstrap,
-  type RunCompanionInterventionBootstrapPorts,
-} from './run-companion-intervention-bootstrap';

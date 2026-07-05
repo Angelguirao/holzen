@@ -1,8 +1,9 @@
 /**
  * Supabase-generated `Database` types.
  *
- * Regenerate after migrations: `npm run gen:types`
- * (requires `supabase login` or `SUPABASE_ACCESS_TOKEN`; uses `--linked` + `supabase/config.toml`).
+ * Regenerate after migrations: `npm run gen:types` (production) or
+ * `npm run gen:types:staging` (staging).
+ * Generated from explicit target: production (geqkxsnyqvhtascjghuu).
  *
  * If this file drifts from production, dropped tables/columns may still appear
  * until you re-run the generator. Application code targets Pause V2
@@ -148,7 +149,7 @@ export type Database = {
         }
         Relationships: []
       }
-      btc_price_cache: {
+      market_price_cache: {
         Row: {
           date: string
           fetched_at: string
@@ -187,110 +188,6 @@ export type Database = {
           date?: string
           id?: string
           version?: string
-        }
-        Relationships: []
-      }
-      collection_items: {
-        Row: {
-          added_at: string
-          collection_id: string
-          id: string
-          pause_instance_id: string
-          position: number
-        }
-        Insert: {
-          added_at?: string
-          collection_id: string
-          id?: string
-          pause_instance_id: string
-          position?: number
-        }
-        Update: {
-          added_at?: string
-          collection_id?: string
-          id?: string
-          pause_instance_id?: string
-          position?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "collection_items_collection_id_fkey"
-            columns: ["collection_id"]
-            isOneToOne: false
-            referencedRelation: "collections"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "pause_instances"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_archive_echoes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_archive_pauses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_completed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_current"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_full"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      collections: {
-        Row: {
-          color: string | null
-          created_at: string
-          description: string | null
-          icon: string | null
-          id: string
-          name: string
-          user_id: string
-        }
-        Insert: {
-          color?: string | null
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          name: string
-          user_id: string
-        }
-        Update: {
-          color?: string | null
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          name?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -836,48 +733,6 @@ export type Database = {
         }
         Relationships: []
       }
-      grounding_enrichment_cache: {
-        Row: {
-          abstract: string | null
-          citation_count: number | null
-          citation_hash: string
-          created_at: string
-          doi: string | null
-          expires_at: string
-          id: string
-          last_validated_at: string | null
-          researchers: Json
-          source_provenance: Json
-          url: string | null
-        }
-        Insert: {
-          abstract?: string | null
-          citation_count?: number | null
-          citation_hash: string
-          created_at?: string
-          doi?: string | null
-          expires_at?: string
-          id?: string
-          last_validated_at?: string | null
-          researchers?: Json
-          source_provenance?: Json
-          url?: string | null
-        }
-        Update: {
-          abstract?: string | null
-          citation_count?: number | null
-          citation_hash?: string
-          created_at?: string
-          doi?: string | null
-          expires_at?: string
-          id?: string
-          last_validated_at?: string | null
-          researchers?: Json
-          source_provenance?: Json
-          url?: string | null
-        }
-        Relationships: []
-      }
       monthly_feature_usage: {
         Row: {
           created_at: string
@@ -1362,19 +1217,13 @@ export type Database = {
           companion_history: boolean
           companion_signal: boolean
           companion_zoom_out: boolean
-          cooldown_hours: number
           created_at: string
-          cumulative_threshold: number
           custom_prompt: string | null
           email_notifications: boolean
           first_name: string | null
           grounding_activities: string[] | null
           has_onboarded: boolean
-          hold_goal_currency: string | null
-          hold_goal_start: string | null
-          hold_goal_target_months: number | null
-          hold_goal_target_price: number | null
-          hold_goal_type: string | null
+          display_currency: string | null
           id: string
           is_admin: boolean | null
           language: string
@@ -1383,10 +1232,9 @@ export type Database = {
           lifetime_access: boolean
           mantra: string | null
           motivations: string[] | null
+          pause_thesis: string | null
           quiet_hours_end: number | null
           quiet_hours_start: number | null
-          referral_code: string
-          referred_by: string | null
           reflection_style: string
           reflection_tone: string
           silent_mode: boolean
@@ -1408,19 +1256,13 @@ export type Database = {
           companion_history?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
-          cooldown_hours?: number
           created_at?: string
-          cumulative_threshold?: number
           custom_prompt?: string | null
           email_notifications?: boolean
           first_name?: string | null
           grounding_activities?: string[] | null
           has_onboarded?: boolean
-          hold_goal_currency?: string | null
-          hold_goal_start?: string | null
-          hold_goal_target_months?: number | null
-          hold_goal_target_price?: number | null
-          hold_goal_type?: string | null
+          display_currency?: string | null
           id?: string
           is_admin?: boolean | null
           language?: string
@@ -1429,10 +1271,9 @@ export type Database = {
           lifetime_access?: boolean
           mantra?: string | null
           motivations?: string[] | null
+          pause_thesis?: string | null
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
-          referral_code?: string
-          referred_by?: string | null
           reflection_style?: string
           reflection_tone?: string
           silent_mode?: boolean
@@ -1454,19 +1295,13 @@ export type Database = {
           companion_history?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
-          cooldown_hours?: number
           created_at?: string
-          cumulative_threshold?: number
           custom_prompt?: string | null
           email_notifications?: boolean
           first_name?: string | null
           grounding_activities?: string[] | null
           has_onboarded?: boolean
-          hold_goal_currency?: string | null
-          hold_goal_start?: string | null
-          hold_goal_target_months?: number | null
-          hold_goal_target_price?: number | null
-          hold_goal_type?: string | null
+          display_currency?: string | null
           id?: string
           is_admin?: boolean | null
           language?: string
@@ -1475,10 +1310,9 @@ export type Database = {
           lifetime_access?: boolean
           mantra?: string | null
           motivations?: string[] | null
+          pause_thesis?: string | null
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
-          referral_code?: string
-          referred_by?: string | null
           reflection_style?: string
           reflection_tone?: string
           silent_mode?: boolean
@@ -1553,90 +1387,6 @@ export type Database = {
           label?: string
           start_hour?: number
           user_id?: string
-        }
-        Relationships: []
-      }
-      referral_pending_jobs: {
-        Row: {
-          attempts: number
-          created_at: string
-          id: string
-          last_error: string | null
-          max_attempts: number
-          next_attempt_at: string | null
-          referral_code: string
-          referred_user_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          attempts?: number
-          created_at?: string
-          id?: string
-          last_error?: string | null
-          max_attempts?: number
-          next_attempt_at?: string | null
-          referral_code: string
-          referred_user_id: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          attempts?: number
-          created_at?: string
-          id?: string
-          last_error?: string | null
-          max_attempts?: number
-          next_attempt_at?: string | null
-          referral_code?: string
-          referred_user_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      referral_rewards: {
-        Row: {
-          granted_at: string
-          id: string
-          milestone: number
-          reward_type: string
-          user_id: string
-        }
-        Insert: {
-          granted_at?: string
-          id?: string
-          milestone: number
-          reward_type: string
-          user_id: string
-        }
-        Update: {
-          granted_at?: string
-          id?: string
-          milestone?: number
-          reward_type?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      referrals: {
-        Row: {
-          created_at: string
-          id: string
-          referred_user_id: string
-          referrer_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          referred_user_id: string
-          referrer_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          referred_user_id?: string
-          referrer_id?: string
         }
         Relationships: []
       }
@@ -2813,29 +2563,8 @@ export type Database = {
         }
         Returns: Json
       }
-      claim_referral_pending_jobs: {
-        Args: { p_limit?: number }
-        Returns: {
-          attempts: number
-          created_at: string
-          id: string
-          last_error: string | null
-          max_attempts: number
-          next_attempt_at: string | null
-          referral_code: string
-          referred_user_id: string
-          status: string
-          updated_at: string
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "referral_pending_jobs"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
       claim_trigger_slot: {
-        Args: { _cooldown_hours: number; _user_id: string }
+        Args: { _user_id: string }
         Returns: boolean
       }
       consume_feature_allowance_or_credits: {
@@ -2904,10 +2633,6 @@ export type Database = {
           p_user_id: string
         }
         Returns: undefined
-      }
-      owns_collection: {
-        Args: { _collection_id: string; _user_id: string }
-        Returns: boolean
       }
       pause_adopt_pending_offer: { Args: never; Returns: Json }
       pause_create_or_reuse: {

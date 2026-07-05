@@ -27,14 +27,11 @@ import {
   runLogCompanionFeedbackVote as runFeedbackVoteFromAnalyticsIo,
   runLogCompanionFullviewOpened as runFullviewOpenedFromAnalyticsIo,
 } from '@/features/pause/presentation/companion/pause-companion-analytics-io';
+import { runCompanionSlotOrchestrate as runSlotOrchestrateFromOrchestrateIo } from '@/features/pause/presentation/companion/pause-companion-orchestrate-io';
 import {
   loadCompanionOrchestrateSession as loadSessionFromOrchestrationIo,
   pauseLoadCompanionOrchestrateSession,
 } from '@/features/pause/presentation/companion/pause-companion-orchestration-io';
-import {
-  runCompanionInterventionBootstrap as runInterventionFromOrchestrateIo,
-  runCompanionSlotOrchestrate as runSlotOrchestrateFromOrchestrateIo,
-} from '@/features/pause/presentation/companion/pause-companion-orchestrate-io';
 import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
 
 describe('pause-companion-analytics-io parity (application)', () => {
@@ -62,9 +59,9 @@ describe('pause-companion-analytics-io parity (application)', () => {
    */
   it('sibling cluster: analytics-flow exports stay distinct from orchestrate-io', () => {
     expect(runLogCompanionFeedbackVote).not.toBe(runSlotOrchestrateFromOrchestrateIo);
-    expect(runLogCompanionFullviewOpened).not.toBe(runInterventionFromOrchestrateIo);
+    expect(runLogCompanionFullviewOpened).not.toBe(runSlotOrchestrateFromOrchestrateIo);
     expect(runFeedbackVoteFromAnalyticsIo).not.toBe(runSlotOrchestrateFromOrchestrateIo);
-    expect(runFullviewOpenedFromAnalyticsIo).not.toBe(runInterventionFromOrchestrateIo);
+    expect(runFullviewOpenedFromAnalyticsIo).not.toBe(runSlotOrchestrateFromOrchestrateIo);
     expect(companionAnalyticsRepository).not.toBe(runSlotOrchestrateFromOrchestrateIo);
     // Reciprocal inline pins: `presentation/companion/pause-companion-analytics-io-parity.test.ts`.
   });

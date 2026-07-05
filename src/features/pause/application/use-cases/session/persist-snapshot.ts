@@ -29,6 +29,7 @@ export type PauseSessionPersistSnapshotInput = {
   briefStep: BriefPauseStep;
   briefIntegrateDone: boolean;
   selectedBriefFace: FeelStepTile | null;
+  ritualStartedAtMs: number | null;
 };
 
 /**
@@ -60,5 +61,6 @@ export function buildPauseSessionPersistSnapshot(p: PauseSessionPersistSnapshotI
     briefStep: p.ritualEntry === 'brief' ? p.briefStep : undefined,
     briefIntegrateDone: p.ritualEntry === 'brief' ? p.briefIntegrateDone : undefined,
     briefFace: p.ritualEntry === 'brief' ? p.selectedBriefFace ?? undefined : undefined,
+    ritualStartedAtMs: p.ritualStartedAtMs ?? undefined,
   };
 }

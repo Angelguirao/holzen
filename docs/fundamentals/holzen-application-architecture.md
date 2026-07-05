@@ -264,7 +264,7 @@ In Postgres, the ritual is already **one aggregate family**:
 So **companions are not a separate product domain** like billing. They are:
 
 1. **Ritual beats** (Reflect copy, Frame slots, breathing segments, Decide outcome), and  
-2. **AI delivery mechanisms** (orchestrate, reflect, pregenerate, grounding-enrich) that **write into pause tables**.
+2. **AI delivery mechanisms** (orchestrate, reflect, pregenerate; legacy: grounding-enrich) that **write into pause tables**.
 
 Treat **companion** as a **module inside `@holzen/pause`**, not a peer package — unless edge/team size forces a **private subfolder** (see below).
 
@@ -289,7 +289,7 @@ packages/pause/src/   # today: src/features/pause/
         feel/
         breathe/
         reflect/                # reflection_step + holzen-reflect generation
-        frame/                  # intervention, slot orchestrate, grounding-enrich
+        frame/                  # intervention, slot orchestrate
         decide/
         done/
       archive/                  # pauses/echoes reads (not user collections)

@@ -8,7 +8,7 @@ export type CompanionSectionVisibility = {
   hasHistory: boolean;
 };
 
-/** Which inline companion cards render in `CompanionSection` (intervention runs via data hook either way). */
+/** Which inline companion cards render in `CompanionSection`. */
 export function getCompanionSectionVisibility(
   prefs: CompanionPrefs,
   companions: CompanionData,

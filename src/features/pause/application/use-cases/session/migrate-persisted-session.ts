@@ -2,6 +2,7 @@ import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import {
   PAUSE_RITUAL_SCHEMA_VERSION,
 } from '@/features/pause/domain/ritual-types';
+import { normalizeCompanionData } from '@/features/pause/domain/companion-card-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 
 type LegacyPauseStep = 'breathe' | 'feel' | 'reflect' | 'shift' | 'decide';
@@ -24,6 +25,7 @@ export function migratePersistedPauseSession(raw: PersistedSession): PersistedSe
     const fromChoose = (raw.step as string) === 'choose';
     return {
       ...raw,
+      companions: normalizeCompanionData(raw.companions),
       ...n,
       step: fromChoose ? ('decide' as PauseStep) : raw.step,
       decideOnBackStep:
@@ -98,6 +100,7 @@ export function migratePersistedPauseSession(raw: PersistedSession): PersistedSe
 
   return {
     ...raw,
+    companions: normalizeCompanionData(raw.companions),
     step,
     moodDone,
     moodAfterDone,

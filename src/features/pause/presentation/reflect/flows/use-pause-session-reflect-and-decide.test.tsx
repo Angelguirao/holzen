@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TFunction } from 'i18next';
+import { DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
@@ -23,6 +24,7 @@ const {
     lastReflectGenArgs.current = args;
     return {
       reflectionMessage: 'Generated reflection',
+      reflectionContent: null,
       loading: false,
       error: null,
       retry: vi.fn(),
@@ -61,7 +63,7 @@ function baseParams(
     pauseInstanceId: 'pause-inst-1',
     context: 'btc_dip',
     message: 'Seed message',
-    btcData: { changePercent: -4.2 } as import('@/features/market/public').BtcPriceData,
+    marketData: { changePercent: -4.2 } as import('@/features/market/public').MarketQuote,
     companionsHaiku: 'line one',
     dismissMessage: vi.fn(),
     refreshSubscription: vi.fn(),
@@ -69,11 +71,15 @@ function baseParams(
     setPauseImpactData: vi.fn(),
     setPhase: vi.fn(),
     selectedMood: 'calm' as const,
+    selectedBriefFace: null,
     selectedMoodAfter: null,
     breathingFirstCompleted: true,
     breathingSecondCompleted: false,
     feelIntensity: 3,
     shiftIntensity: null,
+    ritualStartedAtMs: Date.now() - 60_000,
+    companionPrefs: DEFAULT_PREFS,
+    isFavorite: false,
     ...overrides,
   };
 }

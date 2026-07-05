@@ -51,7 +51,7 @@ Supabase Edge secrets are not exported automatically.
    - `LOG_DRAIN_URL`, `LOG_DRAIN_TOKEN`
    - `SLACK_WEBHOOK_URL`
    - `RESEND_API_KEY`, `SEND_EMAIL_HOOK_SECRET`
-   - `GOOGLE_AI_API_KEY`, `OPENROUTER_API_KEY` (optional failover)
+   - `OPENROUTER_API_KEY` (required for LLM); remove legacy `GOOGLE_AI_API_KEY` if unused
    - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
    - `PERPLEXITY_API_KEY`, `CRON_SECRET`
    - Vault: `holzen_cron_service_role` for pg_cron HTTP auth
@@ -63,7 +63,7 @@ Supabase Edge secrets are not exported automatically.
 `git clone` sanity — confirms we can rebuild from scratch:
 
 1. Clone into a throwaway directory.
-2. `npm install && npm run build`. Build must succeed (set `VITE_SUPABASE_*` or use hosted fallbacks per README).
+2. `npm install && npm run build`. Build must succeed with explicit `VITE_SUPABASE_*` (or `SUPABASE_*` for `check:version-sync`) set for the target project.
 3. `npm run test`. Full test suite must pass.
 4. `npm run check:edge`. Deno type checking passes on all edge functions (when Deno installed).
 

@@ -16,4 +16,4 @@ SELECT vault.create_secret(
 -- SELECT vault.create_secret('<random CRON_SECRET>', 'CRON_SECRET');
 
 -- Reschedule HTTP crons (do NOT rely on UPDATE cron.job — 42501 on hosted):
--- npx supabase db query --linked --file scripts/sql/staging-reschedule-owned-crons.sql
+-- npm run staging:reschedule-crons

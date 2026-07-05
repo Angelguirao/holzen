@@ -1,0 +1,33 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import PublicFooter from '../components/PublicFooter.astro';
+import { aboutCopy } from '../lib/about-content';
+---
+
+<MarketingLayout
+  title={aboutCopy.meta.title}
+  description={aboutCopy.meta.description}
+  canonicalPath={aboutCopy.meta.path}
+>
+  <article class="marketing-page">
+    <a class="back-link" href="/welcome">← {aboutCopy.back}</a>
+    <h1 class="page-title">{aboutCopy.title}</h1>
+
+    {
+      aboutCopy.sections.map((section) => (
+        <section class="prose-section">
+          <p class="prose-label">{section.label}</p>
+          {section.lead ? <p class="prose-lead">{section.lead}</p> : null}
+          {section.paragraphs?.map((p) => <p class="prose-p">{p}</p>)}
+          {section.link ? (
+            <a class="prose-link" href={section.link.href}>
+              {section.link.label}
+            </a>
+          ) : null}
+        </section>
+      ))
+    }
+
+    <PublicFooter />
+  </article>
+</MarketingLayout>

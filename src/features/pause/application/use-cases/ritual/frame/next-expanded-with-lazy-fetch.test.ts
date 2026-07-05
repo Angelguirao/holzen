@@ -47,11 +47,16 @@ describe('nextExpandedWithLazyFetch', () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it('does not fetch when data already present', () => {
+  it('does not fetch when displayable data already present', () => {
     const fetch = vi.fn();
     expect(
       nextExpandedWithLazyFetch(false, {
-        data: { title: 'ok' },
+        data: {
+          onThisDay: [],
+          currentPrice: null,
+          echo: null,
+          deepTime: { title: 'T', body: 'B' },
+        },
         loading: false,
         error: null,
         canAccess: () => true,
@@ -62,7 +67,22 @@ describe('nextExpandedWithLazyFetch', () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it('does not fetch while loading or after error', () => {
+  it('fetches when data object exists but is not displayable', () => {
+    const fetch = vi.fn();
+    expect(
+      nextExpandedWithLazyFetch(false, {
+        data: { title: '', body: '', citation: '', url: '' },
+        loading: false,
+        error: null,
+        canAccess: () => true,
+        fetch,
+        slot: 'grounding',
+      }),
+    ).toBe(true);
+    expect(fetch).toHaveBeenCalledWith('grounding');
+  });
+
+  it('still fetches while loading when payload is not displayable', () => {
     const fetch = vi.fn();
     expect(
       nextExpandedWithLazyFetch(false, {
@@ -74,9 +94,11 @@ describe('nextExpandedWithLazyFetch', () => {
         slot: 'history',
       }),
     ).toBe(true);
-    expect(fetch).not.toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledWith('history');
+  });
 
-    fetch.mockClear();
+  it('retries fetch when expanding after error', () => {
+    const fetch = vi.fn();
     expect(
       nextExpandedWithLazyFetch(false, {
         data: null,
@@ -87,6 +109,6 @@ describe('nextExpandedWithLazyFetch', () => {
         slot: 'history',
       }),
     ).toBe(true);
-    expect(fetch).not.toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledWith('history');
   });
 });

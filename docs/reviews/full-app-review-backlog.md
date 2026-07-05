@@ -73,7 +73,7 @@ Treat Phases **1–2** as the **product spine** for pause; **3–8** as the **ba
 | `/tools` | 1–2 | Tools index in shell |
 | `/settings` | 5–8 | Subscription, language, notifications, account—overlaps billing edge review |
 | `/settings/about` | 0.5–1 | Changelog / feedback sub-surface |
-| `/admin` | 4–8 | Curated content and ops; depends on `VITE_ADMIN_USER_IDS` |
+| `/admin` | 4–8 | Curated content and ops; requires `profiles.is_admin` |
 
 ## Public and marketing
 

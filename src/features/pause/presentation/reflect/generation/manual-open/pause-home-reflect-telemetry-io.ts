@@ -10,9 +10,7 @@
  * `pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` ↔ `pause-home-reflect-io`.
  */
 export {
-  trackHomePendingPauseBannerPauseOpened,
   trackPauseOpenDismissed,
-  type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/home-pause-actions-telemetry';
 export {

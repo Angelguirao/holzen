@@ -12,17 +12,15 @@ import {
   pauseArchiveStorageCacheKey,
   readJsonLocalStorage,
   writeJsonLocalStorage,
-  type PauseArchiveListSort,
   type PauseArchiveRow,
   type PauseArchiveSegment,
 } from '../../public-queries';
 
-export type { PauseArchiveRow, PauseArchiveListSort, PauseArchiveSegment };
+export type { PauseArchiveRow, PauseArchiveSegment };
 
 export type UsePauseArchiveListOptions = {
   segment: PauseArchiveSegment;
   favoritesOnly?: boolean;
-  listSort?: PauseArchiveListSort;
   /** When false, skip network (e.g. Archive “Collections” tab uses another hook). */
   enabled?: boolean;
 };
@@ -33,16 +31,15 @@ export function usePauseArchiveList(options: UsePauseArchiveListOptions) {
   const enabled = options.enabled ?? true;
   const segment = options.segment;
   const favoritesOnly = options.favoritesOnly ?? false;
-  const listSort: PauseArchiveListSort = options.listSort ?? 'newest';
-  const storageKey = pauseArchiveStorageCacheKey(segment, favoritesOnly, listSort);
+  const storageKey = pauseArchiveStorageCacheKey(segment, favoritesOnly);
   const userId = user?.id;
   const queryEnabled = enabled && Boolean(userId);
 
   const queryKey = useMemo(() => {
-    if (!userId) return ['pause-archive', 'signed-out', segment, favoritesOnly ? 'fav' : 'all', listSort] as const;
-    if (!enabled) return ['pause-archive', userId, 'paused', segment, favoritesOnly ? 'fav' : 'all', listSort] as const;
-    return pauseArchiveInfiniteQueryKey(userId, segment, favoritesOnly, listSort);
-  }, [userId, enabled, segment, favoritesOnly, listSort]);
+    if (!userId) return ['pause-archive', 'signed-out', segment, favoritesOnly ? 'fav' : 'all'] as const;
+    if (!enabled) return ['pause-archive', userId, 'paused', segment, favoritesOnly ? 'fav' : 'all'] as const;
+    return pauseArchiveInfiniteQueryKey(userId, segment, favoritesOnly);
+  }, [userId, enabled, segment, favoritesOnly]);
 
   const initialData = useMemo(() => {
     if (!queryEnabled || !userId) return undefined;
@@ -62,7 +59,7 @@ export function usePauseArchiveList(options: UsePauseArchiveListOptions) {
   } = useInfiniteQuery({
     queryKey,
     queryFn: ({ pageParam }) =>
-      fetchPauseArchivePage(userId!, segment, favoritesOnly, listSort, pageParam),
+      fetchPauseArchivePage(userId!, segment, favoritesOnly, pageParam),
     ...getPauseArchiveInfiniteQueryDefaults(),
     enabled: queryEnabled,
     initialData,

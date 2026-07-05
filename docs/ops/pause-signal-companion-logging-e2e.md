@@ -21,7 +21,7 @@ Use this when you want to **trace one full path** from landing on **`/pause`** t
 ## Happy-path steps (manual)
 
 1. From **Home**, complete **Need a moment** (or equivalent) so you land on **`/pause`** with **`pauseInstanceId`** in **router location state** (same shape as **`navigate('/pause', { state: { pauseInstanceId, … } })`** — see **`parsePauseSessionLocationState`**).
-2. Wait for intervention / shell to load (first **`companion-orchestrate`** may be intervention-only).
+2. Open **Frame** and expand a companion card (first **`companion-orchestrate`** on shipped path is **lazy slot** fetch, e.g. Signal — not intervention-only).
 3. Expand **Read the signal →** (Signal companion card).
 4. **Client:** Confirm lines similar to:
    - **`[holzen:companion] lazy fetch orchestrate invoke`** — `slot: signal`, `holzenInvokeSource: browser_lazy_fetch`, `pause_instance_prefix`.

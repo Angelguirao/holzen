@@ -52,11 +52,12 @@ Holzen thesis #4 — *boundaries are enforced* — is implemented largely throug
 |------------|-------------------------|-----------------|
 | Ship pause-first only | `check:active-surface`, `check:bundle-shipped`, `check:no-phase-labels` | [active-surface.md](../ops/active-surface.md) |
 | Modular monolith / layer direction | `check:architecture-alignment` (includes `check:feature-imports`, `check:no-screens-in-features`), `check:no-root-components` | [.cursor/rules/architecture-migration.mdc](../../.cursor/rules/architecture-migration.mdc) discovery `rg` |
-| Server owns truth | Vitest; RLS/migration review | [client-server-architecture-holzen.md](client-server-architecture-holzen.md), flow review |
+| Server owns truth | Vitest; RLS/migration review; `check:no-idle-query-polling` | [client-server-architecture-holzen.md](client-server-architecture-holzen.md), flow review |
 | Edge deploy + observe | `check:edge-logging`, config.toml coverage, `check:edge-coverage-manifest`, `check:edge` | [edge-logging-conventions.md](../ops/edge-logging-conventions.md) |
 | Controlled client → edge surface | `check:invoke-edge-allowlist` | `invokeEdge` + `x-cid` on new call sites |
 | Analytics taxonomy | `check:posthog-events-allowlist` | [event-taxonomy.md](../ops/event-taxonomy.md) in same PR |
 | Feature flags taxonomy | `check:feature-flags-doc` | [feature-flags.md](../ops/feature-flags.md) in same PR |
+| Config/env inventory stays truthful | `check:env-docs` | [environment-matrix.md](../ops/environment-matrix.md) |
 | API review catalog | `check:bruno-active-manifest` | `bruno/active/functions-catalog.md` |
 | Schema evolves safely | `check:view-migrations`, `check:sql-search-path`, local `supabase db reset` (prepush) | [migration-view-safety.md](../ops/migration-view-safety.md), [migration-security-conventions.md](../ops/migration-security-conventions.md) |
 | Release traceability | `check:version-sync`, `stamp-edge-release` / `check:release-stamp` | `VITE_APP_VERSION` = Git SHA in Lovable |
@@ -93,6 +94,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 | `check:no-app-imports-in-features` | Via architecture-alignment | No `@/app/*` imports under `src/features/**` |
 | `check:no-profile-spread-in-pause-home` | Via architecture-alignment | `useHolzenHomeContextState` must not `...profile` — use `useProfile` at call sites |
 | `check:no-root-components` | Yes | No new `src/components/*.tsx` outside allowlist |
+| `check:no-idle-query-polling` | Yes | Active `src/` TanStack Query: no timed `refetchInterval`, `refetchOnWindowFocus: true`, `refetchOnReconnect: true`, or focus-driven `invalidateQueries` (admin ops allowlisted) |
 
 ### 4.3 Edge platform
 
@@ -110,10 +112,11 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 |--------|--------------|------------|
 | `check:posthog-events-allowlist` | Yes | `trackEvent` names ⊆ event taxonomy Active section |
 | `check:feature-flags-doc` | Yes | `useFeatureFlag` keys ⊆ feature-flags.md Active flags table |
+| `check:env-docs` | Yes | Runtime/build env names, example env files, and CI catalog entries stay aligned with `docs/ops/environment-matrix.md` |
 | `check:i18n-active-keys` | Yes | Active `t('…')` keys exist in `src/locales/en.json` |
 | `check:view-migrations` | Prepush | Safe `CREATE OR REPLACE VIEW` patterns |
 | `check:sql-search-path` | Yes (`test:ci`) + Prepush | Every migration function pins `public` in `search_path` |
-| `check:version-sync` | Prebuild | `package.json` version = latest changelog row |
+| `check:version-sync` | Prebuild | `package.json` version is valid semver |
 | `stamp-edge-release` / `check:release-stamp` | Prepush stamp step | Edge `EDGE_RELEASE` = Git SHA |
 | `npm run test` + `npm run build` | Prepush / CI | Behavior + production bundle |
 

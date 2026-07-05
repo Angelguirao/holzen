@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { ProfileSessionInvalidError } from '@/features/user/domain/profile-session-invalid-error';
 import { holzenLog } from '@/lib/holzen-console';
 import {
   PROFILE_QUERY_KEY,
@@ -14,7 +15,7 @@ export {
 export type { ProfileRow } from '@/features/user/domain/user-profile-row';
 
 const PROFILE_SELECT_COLUMNS =
-  'threshold, threshold_down, cumulative_threshold, last_context, email_notifications, has_onboarded, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, motivations, mantra, hold_goal_currency, hold_goal_type, hold_goal_start, hold_goal_target_months, hold_goal_target_price, tracked_asset_id, language, grounding_activities, referral_code, created_at, snoozed_until, is_admin';
+  'threshold, threshold_down, last_context, has_onboarded, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, last_trigger_at, first_name, motivations, mantra, display_currency, tracked_asset_id, language, grounding_activities, created_at, snoozed_until, is_admin';
 
 /**
  * Loads (or creates) the caller's `profiles` row. Used as a single `queryFn` so all
@@ -42,6 +43,10 @@ export async function fetchProfileRowForUser(userId: string): Promise<ProfileRow
   if (!data) {
     holzenLog.profile('no row — inserting profiles');
     const { error: insErr } = await supabase.from('profiles').insert({ user_id: userId });
+    if (insErr?.code === '23503') {
+      holzenLog.profile('insert blocked — auth.users missing for user_id');
+      throw new ProfileSessionInvalidError(insErr.message);
+    }
     if (insErr && !String(insErr.message).includes('duplicate') && insErr.code !== '23505') {
       console.error('[useProfile] profiles insert failed:', insErr.message);
     }
@@ -52,6 +57,10 @@ export async function fetchProfileRowForUser(userId: string): Promise<ProfileRow
       .maybeSingle();
     data = again.data as ProfileRow | null;
     if (again.error) console.error('[useProfile] profiles re-select failed:', again.error.message);
+    if (!data) {
+      holzenLog.profile('no profile row after insert attempt — treating session as invalid');
+      throw new ProfileSessionInvalidError();
+    }
   }
 
   return data;
@@ -63,7 +72,7 @@ export function getProfileRowQueryOptions(userId: string | undefined) {
     queryKey: PROFILE_QUERY_KEY(userId ?? PROFILE_QUERY_SIGNED_OUT_KEY),
     queryFn: () => fetchProfileRowForUser(userId!),
     enabled: Boolean(userId),
-    staleTime: 0,
+    staleTime: 60_000,
     refetchOnWindowFocus: false,
     retry: false,
   } as const;

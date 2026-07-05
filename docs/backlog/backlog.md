@@ -30,7 +30,7 @@ Rule of thumb used here:
 
 | When | Ticket | Notes |
 |------|--------|-------|
-| 2026-04 | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | `verifyServiceAuth` + Bruno `SERVICE_CRON_BEARER`; no `x-supabase-cron` bypass. |
+| 2026-06 | 7-day cumulative residue cleanup | Dropped `profiles.cumulative_threshold`; removed 7d fields from `MarketQuote`, pause snapshots, and fingerprint hash (`cb`). |
 | 2026-04 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | `mobile-web-app-capable` in `index.html`. |
 | 2026-04 | [cache-async-error-handling.md](cache-async-error-handling.md) | `.catch` + structured log on cache side-effect Supabase calls. |
 | 2026-04 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | Revert optimistic UI + `isPausePersistError` on Home when pause instance creation fails after generate. |
@@ -110,6 +110,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Lower | [companion-share-as-image-pro.md](companion-share-as-image-pro.md) | **Companions:** Pro **share as image** — **`html-to-image`** client-side; design pass — see ticket. |
 | Lower | [companion-high-contrast-reading-mode.md](companion-high-contrast-reading-mode.md) | **Companions:** **High-contrast reading** — theme token swap for Full View / cards — see ticket. |
 | Lower | [companion-print-friendly-css.md](companion-print-friendly-css.md) | **Companions:** **`@media print`** for reading surfaces — see ticket. |
+| Defer | [volatility-anchor-thresholds.md](volatility-anchor-thresholds.md) | **Market / pause:** optional price-level or cost-basis anchors **on top of** % triggers — see ADR + ticket. |
 
 ### Ops & security (cron workers, secrets, docs alignment)
 
@@ -172,6 +173,10 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Product / UX | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | **Done (2026-04).** Logs + pause UI copy — see ticket |
 | Product / UX | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Form **`name`** / **`id`** / **`autocomplete`** — see ticket |
 | Product / UX | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** Home **`/`** axe fixes — see ticket |
+| Product / UX | [home-why-thesis-evolution.md](home-why-thesis-evolution.md) | **Home / Pause / Journey:** thesis depth — activation in ritual, identity in Settings, history on Journey |
+| Product / UX | [home-market-logical-surface.md](home-market-logical-surface.md) | **Home market widget:** posture-first tiers, remove 7d chart from Home, gate community stats; why + phased roadmap |
+| Product / UX | [journey-practice-stats-evolution.md](journey-practice-stats-evolution.md) | **Home glimpse → Journey drill-down:** Presence XP slices, pause counts by variant/signal |
+| Product / UX | [volatility-anchor-thresholds.md](volatility-anchor-thresholds.md) | **Market / pause:** optional anchor thresholds (entry, levels) layered on % triggers |
 | Product / UX | [companion-tts-pro.md](companion-tts-pro.md) | **Companions:** Pro TTS (`SpeechSynthesis` → ElevenLabs if needed) |
 | Product / UX | [companion-share-as-image-pro.md](companion-share-as-image-pro.md) | **Companions:** Pro share-as-image (`html-to-image` + design) |
 | Product / UX | [companion-high-contrast-reading-mode.md](companion-high-contrast-reading-mode.md) | **Companions:** High-contrast reading (theme tokens) |
@@ -201,7 +206,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | **Companions (reading / sharing)** | [companion-tts-pro.md](companion-tts-pro.md), [companion-share-as-image-pro.md](companion-share-as-image-pro.md), [companion-high-contrast-reading-mode.md](companion-high-contrast-reading-mode.md), [companion-print-friendly-css.md](companion-print-friendly-css.md) |
 | **Pause pipeline & client–server boundaries** | ~~[orchestrate-client-cron.md](orchestrate-client-cron.md)~~ **done**, ~~[automatic-pause-notification-timing.md](automatic-pause-notification-timing.md)~~ **done**, ~~[cron-pause-featured-parity.md](cron-pause-featured-parity.md)~~ **done** |
 | **Cost & duplicate work (client + server)** | ~~[orchestrate-client-cron.md](orchestrate-client-cron.md)~~ **done**, ~~[cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md)~~ **done**, [home-fetch-deduplication.md](home-fetch-deduplication.md) |
-| **Cache, library & market data** | ~~[cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md)~~ **done**, ~~[btc-price-cache-freshness.md](btc-price-cache-freshness.md)~~ **done**, ~~[cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md)~~ **done 2026-04** |
+| **Cache, library & market data** | ~~[cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md)~~ **done**, ~~[btc-price-cache-freshness.md](btc-price-cache-freshness.md)~~ **done**, ~~[cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md)~~ **done 2026-04**, [volatility-anchor-thresholds.md](volatility-anchor-thresholds.md) |
 | **Rate limits, quality & observability** | ~~[rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md)~~ **done**, ~~[rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)~~ **done**, [quality-gates-false-positives.md](quality-gates-false-positives.md), [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md), [edge-functions-request-logging-migration.md](edge-functions-request-logging-migration.md), [posthog-legacy-reflection-events-cleanup.md](posthog-legacy-reflection-events-cleanup.md), [posthog-ui-privacy-hardening.md](posthog-ui-privacy-hardening.md), [sentry-allowed-domains.md](sentry-allowed-domains.md) |
 | **Data consistency** | *(none pending — grounding dual-write shipped 2026-04)* |
 
@@ -250,6 +255,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [sentry-allowed-domains.md](sentry-allowed-domains.md) | **Open.** Restrict public DSN to Holzen origins |
 | [spa-framework-evaluation.md](spa-framework-evaluation.md) | Vite SPA vs full-stack React framework (React docs tradeoffs; when to revisit) |
 | [typed-navigation-state.md](typed-navigation-state.md) | **Done (2026-04).** `router-location-state.ts` — see ticket |
+| [volatility-anchor-thresholds.md](volatility-anchor-thresholds.md) | **Open.** Optional price-level / cost-basis pause triggers — ADR: percent-based primary |
 | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | **Done (2026-04).** Grounding single source — see ticket. |
 
 ---

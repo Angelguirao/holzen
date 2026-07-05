@@ -1,0 +1,71 @@
+---
+import '../styles/site.css';
+import '../styles/marketing-page.css';
+import {
+  MARKETING_APPLE_TOUCH_ICON_URL,
+  MARKETING_FAVICON_URL,
+  MARKETING_OG_IMAGE_URL,
+  MARKETING_SITE_ORIGIN,
+  MARKETING_THEME_COLOR,
+} from '../lib/marketing-seo';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath?: string;
+  ogImage?: string;
+  ogType?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title,
+  description,
+  canonicalPath = Astro.url.pathname,
+  ogImage = MARKETING_OG_IMAGE_URL,
+  ogType = 'website',
+  jsonLd,
+} = Astro.props;
+
+const canonical = new URL(canonicalPath, Astro.site ?? MARKETING_SITE_ORIGIN).href;
+const ogUrl = canonical;
+const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="author" content="Holzen" />
+    <meta name="theme-color" content={MARKETING_THEME_COLOR} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/png" href={MARKETING_FAVICON_URL} />
+    <link rel="apple-touch-icon" href={MARKETING_APPLE_TOUCH_ICON_URL} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={ogUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content="Holzen" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <title>{title}</title>
+    {jsonLdItems.map((item) => (
+      <script type="application/ld+json" set:html={JSON.stringify(item)} />
+    ))}
+  </head>
+  <body>
+    <div class="page">
+      <slot />
+    </div>
+  </body>
+</html>

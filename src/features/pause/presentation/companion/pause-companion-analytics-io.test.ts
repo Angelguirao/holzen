@@ -26,7 +26,6 @@ const orchestrationIoStubs = vi.hoisted(() => ({
 
 const orchestrateIoStubs = vi.hoisted(() => ({
   runCompanionSlotOrchestrate: vi.fn(),
-  runCompanionInterventionBootstrap: vi.fn(),
 }));
 
 vi.mock('./pause-companion-orchestration-io', () => orchestrationIoStubs);
@@ -49,7 +48,7 @@ const {
   invalidateCompanionUiCompletionQuery,
 } = orchestrationIoStubs;
 
-const { runCompanionSlotOrchestrate, runCompanionInterventionBootstrap } = orchestrateIoStubs;
+const { runCompanionSlotOrchestrate } = orchestrateIoStubs;
 
 describe('pause-companion-analytics-io', () => {
   it('routes feedback vote through the default PauseAnalyticsRepository port adapter', async () => {
@@ -100,7 +99,7 @@ describe('pause-companion-analytics-io', () => {
 
   it('sibling cluster: orchestrate-io exports stay distinct from analytics-io', () => {
     expect(logCompanionFeedbackVote).not.toBe(runCompanionSlotOrchestrate);
-    expect(logCompanionFullviewOpened).not.toBe(runCompanionInterventionBootstrap);
+    expect(logCompanionFullviewOpened).not.toBe(logCompanionFeedbackVote);
     // Reciprocal inline pins: `pause-companion-orchestrate-io.test.ts`;
     // dedicated sibling: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts`.
   });

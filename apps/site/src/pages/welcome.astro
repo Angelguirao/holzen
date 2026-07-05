@@ -1,0 +1,116 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import LandingBenefits from '../components/LandingBenefits.astro';
+import LandingComparison from '../components/LandingComparison.astro';
+import LandingFaq from '../components/LandingFaq.astro';
+import LandingHeroPreview from '../components/LandingHeroPreview.astro';
+import LandingHowItWorks from '../components/LandingHowItWorks.astro';
+import LandingTrustRow from '../components/LandingTrustRow.astro';
+import PublicFooter from '../components/PublicFooter.astro';
+import WaitlistForm from '../components/WaitlistForm.astro';
+import { landingCopy, landingFaqJsonLd, landingWebPageJsonLd } from '../lib/landing-content';
+import '../styles/welcome.css';
+
+const ref = Astro.url.searchParams.get('ref');
+const copy = landingCopy;
+---
+
+<MarketingLayout
+  title={copy.meta.title}
+  description={copy.meta.description}
+  canonicalPath={copy.meta.path}
+  jsonLd={[landingWebPageJsonLd(), landingFaqJsonLd()]}
+>
+  <header class="nav">
+    <span class="brand">Holzen</span>
+  </header>
+
+  <section class="hero-wrap">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-glow"></div>
+      <div class="hero-grid-lines"></div>
+    </div>
+
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="hero-eyebrow">{copy.heroEyebrow}</p>
+        <h1>{copy.hero}</h1>
+        <p class="hero-lead">{copy.heroDesc}</p>
+
+        <div class="form-shell">
+          <WaitlistForm ref={ref} formId="waitlist-email-hero" />
+          <LandingTrustRow />
+        </div>
+
+        <p class="hero-note">{copy.heroNote}</p>
+      </div>
+
+      <div class="hero-visual">
+        <LandingHeroPreview />
+      </div>
+    </div>
+  </section>
+
+  <main class="landing-main">
+    <section id="why" class="section">
+      <header class="section-head">
+        <p class="section-label">{copy.reflectionLoop}</p>
+        <h2 class="section-title">{copy.reflectionLoopIntro}</h2>
+      </header>
+      <LandingComparison />
+    </section>
+
+    <section id="how-it-works" class="section section--band">
+      <header class="section-head">
+        <p class="section-label">{copy.howItWorksTitle}</p>
+        <h2 class="section-title">{copy.howItWorksIntro}</h2>
+      </header>
+      <LandingHowItWorks />
+    </section>
+
+    <section class="section">
+      <header class="section-head">
+        <p class="section-label">{copy.benefitsTitle}</p>
+        <h2 class="section-title">{copy.benefitsIntro}</h2>
+      </header>
+      <LandingBenefits />
+    </section>
+
+    <section class="section section--band">
+      <div class="science-strip">
+        <blockquote class="science-quote">{copy.scienceQuote}</blockquote>
+        <p class="science-quote-desc">{copy.scienceDesc}</p>
+        <a
+          class="science-citation"
+          href={copy.scienceCitationUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {copy.scienceCitationLabel}
+        </a>
+      </div>
+    </section>
+
+    <section id="early-access" class="section">
+      <div class="cta-band">
+        <h2 class="cta-band-title">{copy.waitlistTitle}</h2>
+        <p class="cta-band-desc">{copy.waitlistDesc}</p>
+        <div class="form-shell form-shell--compact">
+          <WaitlistForm ref={ref} compact formId="waitlist-email-footer" />
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--faq">
+      <header class="section-head section-head--tight">
+        <p class="section-label">{copy.questions}</p>
+      </header>
+      <LandingFaq />
+    </section>
+  </main>
+
+  <footer class="landing-footer">
+    <p class="landing-disclaimer">{copy.footer}</p>
+    <PublicFooter />
+  </footer>
+</MarketingLayout>

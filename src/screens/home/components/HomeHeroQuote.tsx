@@ -24,8 +24,8 @@ export function HomeHeroQuote({ userId, firstName }: HomeHeroQuoteProps) {
 
   return (
     <div className="space-y-1 pr-16">
-      {lines.map((line, i) => (
-        <p key={i} className="text-base font-medium leading-relaxed text-foreground">
+      {lines.map((line) => (
+        <p key={line} className="text-base font-medium leading-relaxed text-foreground">
           {line}
         </p>
       ))}

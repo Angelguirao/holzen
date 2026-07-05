@@ -24,7 +24,7 @@ function groupByCalendarDay(items: PauseArchiveRow[], t: (k: string, o?: { defau
     arr.push(row);
     buckets.set(day, arr);
   });
-  const keys = [...buckets.keys()].sort((a, b) => b - a);
+  const keys = [...buckets.keys()].toSorted((a, b) => b - a);
   return keys.map((ts) => {
     const d = new Date(ts);
     const label = isToday(d) ? t('library.dateToday') : format(d, 'dd/MM/yy');
@@ -33,8 +33,7 @@ function groupByCalendarDay(items: PauseArchiveRow[], t: (k: string, o?: { defau
 }
 
 type Props = {
-  rows: PauseArchiveRow[];
-  filtered: PauseArchiveRow[];
+  items: PauseArchiveRow[];
   loading: boolean;
   listLoadFailed: boolean;
   refetch: () => Promise<void>;
@@ -46,8 +45,7 @@ type Props = {
 };
 
 export function ArchivePauseItems({
-  rows,
-  filtered,
+  items,
   loading,
   listLoadFailed,
   refetch,
@@ -59,23 +57,23 @@ export function ArchivePauseItems({
 }: Props) {
   const { t } = useTranslation();
 
-  const groups = useMemo(() => groupByCalendarDay(filtered, t), [filtered, t]);
+  const groups = useMemo(() => groupByCalendarDay(items, t), [items, t]);
 
   return (
     <div className="flex flex-col">
       <div>
-        {loading && filtered.length === 0 && !listLoadFailed ? (
-          <div className="flex justify-center py-16" role="status" aria-busy="true" aria-label={t('common.loading')}>
+        {loading && items.length === 0 && !listLoadFailed ? (
+          <div className="flex justify-center py-16" aria-busy="true" aria-label={t('common.loading')}>
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/40" />
           </div>
-        ) : listLoadFailed && filtered.length === 0 ? (
+        ) : listLoadFailed && items.length === 0 ? (
           <div className="flex flex-col items-center gap-4 py-12 px-4 text-center">
             <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">{t('archive.loadFailed')}</p>
             <Button type="button" variant="secondary" size="sm" onClick={() => void refetch()}>
               {t('common.retry', { defaultValue: 'Retry' })}
             </Button>
           </div>
-        ) : filtered.length === 0 ? (
+        ) : items.length === 0 ? (
           <div className="space-y-3 py-12 px-2 text-center">
             <p className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
               {emptyStateMessage ?? t('archive.emptyDefault')}
@@ -91,7 +89,7 @@ export function ArchivePauseItems({
           <div className="space-y-4">
             {groups.map((group) => (
               <div key={group.key} className="space-y-0.5">
-                <p className="px-3 pb-1 text-sm font-sans font-normal uppercase tracking-wider text-[#dbb266]">
+                <p className="px-3 pb-1 text-sm font-sans font-normal uppercase tracking-wider text-nox-text-highlight">
                   {group.label}
                 </p>
                 <div className="space-y-3">

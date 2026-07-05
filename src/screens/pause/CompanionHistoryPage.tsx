@@ -1,15 +1,19 @@
+import { useMemo } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
+import {
+  mergeHistoryMarketOverlay,
+  resolveHistoricalMarketInsight,
+} from '@/features/pause/public-ritual-frame';
 import { useTranslation } from 'react-i18next';
 import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useProfile } from '@/features/user/public-hooks';
 import { useCompanionFullViewPage } from '@/features/pause/public-ritual-frame';
 import { HistoricalInsightDisplay } from '@/screens/pause/components/HistoricalInsightDisplay';
+import { LookBackFullView } from '@/screens/pause/components/look-back-full-view';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { ReadTime } from '@/screens/pause/components/companion/ReadTime';
 import { WhyThisCard } from '@/screens/pause/components/companion/WhyThisCard';
-import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
-import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { PageMeta } from '@/app/components/PageMeta';
 
 export default function CompanionHistoryPage() {
@@ -32,10 +36,10 @@ export default function CompanionHistoryPage() {
       historyLoading,
       historyError,
       retryHistory,
+      zoomOut,
       cacheIds,
       cacheRelaxations,
       regenerateCompanion,
-      intervention,
     },
   } = useCompanionFullViewPage({
     routeInstanceId: rid,
@@ -44,11 +48,16 @@ export default function CompanionHistoryPage() {
     severity,
   });
 
+  const historyDisplay = useMemo(
+    () => mergeHistoryMarketOverlay(historyInsight, zoomOut),
+    [historyInsight, zoomOut],
+  );
+
   if (missingRouteId) return <Navigate to="/" replace />;
 
   if (loadError) {
     return (
-      <CompanionFocusLayout title={t('companions.lookBack')} onBack={handleBack}>
+      <CompanionFocusLayout title={t('companions.lookBackTitle')} onBack={handleBack}>
         <PageMeta
           title={t('companions.focusHistoryMeta')}
           description={t('companions.focusHistoryMeta')}
@@ -61,47 +70,49 @@ export default function CompanionHistoryPage() {
 
   if (!loadError && (snapshotPending || !snapshot)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-busy="true">
+      <div className="min-h-screen flex items-center justify-center bg-background" aria-busy="true">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-border/50 border-t-nox-text-link/70" />
       </div>
     );
   }
 
   return (
-    <CompanionFocusLayout title={t('companions.lookBack')} onBack={handleBack}>
+    <CompanionFocusLayout title={t('companions.lookBackTitle')} onBack={handleBack}>
       <PageMeta
         title={t('companions.focusHistoryMeta')}
         description={t('companions.focusHistoryMeta')}
         noindex
       />
       <div className="space-y-6">
-        <InterventionCrossRefBadge companion="history" intervention={intervention} />
-
-        {historyInsight && (
+        {historyDisplay && (
           <div className="flex items-center gap-2 flex-wrap">
             <ReadTime
               chars={
-                (historyInsight.title?.length ?? 0) +
-                (historyInsight.btcInsight?.length ?? 0) +
-                (historyInsight.analogy?.length ?? 0)
+                (historyDisplay.title?.length ?? 0) +
+                (resolveHistoricalMarketInsight(historyDisplay)?.length ?? 0) +
+                (historyDisplay.analogy?.length ?? 0)
               }
             />
             <WhyThisCard companion="history" mood={mood} className="ml-auto" />
           </div>
         )}
 
-        <HistoricalInsightDisplay
-          data={historyInsight}
-          loading={historyLoading}
-          error={historyError}
-          onRetry={retryHistory}
-        />
-        {historyInsight && cacheRelaxations.history && (
-          <p className="text-[10px] text-muted-foreground/55 font-mono leading-snug" role="status">
+        {historyLoading || historyError || !historyDisplay ? (
+          <HistoricalInsightDisplay
+            data={historyDisplay}
+            loading={historyLoading}
+            error={historyError}
+            onRetry={retryHistory}
+          />
+        ) : (
+          <LookBackFullView data={historyDisplay} />
+        )}
+        {historyDisplay && cacheRelaxations.history && (
+          <p className="text-[10px] text-muted-foreground/55 font-mono leading-snug">
             {t(`companions.cacheRelaxation.${cacheRelaxations.history}`)}
           </p>
         )}
-        {historyInsight && revealed && (
+        {historyDisplay && revealed && (
           <div className="space-y-4 border-t border-border/20 pt-5 animate-in fade-in duration-500">
             <CompanionFeedback
               pauseInstanceId={pauseInstanceId}
@@ -113,8 +124,6 @@ export default function CompanionHistoryPage() {
             />
           </div>
         )}
-
-        <HistoryThread companion="history" currentPauseInstanceId={pauseInstanceId} />
       </div>
     </CompanionFocusLayout>
   );

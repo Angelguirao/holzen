@@ -93,3 +93,18 @@ export function resolveVapidMailto(): string {
   const local = trimEnv("EMAIL_VAPID_MAILTO_LOCAL") ?? resolveEmailFromLocal();
   return `mailto:${local}@${resolveEmailFromDomain()}`;
 }
+
+function readBoolEnv(key: string, defaultValue: boolean): boolean {
+  const v = readEnv(key);
+  if (v === undefined) return defaultValue;
+  return !(v === "0" || v === "false" || v === "no");
+}
+
+/**
+ * Volatility pause-offer email from `check-volatility`.
+ * Default enabled; set `PAUSE_VOLATILITY_EMAIL_ENABLED=false` on Edge secrets to disable
+ * without affecting auth, welcome, checkout, or web push / in-app bell.
+ */
+export function isPauseVolatilityEmailEnabled(): boolean {
+  return readBoolEnv("PAUSE_VOLATILITY_EMAIL_ENABLED", true);
+}

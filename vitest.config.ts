@@ -5,9 +5,9 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   define: {
-    // Vitest does not load vite.config hosted fallbacks — keep Supabase client importable in unit tests.
+    // Vitest does not load vite.config, so define explicit test values here.
     "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
-      process.env.VITE_SUPABASE_URL ?? "http://127.0.0.1:54321",
+      process.env.VITE_SUPABASE_URL ?? "http://127.0.0.1:55421",
     ),
     "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
       process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "test-publishable-key",

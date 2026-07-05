@@ -3,11 +3,11 @@
  * Provides consistent JWT verification and service role validation.
  */
 
-import type { User } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { User } from "npm:@supabase/supabase-js@2";
 
 /** Create a Supabase client with the user's auth header */
 export async function createAuthenticatedClient(authHeader: string) {
-  const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.57.2");
+  const { createClient } = await import("npm:@supabase/supabase-js@2");
   const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
   const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
   return createClient(sbUrl, sbAnon, {
@@ -17,7 +17,7 @@ export async function createAuthenticatedClient(authHeader: string) {
 
 /** Create a Supabase service role client (for server-side operations) */
 export async function createServiceClient() {
-  const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.57.2");
+  const { createClient } = await import("npm:@supabase/supabase-js@2");
   const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
   const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
   return createClient(sbUrl, svcKey, { auth: { persistSession: false } });

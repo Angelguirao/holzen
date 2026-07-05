@@ -31,6 +31,13 @@
     "intelligence": "Intelligence",
     "reach": "Reach"
   },
+  "comingSoon": {
+    "metaTitle": "Holzen — Coming soon",
+    "metaDescription": "Holzen helps investors pause before they act when markets move. We're not open to the public yet.",
+    "headline": "Coming soon",
+    "body": "We're building a pause-first space for when markets move. Sign-ups and the full app aren't available yet — check back soon.",
+    "contact": "hello@holzen.app"
+  },
   "common": {
     "back": "Back",
     "close": "Close",
@@ -64,6 +71,7 @@
     "showLess": "Show less"
   },
   "auth": {
+    "sessionInvalid": "Your sign-in is no longer valid on the server. Please sign in again.",
     "restoringSession": "Restoring your session…",
     "signInToContinue": "Sign in to continue",
     "createAnAccount": "Create an account",
@@ -90,23 +98,81 @@
   },
   "home": {
     "title": "Home",
-    "greeting": "Welcome back, {{name}}",
     "noActiveReflection": "No active pause.",
     "pauseEmpty": {
       "statusLine": "No active pause right now. Try the next step below between checks — or request a manual pause anytime."
     },
+    "pauseIdle": {
+      "withinRangeLead": "The market is within your range.",
+      "withinRangeTail": "This is the moment to pause without urgency.",
+      "postManualCooldownLead": "The time has passed.",
+      "postManualCooldownTail": "Another pause is available, if you need it.",
+      "letsPauseCta": "Let's pause"
+    },
+    "pauseInProgress": {
+      "stillHere": "The pause you started is still here.",
+      "marketSettledLead": "The market that disturbed you has settled.",
+      "closesIn": "This pause closes in {{remaining}}",
+      "closesAfterSettle": "This pause closes 12 hours after the market settles.",
+      "closesAfterContextShift": "This pause closes 12 hours after the market context shifts."
+    },
+    "welcomeBack": {
+      "title": "Welcome back",
+      "body": "Continue your pause where you left it.",
+      "startOver": "Start over",
+      "pendingHeadline": "You have a pause waiting",
+      "pendingBodyWithRemaining": "The market context has changed since you started. You have {{remaining}} left to finish this pause before it closes.",
+      "pendingBodyNoAnchor": "The market context has changed since you started. Finish this pause before it closes — the window starts once the market settles.",
+      "discardThisPause": "Discard this pause"
+    },
     "generatingReflection": "Preparing your pause…",
     "pauseCtaActive": "Start this pause",
     "pauseCtaEngaged": "Continue this pause",
+    "pauseWidget": {
+      "pauseWithThis": "Pause with this",
+      "continue": "Continue",
+      "discard": "Discard",
+      "discardSnackbar": "Pause discarded",
+      "discardUndo": "Undo",
+      "pauseAgain": "Pause again",
+      "pauseWithNewContext": "Pause with new context",
+      "newContextLead": "The market has moved sharply.",
+      "updatedAt": "Updated {{time}}",
+      "currentPauseSection": "Current pause",
+      "newContextSection": "New context",
+      "orDivider": "or"
+    },
+    "pauseOpening": {
+      "fearDown": "It is natural to feel unease when the collective mood shifts toward fear.",
+      "extremeFearDown": "When fear runs high, the market can feel personal — you do not have to act on that feeling.",
+      "greedUp": "When momentum builds, urgency can feel like clarity — pause before you follow it.",
+      "extremeGreedUp": "Extreme optimism can make stillness feel costly — you can choose pause anyway.",
+      "downDefault": "A move like this can stir more than the chart — you can take a breath before you act.",
+      "upDefault": "A rise can pull attention toward action — you can pause before the next step.",
+      "neutral": "Something shifted in the market — you can meet it with a pause before you decide."
+    },
+    "pausePostPause": {
+      "restBody": "You completed a pause recently. Rest is part of the practice — when you are ready, you can pause again.",
+      "noArchiveBody": "You completed a pause. Your archive will collect these moments over time — for now, rest or start another pause when you need it.",
+      "cooldownArchiveBody": "If the urge returns, another pause is available at {{time}}. Until then, your past words are here.",
+      "cooldownNoArchiveBody": "If the urge returns, another pause is available at {{time}}.",
+      "newOfferBody": "The market moved again. Holzen has a pause ready for you — you can start it below without waiting for your personal cooldown.",
+      "availableAt": "Another manual pause is available at {{time}}",
+      "manualCooldownBody": "You can start another pause yourself at {{time}}. If the market moves before then, Holzen can still offer one here.",
+      "revisitArchive": "Revisit your archive"
+    },
+    "pauseCalmWaters": {
+      "body": "The moment passed — conditions settled before you opened this pause. You do not need to act on it.",
+      "toast": "Market settled — that pause offer closed."
+    },
     "pendingQueuedTitle": "New moment queued",
-    "pendingQueuedBody": "The market moved again while this pause is open. On the pause screen you can switch to the fresh context or keep this one.",
-    "pendingQueuedCta": "Open pause screen",
+    "pendingQueuedBody": "The market moved again while this pause is open. Switch to the fresh context below or keep this one.",
     "pauseReadyBanner": "A pause is ready for you",
     "pauseReadyBannerHideAria": "Hide reminder — your pause stays open on Home",
     "pauseDismissCta": "Dismiss pause",
     "pauseDismissHint": "Ends this open pause without finishing the ritual. You can start a new one anytime.",
     "needAMoment": "I need a pause",
-    "manualReflectionIn": "Next pause in {{minutes}} min",
+    "manualReflectionIn": "Next manual pause in {{minutes}} min",
     "manualReflectionInSoon": "Next pause in {{time}}",
     "cooldownMessage": "Take this time to breathe. The next pause will be here when you need it.",
     "requestAnytime": "Request a pause anytime — no threshold required.",
@@ -116,42 +182,68 @@
     "whenBtcMoves": "When Bitcoin moves, we'll help you pause before you act.",
     "today": "Today",
     "customize": "Customize",
+    "greeting": {
+      "welcome": "Welcome",
+      "helloAgain": "Hello, again",
+      "helloName": "Hello, {{name}}"
+    },
+    "practiceStats": {
+      "presence": "Presence",
+      "presenceUnit": "XP",
+      "pauses": "Completed",
+      "pausesUnit": "Pauses"
+    },
     "customizeSheet": {
       "title": "Customize your Home",
-      "description": "Shape what you see first and how it is ordered—so Home meets you where you are and supports the mindset you want to carry into the rest of the app.",
+      "description": "Choose what you see on Home. Toggle widgets on or off. Drag to reorder.",
       "resetLayout": "Reset layout & widgets",
       "widgetsHeading": "Widgets",
       "resetLink": "Reset to defaults",
       "sections": {
         "goalWhy": {
-          "title": "Why you stay",
-          "desc": "The thread of why you stay and what you are holding for—so Home can anchor you in meaning before the next impulse arrives."
+          "title": "Anchor",
+          "desc": "Your optional anchor line and your Why."
         },
         "market": {
           "title": "Market",
-          "desc": "Optional wider-world context on the same screen when you want it—so you can stay oriented without leaving your flow."
+          "desc": "BTC price, 24h change, and market sentiment."
         },
         "yourPause": {
           "title": "Your pause",
-          "desc": "Brings your pause practice into view on Home—so regulation and boundaries stay within reach when intensity rises."
+          "desc": "Your active pause, when the market moves or when you ask for one."
         },
         "journeyPulse": {
-          "title": "Journey pulse",
-          "desc": "A light snapshot of how your practice is moving—so you sense continuity and direction without wading through every detail."
-        },
-        "quickCapture": {
-          "title": "Quick capture",
-          "desc": "Space to register what shows up in the moment—so meaning you notice here is less likely to evaporate when you move on."
-        },
-        "night": {
-          "title": "Evening reflection",
-          "desc": "A gentle close to the day—room to notice how things landed and leave today with a little more clarity before what comes next."
+          "title": "Practice",
+          "desc": "Your presence and pauses."
         }
       }
     },
+    "pauseHelpFeedback": {
+      "title": "Did this pause help?",
+      "subtitle": "Your feedback helps us improve Holzen for moments like this.",
+      "ratingLabel": "Rate this pause from 1 to 5 stars",
+      "starAria": "{{value}} stars",
+      "commentLabel": "Anything else? (optional)",
+      "commentPlaceholder": "Tell us what worked or what we could do better…",
+      "send": "Send",
+      "maybeLater": "Maybe later",
+      "thankYou": "Thank you for building it with us.",
+      "dismissThankYou": "Dismiss",
+      "submitFailed": "Could not send feedback. Try again later."
+    },
     "goalWhy": {
-      "expandHoldDetails": "Show hold goal details and motivations",
-      "collapseHoldDetails": "Hide hold goal details and motivations"
+      "editWhys": "Edit anchor and motivations",
+      "addAnchorCta": "Add your anchor",
+      "addAnchorTitle": "Add your anchor",
+      "addAnchorDesc": "A line you'd come back to. In your own words.",
+      "anchorAdded": "Anchor added",
+      "editTitle": "Edit anchor and whys",
+      "editTitleShort": "Edit",
+      "anchorHeading": "Your anchor",
+      "anchorHint": "A line you'd come back to.",
+      "whyHeading": "Your Why",
+      "whyHint": "Why you're here. Your motives.",
+      "chooseAtLeastOne": "Choose at least one."
     },
     "statTiles": {
       "holzenScore": "Holzen score",
@@ -161,7 +253,10 @@
     "market": {
       "expandDetails": "Show chart and 24h details",
       "collapseDetails": "Hide chart and 24h details",
-      "chartExpandDisabled": "Chart and 24h details need a visible fiat price (not BTC-only or hidden price)."
+      "chartExpandDisabled": "Chart and 24h details need a visible fiat price (not BTC-only or hidden price).",
+      "withinYourRange": "Within your range",
+      "beyondYourRange": "Beyond your range",
+      "beyondRangeCumulative": "7-day move beyond your range"
     },
     "heroQuote": {
       "lineWithName": "{{name}}, {{line}}",
@@ -182,23 +277,22 @@
       }
     },
     "nextAutoCheck": "Next auto-check · {{time}}",
-    "cooldownHeadline": "{{hours}}h cooldown · {{time}} left",
     "nextScanLine": "Next scan · {{scan}}",
-    "nextScanIdleTitle": "When Holzen next checks market conditions against your settings (about every 15 minutes).",
+    "nextScanIdleTitle": "When Holzen next checks market conditions against your settings (about every hour).",
     "autoCooldown": {
-      "afterPauseKicker": "Rest window after your last pause",
       "serverChecksKicker": "Holzen is watching the market for you",
-      "cooldownAria": "You are in the rest period that starts when a pause is created. It is not the same timer as the Need a moment button. This rest window ends at {{time}} ({{hours}} hours from that pause).",
-      "nextScanAria": "Holzen reviews conditions on a quarter-hour rhythm. The next routine check is around {{time}}. A new automatic pause only happens when your settings and the market align — this is only the schedule.",
-      "cooldownReadyAt": "{{hours}}h rest · until {{time}}",
+      "nextScanAria": "Holzen reviews conditions about once an hour. The next routine check is around {{time}}. A new automatic pause only happens when your settings and the market align — this is only the schedule.",
       "nextScanAtClock": "Next routine check · {{time}}"
     },
     "monitoringReady": "Monitoring · ready",
     "widget": {
       "market": "Market",
       "goal": "Goal",
-      "whyHoldTitle": "Your anchor",
+      "whyHoldTitle": "Your whys",
       "yourPause": "Your pause",
+      "continueYourPause": "Continue your pause",
+      "youPaused": "You paused",
+      "newPauseAvailable": "New pause available",
       "reflection": "Pause",
       "quickCapture": "Quick capture",
       "evening": "Evening",
@@ -229,6 +323,12 @@
       "startTrialPrompt": "Start your {{trialDays}}-day free trial to use Pause when markets move.",
       "startTrialCta": "Start {{trialDays}}-day free trial",
       "trialFailed": "Could not start trial. Try again.",
+      "trialAlreadyUsed": "Your free trial has already been used. Subscribe to continue.",
+      "trialEmailNotVerified": "Confirm your email before starting your trial.",
+      "trialDisposableEmail": "Use a permanent email address to start a trial.",
+      "trialCheckoutCancelled": "Trial setup was cancelled. You can try again when ready.",
+      "trialStarted": "Your free trial is active.",
+      "trialCardNotAccepted": "We could not start your trial with this card. Free trials require a standard debit or credit card — prepaid and virtual cards are not supported.",
       "pricePerMonth": "${{price}} per month · Cancel anytime",
       "openingCheckout": "Opening checkout…",
       "checkoutFailed": "Checkout could not be started. Check your connection and try again.",
@@ -273,7 +373,7 @@
     "companions_other": "{{count}} companions",
     "signal": "Signal",
     "zoomOut": "Zoom out",
-    "historicalInsight": "Historical insight",
+    "historicalInsight": "Look Back",
     "echo": "Echo",
     "parallel": "parallel"
   },
@@ -287,9 +387,28 @@
     "overview": {
       "title": "Journey",
       "subtitle": "Your pause rhythm at a glance.",
-      "archiveCta": "Open your pause library",
+      "presence": {
+        "label": "Presence",
+        "footnote": "Lifetime practice XP",
+        "breakdownTitle": "Where your XP came from",
+        "breakdownDesc": "Lifetime XP by signal — brief and deep base, plus deep optional practice.",
+        "breakdownAria": "Presence XP by signal",
+        "signalXp": "{{xp}} XP",
+        "signals": {
+          "base_brief": "Brief ritual completed",
+          "base_deep": "Deep ritual completed",
+          "favorite": "Reflect favorite",
+          "note": "Reflect note",
+          "companions": "Companion completes",
+          "companion_favorites": "Frame companion favorites",
+          "breath_second": "Second breath completed",
+          "shift_mood": "Frame mood check-in",
+          "post_pause_check_in": "Brief Done check-in"
+        }
+      },
       "completed": {
-        "label": "Completed pauses"
+        "label": "Completed pauses",
+        "mix": "{{deep}} deep · {{brief}} brief"
       },
       "streak": {
         "title": "Streak",
@@ -338,7 +457,7 @@
       "editGroundingInSettings": "Edit grounding activities in Settings",
       "openGround": "Open Ground",
       "mantraEmptyTitle": "Set a breathing mantra",
-      "mantraEmptyBody": "A short optional line can anchor you during breathwork. It is not shown on Home.",
+      "mantraEmptyBody": "A short optional line can anchor you during breathwork and on Home.",
       "mantraEmptyCta": "Open Settings → You",
       "tile": {
         "grounding": "Grounding",
@@ -394,16 +513,16 @@
   },
   "settings": {
     "hubIntro": "Pick a category to change how Holzen fits you — same layout as Tools for consistency.",
-    "hubDescYou": "Name, hold goal, motivations, optional mantra for breathing pauses, and how Home greets you.",
-    "hubDescReflection": "Cooldown, tone, style, custom prompt, and silent mode for pauses.",
-    "hubDescExperience": "Conviction mode, currency, language, haptics, zen mode, and sounds.",
+    "hubDescYou": "Name, motivations, optional mantra for breathing pauses, and how Home greets you.",
+    "hubDescReflection": "Volatility thresholds that trigger automatic pauses.",
+    "hubDescExperience": "Display mode, currency, language, haptics, zen mode, and sounds.",
     "hubDescCompanions": "Which companion cards appear with your pause.",
     "hubDescNotifications": "Email, push, digest cadence, and quiet hours.",
-    "hubDescSubscription": "Pro status, billing, and referrals.",
+    "hubDescSubscription": "Pro status and billing.",
     "hubDescAccount": "Password, sign out, and account deletion.",
     "backToAll": "All settings",
     "sectionPageSubtitleYou": "Identity and motivation — what Holzen greets you with.",
-    "sectionPageSubtitleReflection": "How automatic pauses feel and how often they arrive.",
+    "sectionPageSubtitleReflection": "When Holzen offers a pause based on market moves.",
     "sectionPageSubtitleExperience": "Display, language, and sensory defaults across the app.",
     "sectionPageSubtitleCompanions": "Tune which insights sit beside your pause.",
     "sectionPageSubtitleNotifications": "Stay informed without noise — on your schedule.",
@@ -428,15 +547,12 @@
     "holdGoalTitle": "Your commitment",
     "holdGoalDesc": "Optional time-bound or open-ended commitment anchor. This is not portfolio tracking — it supports your pause ritual.",
     "trackedAssetTitle": "Tracked asset",
-    "trackedAssetDesc": "Volatility checks, Home market data, and pause context follow this asset. Legacy Bitcoin calendar badges apply only when Bitcoin is selected.",
+    "trackedAssetDesc": "Volatility checks, Home market data, and pause context follow Bitcoin. Thresholds below apply to BTC price moves.",
     "trackedAssets": {
-      "bitcoin": "Bitcoin (BTC)",
-      "ethereum": "Ethereum (ETH)",
-      "solana": "Solana (SOL)",
-      "monero": "Monero (XMR)"
+      "bitcoin": "Bitcoin (BTC)"
     },
     "myWhy": "My Why",
-    "myWhyDesc": "Why do you hold? Select what resonates. This anchors your pause experience and companion tone.",
+    "myWhyDesc": "Why you invest. Select what resonates — this shapes your Home anchor and pause copy.",
     "motivations": {
       "freedom": "Financial freedom",
       "freedomDesc": "Building independence",
@@ -446,27 +562,25 @@
       "generationalDesc": "Beyond your lifetime",
       "discipline": "Learning discipline",
       "disciplineDesc": "Mastering patience",
-      "conviction": "Philosophical conviction",
-      "convictionDesc": "Believing in the protocol",
-      "sovereignty": "Self-sovereignty",
-      "sovereigntyDesc": "Being your own bank",
+      "conviction": "Long-term conviction",
+      "convictionDesc": "Belief in what you're building toward",
+      "sovereignty": "Financial autonomy",
+      "sovereigntyDesc": "Independence on your terms",
       "inflation": "Inflation hedge",
-      "inflationDesc": "Preserving purchasing power",
+      "inflationDesc": "Protecting what you earn",
       "curiosity": "Curiosity",
-      "curiosityDesc": "Learning about money"
+      "curiosityDesc": "Learning how money works"
     },
-    "personalMantra": "Personal mantra",
-    "mantraDesc": "Optional. Your own words — shown during pauses and woven into AI pause copy.",
-    "mantraPlaceholder": "e.g. I hold because time is on my side…",
-    "btcMode": "1 BTC = 1 BTC",
-    "btcModeDesc": "Strip away fiat noise. No prices, no percentages, no red or green. Just Bitcoin.",
-    "enableConvictionMode": "Enable conviction mode",
+    "personalMantra": "Personal anchor",
+    "mantraDesc": "Optional. A short line for Home and pauses — in your own words.",
+    "mantraPlaceholder": "e.g. I invest for the long run…",
+    "unitBasisMode": "1 BTC = 1 BTC",
+    "unitBasisModeDesc": "Strip away fiat noise. No prices, no percentages, no red or green. Just Bitcoin.",
+    "enableConvictionMode": "Use 1 BTC = 1 BTC mode",
     "displayCurrency": "Display currency",
     "displayCurrencyDesc": "Choose how BTC prices are displayed throughout the app.",
     "reflectionLanguage": "Language",
     "reflectionLanguageDesc": "Choose the language for the entire app, including AI pause prompts, haikus, and insights.",
-    "cooldown": "Cooldown",
-    "cooldownDesc": "Minimum time between automatic pauses.",
     "tone": "Tone",
     "toneDesc": "Choose the voice of your AI pause copy.",
     "tones": {
@@ -509,10 +623,10 @@
     "companionLabels": {
       "breathing": "Breathing exercise",
       "haiku": "Haiku",
-      "grounding": "Grounding nudge",
+      "grounding": "Grounding",
       "signal": "Signal",
-      "zoomOut": "Zoom out",
-      "history": "Historical insight"
+      "zoomOut": "Zoom Out",
+      "history": "Look Back"
     },
     "ritualDescUpdated": "Pause sessions are guided sequences that slow you down before a financial decision.",
     "emailNotifications": "Email notifications",
@@ -520,6 +634,8 @@
     "pushFinishBannerTitle": "Finish enabling push in Settings",
     "pushFinishBannerBody": "Your browser already allows notifications for this site, but this device is not registered for Holzen push yet. Use the button below to complete setup (same as turning push on).",
     "pushFinishBannerAction": "Enable push on this device",
+    "pushRequiresInstallTitle": "Install Holzen for push",
+    "pushRequiresInstallBody": "Push notifications need the installed app (especially on iPhone). Use Account & security → Install app, or add Holzen to your home screen from the browser share menu.",
     "pushSubscribeFailed": "Push notifications could not be enabled. Check your connection and notification permission, then try again.",
     "pushUnsubscribeFailed": "Push notifications could not be turned off on this device. Check your connection and try again.",
     "digestFrequency": "Digest frequency",
@@ -605,9 +721,8 @@
     "checkoutWindowDesc": "How long Stripe checkout stays open before it expires.",
     "checkoutWindowLabel": "Checkout session length",
     "checkoutWindowRange": "{{min}}–{{max}} minutes",
-    "cooldownHelpBody": "Automatic pauses wait at least this long after the previous one.",
-    "cooldownHelpTitle": "Cooldown help",
     "creditsDashboard": "Credits & allowances",
+    "companionCreditsMeteringHelp": "Companions & guidance counts when Holzen first generates or regenerates Signal, Grounding, Look Back, or Zoom Out for a pause. Opening cards or full views you already have does not use allowance. Haiku and reflection prose are separate.",
     "flexBalanceShort": "{{count}} flex credits",
     "flexPackMCta": "Buy Flex Pack M",
     "flexPackSCta": "Buy Flex Pack S",
@@ -618,15 +733,25 @@
     "signOutFailed": "Sign out failed"
   },
   "onboarding": {
+    "asset": {
+      "kicker": "Your asset",
+      "title": "Pick the asset Holzen should watch first",
+      "body": "Holzen starts with Bitcoin. Next you'll choose how much BTC needs to move before Holzen interrupts the impulse.",
+      "btcBody": "Start with BTC so Holzen can watch volatility and prepare your first pause trigger.",
+      "footer": "Bitcoin is the first live option."
+    },
     "heroText": "The market moves. You feel the pull to act. This app exists for the space between impulse and decision.",
     "whatToCallYou": "What should we call you?",
     "firstNameOptional": "First name (optional)",
     "timezone": "Timezone: {{tz}}",
     "yourCompanions": "Your companions",
     "companionIntro": "Each pause can include five companion tools below your featured pause — tap to explore. You can hide any card in Settings; the headline pause may still surface that type of insight when it fits.",
-    "yourWhy": "Why do you hold?",
-    "whyIntro": "Select what resonates. This shapes your pause copy — grounding it in what actually matters to you.",
-    "whyHint": "You can change this anytime in Settings.",
+    "yourWhy": "Why do you invest?",
+    "whyIntro": "Why you are here as an investor. Pick what resonates — this anchors your Home widget and shapes pause copy.",
+    "whyHint": "You can change this anytime from Home or Settings.",
+    "why": {
+      "kicker": "Your why"
+    },
     "yourGrounding": "What grounds you?",
     "groundingIntro": "When volatility hits, what brings you back to center? The AI will suggest these during your pauses.",
     "groundingHint": "You can update this anytime in Settings.",
@@ -645,6 +770,12 @@
     "yourThreshold": "Your threshold",
     "thresholdQuestion": "How much does Bitcoin need to move (up or down) before you want to pause and reflect?",
     "changeThresholdLater": "You can set separate up & down thresholds later in Settings",
+    "threshold": {
+      "kicker": "Your trigger",
+      "title": "Choose when Holzen should interrupt the impulse",
+      "body": "Set the daily move that should trigger a pause. During onboarding, Holzen uses the same threshold for both rises and drops in {{asset}}.",
+      "footer": "You can split upward and downward thresholds later in Settings."
+    },
     "trialHint": "Or start with a {{trialDays}}-day free trial →",
     "companions": {
       "breathing": "Breathing",
@@ -661,28 +792,33 @@
       "zoomOutDesc": "Where were things 1, 3, 5 years ago?",
       "zoomOutSampleLabel": "1 year ago",
       "zoomOutSample": "BTC was $28,400 — today's price represents a 240% gain. What felt like crisis then became a buying opportunity.",
-      "history": "Historical Echo",
+      "history": "Look Back",
       "historyDesc": "Parallels from financial history",
       "historySampleLabel": "Similar moment",
       "historySample": "When gold dropped 26% in 2013, panic sellers locked in losses. Within 2 years, it consolidated and began a new ascent."
     },
     "commitmentKicker": "Your commitment",
     "commitmentTitle": "Your commitment",
-    "commitmentIntro": "Set the commitment you are holding for. You can refine it anytime in Settings → You. Optional breathing mantra is also there after you have used pauses.",
+    "commitmentIntro": "Optional: add a personal commitment anchor anytime in Settings → You.",
     "commitmentFooterHint": "Skip if you prefer — you can set this later under Settings → You.",
     "commitmentHoldLabel": "Commitment (optional)",
     "ready": {
       "title": "You're set",
+      "recapAsset": "Tracked asset",
       "recapWhy": "Your why",
       "recapHoldGoal": "Hold goal",
       "recapHoldGoalSet": "Saved",
       "recapHoldGoalUnset": "Not set yet",
+      "recapWhyUnset": "Not set yet",
       "recapGrounding": "Grounds you",
       "recapThreshold": "Threshold",
-      "trialBody": "Start your {{days}}-day trial to use Pause when volatility spikes. No card required — cancel anytime before it ends.",
-      "startingTrial": "Starting trial…",
+      "trialBody": "$0 today. Add a card to start your {{days}}-day trial to use Pause when volatility spikes. We will not charge you when the trial ends.",
+      "trialBodyConfigured": "$0 today. Add a card to start your {{days}}-day trial — Holzen will watch {{asset}} for moves of about +/-{{threshold}}%. We will not charge you when the trial ends.",
+      "startingTrial": "Opening checkout…",
       "startTrialNoCard": "Start {{days}}-day free trial",
-      "trialFinePrintNoCard": "Then ${{price}}/mo if you keep going · Cancel anytime"
+      "startTrialWithCard": "Start {{days}}-day free trial",
+      "trialFinePrintNoCard": "Then ${{price}}/mo if you keep going · Cancel anytime",
+      "trialFinePrintCard": "$0 today · Standard debit/credit only · No prepaid · No charge at trial end · Subscribe anytime at ${{price}}/mo"
     },
     "groundingAddMore": "Add another",
     "groundingPlaceholder": "e.g. Walk outside without checking price",
@@ -715,23 +851,32 @@
     "bought": "Bought",
     "nothing": "Nothing"
   },
-  "btcStatus": {
+  "marketStatus": {
     "unableToFetch": "Unable to fetch price data",
     "checkConnection": "Check your connection and try again",
-    "exitBtcMode": "Back to {{currency}} price view",
-    "enterBtcMode": "Enter 1 BTC = 1 BTC mode",
+    "exitUnitBasisMode": "Back to {{currency}} price view",
+    "enterUnitBasisMode": "Enter 1 BTC = 1 BTC mode",
+    "unitBasisIdentity": "1 {{symbol}} = 1 {{symbol}}",
     "show": "Show",
     "hide": "Hide",
     "showPrice": "Show price",
     "hidePrice": "Hide price",
+    "hidePriceDisabledInUnitBasis": "Hide price is not available in 1 BTC = 1 BTC mode",
     "priceIsNoise": "Price is noise. Value is constant.",
     "in24h": "in 24h"
   },
   "holzenNumber": {
     "title": "The Holzen Number",
-    "heldSteadyToday": "held steady today",
-    "reflectionsRecorded": "of users held steady today · {{count}} pause recorded",
-    "reflectionsRecorded_other": "of users held steady today · {{count}} pauses recorded"
+    "pausingNow": "of users pausing now",
+    "pausingNowToo": "are pausing now, too",
+    "pausingNowDetail": "{{count}} person pausing now",
+    "pausingNowDetail_other": "{{count}} people pausing now",
+    "pausedToday": "of users paused today",
+    "pausedTodayDetail": "{{count}} person paused today",
+    "pausedTodayDetail_other": "{{count}} people paused today",
+    "heldSteadyToday": "chose deliberately today",
+    "reflectionsRecorded": "of users chose deliberately today · {{count}} pause recorded",
+    "reflectionsRecorded_other": "of users chose deliberately today · {{count}} pauses recorded"
   },
   "ritual": {
     "selectTemplate": "Choose your ritual",
@@ -750,13 +895,13 @@
       "reflect": "Reflect",
       "reflectDesc": "Sit with a reflection message and notice what arises",
       "review": "Self-review",
-      "reviewDesc": "Look at your personal stats — hold rate, mood patterns",
+      "reviewDesc": "Look at your personal stats — steadiness rate, mood patterns",
       "journal": "Journal",
       "journalDesc": "Free-form writing to process thoughts before deciding",
       "physical": "Physical action",
       "physicalDesc": "Movement or physical activity to release tension",
       "decide": "Decide",
-      "decideDesc": "Make your final choice: hold, buy, sell, or do nothing"
+      "decideDesc": "Record what you chose — for your awareness only, not our recommendation"
     },
     "categories": {
       "mindfulness": "Mindfulness",
@@ -795,7 +940,7 @@
     "review": {
       "last30Days": "Your last 30 days",
       "reflections": "Pauses",
-      "holdRate": "Hold rate",
+      "holdRate": "Steadiness rate",
       "dominantMood": "Dominant mood",
       "lastMarket": "Last market",
       "acknowledged": "I see my patterns"
@@ -812,7 +957,7 @@
       "hold": "Hold",
       "sell": "Sell",
       "buy": "Buy",
-      "nothing": "Nothing"
+      "nothing": "Wait"
     }
   },
   "companions": {
@@ -823,6 +968,10 @@
     "signal": "Read the signal →",
     "zoomOut": "Zoom out →",
     "lookBack": "Look back →",
+    "lookBackTitle": "Look Back",
+    "groundTitle": "Grounding",
+    "signalTitle": "Signal",
+    "zoomOutTitle": "Zoom Out",
     "helpfulQuestion": "Helpful?",
     "regenerate": "Regenerate",
     "regenerating": "Regenerating…",
@@ -847,10 +996,14 @@
     "echoMoreEntries_other": "{{count}} more entries from that pause",
     "echoEmptyTitle": "Echo",
     "echoEmptyBody": "You haven’t left notes on past pauses yet. Add one next time — only your own words show up here, never a new AI take.",
+    "zoomOutEmptyLead": "Perspective takes time to build.",
+    "zoomOutEmptyBody": "The more you pause and add notes, the richer your zoom-out view becomes. Deep-time perspective and your own words from past pauses will appear here over time.",
     "echoHolzenAsked": "Holzen asked",
     "echoYourNote": "Your note",
     "echoYourReplay": "Your replay",
     "openFullView": "Open full view",
+    "readFullStory": "Read the full story",
+    "keyIdeasHeading": "KEY IDEAS",
     "focusZoomOutMeta": "Zoom Out — Holzen",
     "focusHistoryMeta": "Look back — Holzen",
     "focusLoadError": "We could not load this pause. It may have been removed or you may need to sign in again.",
@@ -873,7 +1026,7 @@
         "body": {
           "signal": "Chosen because you feel {{mood}}, {{direction}}, and this pause's theme is {{bias}}.",
           "grounding": "Chosen because you feel {{mood}}, {{direction}}, and this pause's theme is {{bias}}. Grounding cards surface the bias most likely to trip you today.",
-          "history": "Chosen because you feel {{mood}}, {{direction}}, and this pause's theme is {{bias}}. History cards look for a comparable Bitcoin moment from your past.",
+          "history": "Chosen because you feel {{mood}}, {{direction}}, and this pause's theme is {{bias}}. Look Back cards look for a comparable Bitcoin moment from your past.",
           "zoomOut": "Chosen because you feel {{mood}}, {{direction}}, and this pause's theme is {{bias}}. Zoom Out pulls in deep-time perspective to balance short-term noise.",
           "fallback": "Chosen based on how you said you felt and this pause's theme."
         }
@@ -924,9 +1077,9 @@
   },
   "landing": {
     "hero": "When Bitcoin moves, pause before you do.",
-    "heroDesc": "Holzen is a self-awareness practice for Bitcoin holders. When volatility hits, you get a moment to breathe, reflect, and notice your patterns — before impulse takes over.",
+    "heroDesc": "Holzen is a self-awareness practice for investors. When Bitcoin moves, you get a moment to breathe, reflect, and notice your patterns — before impulse takes over. We don't recommend buying, selling, or holding anything — only pausing long enough to choose deliberately.",
     "getStartedForFree": "Start your free trial",
-    "noCreditCard": "{{trialDays}}-day Pro trial · no card required · ${{price}}/mo after trial",
+    "noCreditCard": "{{trialDays}}-day Pro trial · card required · $0 today · ${{price}}/mo if you subscribe after",
     "reflectionLoop": "Impulse vs. Intention",
     "reaction": {
       "label": "Without Holzen",
@@ -952,116 +1105,88 @@
       "03title": "You reflect",
       "03desc": "An AI-generated reflection encourages awareness, not action. Five companions offer context: a haiku, a signal, a grounding nudge, a zoom-out perspective, and a historical echo.",
       "04title": "You decide",
-      "04desc": "Choose deliberately whether you held steady, sold, or bought. The full pause guides you through feel, breathe, reflect, frame, a second breath, then a short settle before Decide — six beats in the ritual, so your choices come from clarity, not impulse.",
+      "04desc": "Log what you chose — for your awareness, not our advice. The full pause guides you through feel, breathe, reflect, frame, a second breath, then a short settle before Decide — six beats in the ritual, so your choices come from clarity, not impulse.",
       "05title": "You grow",
       "05desc": "Tag emotions. Add notes. Log outcomes. Your Archive and Journey overview show how your composure evolves over time."
     },
     "companionsTitle": "Five companions",
-    "companionsDesc": "Every pause comes with companions designed to slow you down and add perspective. Save any to your Library with a tap.",
+    "companionsDesc": "Every pause comes with companions designed to slow you down and add perspective. Heart your favorites to revisit them later.",
     "companions": {
       "haiku": "Haiku",
       "haikuDesc": "5-7-5 stillness, unique each time",
       "signal": "Signal",
-      "signalDesc": "Curated Bitcoin thinking on sovereignty, time preference, and sound money",
+      "signalDesc": "Curated thinking on patience, uncertainty, and time horizon",
       "grounding": "Ground Yourself",
       "groundingDesc": "Behavioral finance research in context",
       "zoomOut": "Zoom Out",
-      "zoomOutDesc": "BTC prices 1–5 years ago, your past pauses & deep-time perspective",
-      "history": "Historical Echo",
-      "historyDesc": "Financial history parallels & cross-asset analogies via research"
+      "zoomOutDesc": "Deep-time perspective and your own words from past pauses",
+      "history": "Look Back",
+      "historyDesc": "Bitcoin on this day, historical parallels, and cross-asset perspective"
     },
     "whatYouGet": "What's included",
     "features": {
       "pause": "The Pause",
       "pauseDesc": "Science-sequenced ritual: feel, breathe, reflect, frame, breathe again, choose, then decide — triggered by real market volatility",
       "companions": "5 AI Companions",
-      "companionsDesc": "Haiku, Signal, Grounding, Zoom Out (historical BTC prices), and Historical Echo — different angles on the same pause, ready to explore or save",
+      "companionsDesc": "Haiku, Signal, Grounding, Zoom Out, and Look Back — different angles on the same pause, ready to explore",
       "detection": "Smart detection",
-      "detectionDesc": "Separate up/down thresholds, 24h + 7-day cumulative, configurable cooldown",
+      "detectionDesc": "Separate up/down thresholds on 24h moves, plus quiet hours and snooze when you need silence",
       "mood": "Emotional tracking",
-      "moodDesc": "8 states from FOMO to detachment, tags, journal notes, outcome logging",
-      "decisionMirror": "Decision Mirror",
-      "decisionMirrorDesc": "AI-powered follow-up questions that challenge your impulse before you commit",
+      "moodDesc": "8 states from FOMO to detachment, tags, notes, and outcome logging on each pause",
       "grounding": "Personal grounding",
-      "groundingDesc": "Define your own grounding activities — AI uses them to suggest personalized exercises during volatility",
-      "insights": "AI insights",
-      "insightsDesc": "Composure score, decision quality, mood trends, period comparisons",
-      "nightReflections": "Night reflections",
-      "nightReflectionsDesc": "End-of-day check-ins reviewing how the market moved while you weren't looking",
-      "holdGoals": "Hold goal tracking",
-      "holdGoalsDesc": "Set time or price targets, backdate existing holdings, track progress visually",
-      "profileStats": "Personal stats",
-      "profileStatsDesc": "Holzen Score, mood distribution, composure trends, and behavioral insights over time",
-      "badges": "Badges & streaks",
-      "badgesDesc": "Milestones that celebrate composure, not trading activity",
-      "library": "Personal library",
-      "libraryDesc": "Save companions, pauses, and notes. Organize in collections.",
-      "letters": "Emotional time capsules",
-      "lettersDesc": "Write during fear or calm — delivered in the opposite market state, with BTC price comparison",
-      "wisdomQuotes": "Wisdom Quotes",
-      "wisdomQuotesDesc": "Curated insights from legendary investors, surfaced during your breathing practice",
-      "practice": "Mindful practices",
-      "practiceDesc": "Body scan, guided journal, emotional check-in, and reflection replay — plus standalone breathing and grounding exercises anytime, not only during a pause.",
-      "breatheGround": "Breathe & Ground",
-      "breatheGroundDesc": "Standalone breathing and grounding exercises available anytime, not just during pauses",
-      "personalization": "Deep personalization",
-      "personalizationDesc": "Custom reflection tone, ritual depth, companion preferences, quiet hours & more",
+      "groundingDesc": "Define your own grounding activities — Holzen references them during pauses and in Ground Yourself",
+      "archive": "Archive",
+      "archiveDesc": "Browse completed pauses and echoes — read-only history that stays available even when your trial ends",
+      "journey": "Journey & Presence",
+      "journeyDesc": "Practice Presence XP, completed pause count, and how your ritual depth adds up over time",
       "mantra": "Custom mantra",
-      "mantraDesc": "Your personal mantra displayed during breathing — a steady anchor in volatile moments",
-      "mindfulSpaces": "The Stillness",
-      "mindfulSpacesDesc": "Real-time Bitcoin network meditation with live block data, epoch progress, contemplations & AI-generated wallpapers from your reflections",
-      "globalDefault": "Global by default",
-      "globalDefaultDesc": "8 currencies & timezone-aware smart notifications with quiet hours",
+      "mantraDesc": "Your personal mantra on Home and during breathing — a steady anchor in volatile moments",
       "pwa": "Installable app",
       "pwaDesc": "Works offline, installable on any device — no app store needed",
-      "shareTrack": "Share & track",
-      "shareTrackDesc": "Share reflections to X, WhatsApp & Telegram with a tap",
-      "referral": "Referral program",
-      "referralDesc": "Invite friends and earn rewards as they build their own practice",
-      "roadmap": "Public roadmap",
-      "roadmapDesc": "Vote on upcoming features and shape the product with the community",
-      "activityLog": "Activity log",
-      "activityLogDesc": "Full notification hub with badges, letters, insights & pause history in one place",
       "privacy": "Your data, your control",
       "privacyDesc": "Export JSON/CSV anytime. Delete everything instantly."
     },
-    "scienceQuote": "Impulsive decisions under volatility consistently lead to worse outcomes.",
-    "scienceDesc": "Behavioral finance research shows that emotional reactions — panic selling during drops, euphoric buying during surges — are among the most reliable predictors of poor returns. A brief pause before action leads to better decisions.",
+    "scienceQuote": "Under volatility, feelings often decide before reflection gets a chance.",
+    "scienceDesc": "Research on affect and risk shows that fear in a drop or euphoria in a surge can steer choices before you've regulated. Naming what you feel and slowing down creates space for deliberate judgment — not a market call from us.",
+    "scienceCitationLabel": "Loewenstein, G., Weber, E. U., Hsee, C. K., & Welch, N. (2001). \"Risk as feelings.\" Psychological Bulletin, 127(2), 267–286.",
+    "scienceCitationUrl": "https://doi.org/10.1037/0033-2909.127.2.267",
     "scienceStepsTitle": "The science behind the pause",
     "scienceStepsIntro": "Each step in Holzen's pause session follows a specific principle from clinical and behavioral research:",
     "scienceStepFeel": "Name what you're feeling first. Putting feelings into words ('affect labeling') gives the rest of the ritual a clear emotional anchor (Lieberman et al., 2007).",
     "scienceStepBreathe": "Slow breathing activates the parasympathetic nervous system, shifting from fight-or-flight toward regulation so reflection lands in a steadier body state (Porges, 2011).",
     "scienceStepReflect": "Engage in cognitive reappraisal. Reframing after regulation leads to better decisions than suppression or avoidance (Gross, 2002).",
-    "scienceStepFrame": "Choose your angle. After the reflection, open the companions and tools that help — a metacognitive pause before commitment (Flavell, 1979).",
+    "scienceStepFrame": "Choose your angle. After the reflection, open the companions that help — a metacognitive pause before commitment (Flavell, 1979).",
     "scienceStepBreatheAgain": "Regulate once more before you choose. A second breathing pass lowers arousal again after reframing (Lehrer & Gevirtz, 2014).",
     "scienceStepDecide": "Act from intention, not impulse. System 2 is online: move from reactive processing to a deliberate outcome (Kahneman, 2011).",
     "scienceStepsSummary": "Feel, breathe, reflect, frame, breathe again, then decide — six beats, with a brief settle moment on the same final segment before you record an outcome; each maps to peer-reviewed work from Lieberman, Porges, Gross, Flavell, and Kahneman.",
     "readFullResearch": "Read the full research →",
     "freeToStart": "{{trialDays}}-day free trial",
-    "pricingDesc": "Start with a {{trialDays}}-day free trial of Pro — unlimited pauses and AI companions (${{price}}/month after, cancel anytime). When your trial ends, you can reactivate from Settings to keep pausing.",
+    "pricingDesc": "Start with a {{trialDays}}-day free trial of Pro — add a standard debit or credit card at signup ($0 today, no charge at trial end). Unlimited pauses and AI companions while trialing; ${{price}}/month if you subscribe after, cancel anytime.",
     "questions": "Common questions",
     "faq": {
       "whoQuestion": "Who is Holzen for?",
-      "whoAnswer": "Anyone who holds Bitcoin and has ever felt the urge to sell during a crash or buy during a surge. Holzen is for holders who want to understand their emotional patterns — not traders looking for signals.",
+      "whoAnswer": "Anyone who invests and has felt the pull to act when markets move — whether that's selling during a drop, buying during a surge, or endlessly checking the chart. Holzen is for people who want to understand their emotional patterns and choose deliberately. It is not a signals or trading tool.",
+      "adviceQuestion": "Does Holzen tell me to buy, sell, or hold?",
+      "adviceAnswer": "No. Holzen doesn't know your goals, timeline, or portfolio. It interrupts impulse and helps you notice what you're feeling so you decide — consciously. Outcomes you log during a pause are for your own awareness, not our recommendation.",
       "breatheQuestion": "I don't need an app to tell me to breathe.",
       "breatheAnswer": "You're right — you don't. But Holzen doesn't just remind you to breathe. It intercepts you at the exact moment volatility hits, sequences you through a science-backed protocol (feel → regulate → reappraise → frame → regulate again → decide), and tracks your patterns over time. Willpower alone doesn't build a practice. Timing and structure do.",
       "meditationQuestion": "Isn't this just another meditation app?",
       "meditationAnswer": "Meditation apps are general-purpose. Holzen is triggered by real market events — it meets you in the moment you're most likely to act on impulse. It combines breathing, AI reflections, behavioral science, curated intelligence, and long-term pattern tracking into one practice. Calm doesn't know when Bitcoin just dropped 8%.",
       "valueQuestion": "${{price}}/month for something I might rarely use?",
-      "valueAnswer": "The moments you use Holzen are the moments that matter most — when a single impulsive decision can cost thousands. One avoided panic sell or FOMO buy pays for years of the subscription.\n\nHow often you pause is not \"once in a blue moon\" by design: when markets are choppy or your thresholds are sensitive, alerts can add up to many times a month. In settings, Holzen estimates how often you would have paused on recent price action so you can tune how often you want to be interrupted instead of guessing. You can also request a pause anytime from Home without waiting for an alert, with a short cooldown so the habit stays intentional.\n\nYour {{trialDays}}-day trial includes full Pro access. After it ends, reactivate from Settings to keep engaging with new pauses.",
+      "valueAnswer": "The moments you use Holzen are the moments that matter most — when a single impulsive decision can cost you clarity, sleep, or capital. One pause taken at the right time is worth far more than the subscription.\n\nHow often you pause is not \"once in a blue moon\" by design: when markets are choppy or your thresholds are sensitive, alerts can add up to many times a month. In settings, Holzen estimates how often you would have paused on recent price action so you can tune how often you want to be interrupted instead of guessing. You can also request a pause anytime from Home without waiting for an alert, with a short cooldown so the habit stays intentional.\n\nYour {{trialDays}}-day trial includes full Pro access. After it ends, reactivate from Settings to keep engaging with new pauses.",
       "fairUseQuestion": "What does \"unlimited\" actually mean?",
       "fairUseAnswer": "Pro includes unlimited pauses and AI companions for personal use — there's no per-month cap you can hit. To keep the service healthy for everyone, we apply light technical limits (a short cooldown between pauses and a per-hour ceiling) that real users never notice in practice. These only come into play for clearly abusive patterns like scripted traffic or repeated automated runs.",
       "worksQuestion": "Does this actually change behavior?",
       "worksAnswer": "Each step follows peer-reviewed research: affect labeling (Lieberman), vagal breathing (Porges), cognitive reappraisal (Gross), metacognition (Flavell), a second regulation pass, and deliberate decision-making (Kahneman). Over time, your stats reveal patterns you can't see in the moment — and that awareness itself shifts behavior.",
-      "rationalQuestion": "I'm a long-term holder — I don't panic.",
-      "rationalAnswer": "That's what most holders believe until a -20% day. Research shows even experienced investors overestimate their emotional resilience. Holzen isn't just for panic — it catches subtle patterns like over-checking, quiet anxiety, or euphoric overconfidence that erode conviction without you noticing.",
+      "rationalQuestion": "I'm a steady investor — I don't panic.",
+      "rationalAnswer": "That's what most investors believe until a sharp move. Research shows even experienced people overestimate their emotional resilience. Holzen isn't just for panic — it catches subtle patterns like over-checking, quiet anxiety, or euphoric overconfidence that erode deliberate choice without you noticing.",
       "dataQuestion": "What happens to my emotional data?",
       "dataAnswer": "We store only what's needed: your email, thresholds, pauses, and mood entries. You can export everything as JSON or CSV anytime, or delete your account entirely with one tap. See our"
     },
-    "footer": "Holzen is not a trading tool. It won't tell you what to do. It exists to help you understand yourself — one volatile moment at a time.",
+    "footer": "Holzen is not a trading tool or financial advisor. We don't tell you what to buy, sell, or hold. We help you understand yourself — one volatile moment at a time.",
     "contact": "Contact",
     "about": "About",
-    "btcReserve": "BTC Reserve",
+    "reserveLabel": "BTC Reserve",
     "blog": "Blog",
     "roadmap": "Roadmap",
     "terms": "Terms",
@@ -1076,8 +1201,8 @@
     "opportunityBody3": "But access is only half the equation. What these platforms don't provide is the emotional infrastructure to handle what comes next: the volatility, the uncertainty, the constant temptation to act when doing nothing would serve you better.",
     "opportunityBody4": "That's the gap Holzen fills — not with more data or faster alerts, but with a practice of self-awareness designed to create space between impulse and decision.",
     "whatResearchSays": "What the research says",
-    "researchBody1": "Investing is hard. Controlling your emotions under volatility is harder.",
-    "researchBody2": "Behavioral finance has spent decades documenting this. Daniel Kahneman's work on System 1 and System 2 thinking shows that under stress, our fast, instinctive mind hijacks decisions before our slower, reflective mind can intervene. Barber and Odean's research found that the most active individual traders underperform by 6.5% annually — not because they lack information, but because they act on emotion.",
+    "researchBody1": "Markets move. Noticing your emotions under volatility is harder than it looks.",
+    "researchBody2": "Behavioral research has documented this for decades. Daniel Kahneman's work on System 1 and System 2 thinking shows that under stress, our fast, instinctive mind hijacks decisions before our slower, reflective mind can intervene. Loewenstein and colleagues found that people often react from immediate feelings about risk before they analyze it carefully — which is exactly the gap a structured pause is meant to bridge.",
     "researchBody3": "This is true for experienced investors and beginners alike. The difference is that beginners often don't yet recognise the pattern: the urge to sell when prices fall, the urge to buy when prices surge. Both feel rational in the moment. Neither usually is.",
     "researchBody4": "Holzen applies this research directly. When volatility crosses your threshold, you're guided through a science-backed pause designed to move you from reactive to deliberate.",
     "pauseResearchTitle": "The science behind the guided pause ritual",
@@ -1095,21 +1220,21 @@
     "pauseResearchDecide": "Decide",
     "pauseResearchDecideDesc": "With regulation and reappraisal behind you, Kahneman's System 2 (2011) is online. You can act from intention rather than impulse.",
     "readFullScience": "See the full research on our landing page →",
-    "whyBitcoin": "Why Bitcoin",
-    "bitcoinBody1": "Holding Bitcoin is especially hard — and we think that's exactly why it's worth doing.",
-    "bitcoinBody2": "Bitcoin behaves like a volatile tech stock in the short term, but we believe it is something fundamentally different: the best savings technology ever invented. A decentralised, scarce, programmable monetary network with no counterparty risk.",
-    "bitcoinBody3": "We believe Bitcoin represents the most asymmetric bet in the history of financial markets. But capturing that asymmetry requires one thing above all else: the ability to hold through volatility.",
-    "bitcoinBody4": "Holzen exists to help people hold — with awareness. We don't tell you what to do. We help you pause long enough to notice your impulse, name it, and choose deliberately.",
+    "whyBitcoin": "Why we start with Bitcoin",
+    "bitcoinBody1": "Holzen launches with Bitcoin because it moves sharply, trades around the clock, and tends to stir strong emotions — an honest place to practice pausing before you act.",
+    "bitcoinBody2": "That doesn't mean we take a view on whether you should own Bitcoin, how much, or for how long. Your strategy is yours. We watch price moves so we can meet you in volatile moments, not to judge them.",
+    "bitcoinBody3": "Bitcoin is emotionally demanding in a way many assets are not: big swings, always-on markets, and a culture that celebrates conviction. That makes it a strong first trigger — not a claim that everyone should hold.",
+    "bitcoinBody4": "Holzen exists to help you hold yourself — with awareness. We don't tell you what to do with your portfolio. We help you pause long enough to notice your impulse, name it, and choose deliberately.",
     "ourPhilosophy": "Our philosophy",
     "philosophyBody1": "Holzen is a micropreneur project — small by design.",
     "philosophyBody2": "We don't have investors, a growth team, or a roadmap optimised for scale. We have a focused product, a clear price, and users who value what we build.",
     "philosophyBody3": "We believe the best software is often built by small teams who care deeply about the problem they're solving. No engagement metrics, no dark patterns, no pressure to grow at all costs.",
-    "btcReserve": "BTC Reserve",
-    "reserveBody1": "We hold what we help others hold.",
-    "reserveBody2": "Holzen maintains a Bitcoin reserve as a long-term store of value — not as speculation, but as a statement of conviction.",
+    "reserveLabel": "BTC Reserve",
+    "reserveBody1": "Separately from the product, Holzen maintains a company Bitcoin reserve. See our reserve strategy for the founders' conviction — it's not guidance for your portfolio.",
+    "reserveBody2": "Holzen maintains a Bitcoin reserve as a long-term store of value — not as speculation, but as a statement of founders' conviction.",
     "readReserveStrategy": "Read our full reserve strategy →",
     "aboutUs": "About us",
-    "aboutUsBody1": "Holzen is built by a husband-and-wife team. We're Bitcoin holders ourselves, and we built this tool because we needed it.",
+    "aboutUsBody1": "Holzen is built by a husband-and-wife team. We built it because investing under volatility is hard — and we wanted a practice for the moments impulse speaks loudest.",
     "aboutUsBody2": "We hope Holzen can do the same for you.",
     "home": "Home",
     "terms": "Terms",
@@ -1121,7 +1246,7 @@
     "loadFailed": "We couldn't load posts. Check your connection and try again.",
     "loadMoreFailed": "Couldn't load more posts. Try again in a moment.",
     "nothingYet": "Nothing here yet.",
-    "nothingDesc": "We're working on our first posts about behavioral finance, Bitcoin conviction, and the art of doing nothing. Check back soon.",
+    "nothingDesc": "We're working on our first posts about investor psychology, behavioral finance, and the art of pausing. Check back soon.",
     "home": "Home",
     "about": "About",
     "terms": "Terms",
@@ -1132,11 +1257,11 @@
   },
   "reserve": {
     "title": "BTC Reserve Strategy",
-    "subtitle": "We hold what we help others hold.",
+    "subtitle": "Our company treasury — separate from the product",
     "whyWeHold": "Why we hold",
-    "whyWeHoldBody1": "A product that helps people hold Bitcoin should itself hold Bitcoin. Anything else would be a contradiction.",
-    "whyWeHoldBody2": "Holzen maintains a Bitcoin reserve — not as a financial strategy, but as a statement of conviction. We believe Bitcoin is the best savings technology ever created.",
-    "whyWeHoldBody3": "Our reserve is denominated in Bitcoin, not dollars. We don't measure success by fiat returns. We measure it by the discipline of not selling.",
+    "whyWeHoldBody1": "Holzen maintains a Bitcoin reserve as founders' conviction in what we build — not as a prescription for users.",
+    "whyWeHoldBody2": "The product helps anyone pause before acting, whatever they choose afterward. This page is about our company treasury only.",
+    "whyWeHoldBody3": "Our reserve is denominated in Bitcoin. We report it transparently when it starts — it is not investment advice for you.",
     "ourStrategy": "Our strategy",
     "strategyBody": "We allocate a significant portion of company treasury to Bitcoin. We acquire through dollar-cost averaging and opportunistic buys during periods of elevated fear. We do not trade. We do not hedge. We do not lend.",
     "strategyBullet1": "Self-custody only — no third-party risk",
@@ -1152,15 +1277,15 @@
     "reserveNotStarted": "Our reserve hasn't started yet. When it does, the numbers will appear here — transparent from the first sat.",
     "standingOnConviction": "Standing on conviction",
     "convictionBody1": "Our approach is inspired by companies like MicroStrategy, who demonstrated that a corporate Bitcoin reserve isn't speculative — it's a statement about the future of money.",
-    "convictionBody2": "Every sat in our treasury represents the same conviction we ask our users to practice. We don't just build tools for holders — we are holders.",
-    "closingQuote": "The practice is the same whether you hold 0.001 BTC or 10,000. Sit with the volatility. Notice the impulse. Choose deliberately.",
+    "convictionBody2": "Every sat in our treasury reflects our personal conviction as founders — not a strategy we ask users to follow.",
+    "closingQuote": "The practice is the same for every investor: sit with volatility, notice the impulse, choose deliberately.",
     "closingAttribution": "— Holzen"
   },
   "sources": {
     "title": "Sources",
     "signalTab": "Signal",
     "groundingTab": "Grounding",
-    "signalDescription": "Sources for Signal — Bitcoin sovereignty, sound money, time preference.",
+    "signalDescription": "Sources for Signal — patience, uncertainty, time preference, and decision-making under volatility.",
     "groundingDescription": "Sources for Ground Yourself — behavioral finance, psychology, decision science.",
     "activeCount": "{{active}} of {{total}} active",
     "types": {
@@ -1344,7 +1469,7 @@
     "preTrial": {
       "kicker": "Start your trial",
       "title": "Start your {{days}}-day free trial",
-      "body": "No card required. Full pause ritual for {{days}} days — cancel anytime before it ends.",
+      "body": "Add a card to start your {{days}}-day trial ($0 today). Full pause ritual while trialing — no charge when the trial ends.",
       "cta": "Start {{days}}-day free trial"
     },
     "terminalEntryRedirect": "This pause already ended — opening your archive.",
@@ -1354,12 +1479,20 @@
     "breathIntroGuidance": "Just follow the rhythm.",
     "breathIntroSingle": "Let's slow this down. Just follow the rhythm.",
     "breathStartCta": "Start",
-    "breathSkipToDecide": "Skip to decide",
+    "breathContinueWithoutFinalBreath": "Continue without final breath",
     "breathRoundLabel": "Round {{current}}/{{total}}",
     "startRitual": "Start a ritual",
     "orDecideNow": "or scroll down to decide without a ritual",
-    "whatWillYouDo": "What did you choose?",
-    "decideSubcopy": "Record your decision — Holzen does not judge your strategy.",
+    "whatWillYouDo": "What will you do?",
+    "decideSubcopy": "You've paused. What's next is yours.",
+    "decideDisclaimerTitle": "This doesn't trade",
+    "decideDisclaimerLine1": "Holzen doesn't act for you.",
+    "decideDisclaimerLine2": "This just records what you intend.",
+    "decide": {
+      "hold": "Hold",
+      "buy": "Buy",
+      "sell": "Sell"
+    },
     "youChose": "You chose deliberately.",
     "return": "Return",
     "leaveSessionTitle": "Leave ritual?",
@@ -1372,6 +1505,11 @@
       "stayCta": "Stay",
       "leaveCta": "Leave",
       "switchBriefCta": "Or switch to brief pause (~2 min)"
+    },
+    "inactivity": {
+      "header": "Hello",
+      "headline": "Still with us?",
+      "body": "Your pause is here whenever you're ready."
     },
     "sessionTitle": "Your pause",
     "deep": {
@@ -1386,11 +1524,13 @@
       "breathFirstInterstitialBody": "You've arrived",
       "breathFirstRepeatCta": "Three more",
       "breathSecondInterstitialTitle": "You already know",
+      "breathSecondInterstitialRemember": "Remember",
+      "breathSecondInterstitialWhyHeading": "And your why",
       "breathSecondRepeatCta": "Three more"
     },
     "feelStep": {
       "title": "What's here?",
-      "subtitle": "No need to be sure",
+      "subtitle": "Whatever's here counts.",
       "tiles": {
         "fomo": "FOMO",
         "fearful": "Fearful",
@@ -1438,26 +1578,27 @@
         "completedSaved": "Completed and saved",
         "journeyShort": "This pause is now part of your Journey.",
         "journeyLead": "This pause is saved to your Journey.",
-        "journeyPersonalHeldWithMood": "You named {{mood}}, then chose to hold.",
-        "journeyPersonalHeld": "You chose to hold after pausing.",
+        "journeyPersonalHeldWithMood": "You named {{mood}}, then chose no change.",
+        "journeyPersonalHeld": "You chose no change after pausing.",
         "journeyPersonalSoldWithMood": "You named {{mood}}, then chose to sell.",
         "journeyPersonalSold": "You chose to sell after pausing.",
         "journeyPersonalBoughtWithMood": "You named {{mood}}, then chose to buy.",
         "journeyPersonalBought": "You chose to buy after pausing.",
         "personalityKicker": "Each completed pause adds to your rhythm — Holzen celebrates the pause, not the trade.",
-        "personalityKickerHeld": "You paused and chose to hold. That conscious moment is what counts.",
+        "personalityKickerHeld": "You paused and chose no change. That conscious moment is what counts.",
         "personalityKickerSold": "You paused and chose to sell. That conscious moment is what counts.",
         "personalityKickerBought": "You paused and chose to buy. That conscious moment is what counts.",
         "contributionWhenNoSnapshot": "Your pause is saved to Journey.",
         "contributionTitle": "What you practiced",
         "contributionFallback": "This pause is now part of your Journey.",
-        "impactHeldCalm": "You chose to hold after pausing.",
+        "impactHeldCalm": "You chose no change after pausing.",
         "impactBought": "You recorded what you chose after pausing.",
         "impactSold": "You recorded what you chose after pausing.",
         "impactDecisionRecorded": "You recorded what you chose after pausing — that is the practice.",
         "impactEntryMood": "You named how you felt before deciding.",
-        "checkInSectionTitle": "How are you now?",
+        "checkInSectionTitle": "A second look (Optional)",
         "checkInRowLeft": "Check in again",
+        "checkInRowXpReward": "+{{count}} XP",
         "checkInRowRightHint": "Optional: if how you feel now changed after deciding, adjust mood or intensity and tap Save.",
         "contributionFootnote": "These lines describe how you practiced — not whether your trade was correct.",
         "practiceAffirmLead": "Stopping to decide is what matters here. Journey tracks completed pauses and your rhythm over time.",
@@ -1468,9 +1609,9 @@
         "moodPickerTitle": "Choose emotion",
         "saveToJourney": "Save to journey",
         "saveToJourneySaving": "Saving…",
-        "outcomeHeld": "You chose to Hold",
-        "outcomeSold": "You chose to Sell",
-        "outcomeBought": "You chose to Buy",
+        "outcomeHeld": "Hold",
+        "outcomeSold": "Sell",
+        "outcomeBought": "Buy",
         "outcomeFallback": "Nice work"
       },
       "breathIntroKicker": "Breathe",
@@ -1479,6 +1620,7 @@
     "depthPicker": {
       "contextMoved": "{{sym}} moved {{pct}}% in the last 24 hours.",
       "kicker": "What do you need?",
+      "headline": "How long do you have?",
       "headline1": "You paused",
       "headline2": "That's the hardest part.",
       "brief": {
@@ -1501,38 +1643,28 @@
       "title": "Why pause?",
       "subtitle": "The science behind it",
       "sections": {
-        "holzen": {
-          "title": "Holzen, in one breath",
-          "body": "Holzen is a structured pause for Bitcoin holders: you name what you feel, slow your body with breath, then decide from a steadier state. It is not price advice — it is a regulation ritual so impulses have less room to steer."
+        "holzenChallenge": {
+          "title": "Holzen, the challenge",
+          "body": "The market moves. Your body reacts before you choose to. That reaction has a name: the limbic system — the part of your brain that handles emotion and impulse.\n\nWhen BTC drops sharply, your amygdala fires. Cortisol rises. Your prefrontal cortex — the part that thinks long-term — gets quieter.\n\nMost regrettable financial decisions happen here."
         },
-        "challenge": {
-          "title": "The challenge you are in",
-          "body": "Markets compress time. A chart can feel like a verdict on your judgment, your security, your future. Volatility pulls attention toward threat and reward at once — a recipe for reactive trades. Pausing widens the gap between stimulus and response."
-        },
-        "ninety": {
-          "title": "The 90-second window",
-          "body": "Strong emotional surges often crest within roughly 90 seconds if you do not feed them with new stories or new clicks. A short breathing sequence can help your nervous system shift out of emergency pacing so your prefrontal cortex can come back online for a deliberate choice."
+        "ninetySeconds": {
+          "title": "The 90-seconds window",
+          "body": "Neuroscientist Jill Bolte Taylor found that the chemical response to an emotional trigger lasts about 90 seconds.\n\nAfter that, the feeling only stays if you keep feeding it with thought.\n\nPause for those 90 seconds without acting and the wave passes.\n\nYour prefrontal cortex returns. Now you can decide from clarity, not reactivity."
         },
         "mechanisms": {
           "title": "Three proven mechanisms",
-          "body": "Putting feelings into words (affect labeling) can blunt amygdala drive. Slow exhales lean on the parasympathetic side of regulation. Stepping back to reappraise — “what story am I believing?” — creates distance between you and the urge to act immediately."
+          "body": "Holzen builds the pause around three practices supported by research:\n\nSlow breathing activates your parasympathetic nervous system. The body shifts from \"act now\" to \"rest and assess.\"\n\nAffect labeling, naming what you feel, reduces amygdala activity. Studied by Matthew Lieberman at UCLA.\n\nCognitive distance, observing emotion as something you have, not something you are. A foundation of stoic practice and modern behavioral therapy."
         },
         "sixSteps": {
-          "title": "The deep pause (six beats)",
-          "body": "The header shows six beats: Feel, Breathe, Reflect, Frame, a second Breathe, then Decide. After that second breath, one short settle screen appears before you record whether you held steady, sold, or bought — it uses the same sixth segment as Decide, not a separate labeled step. Each beat maps to skills psychologists study: interoception, autonomic settling, perspective-taking, metacognition, re-centering, and values-aligned action."
+          "title": "The six steps",
+          "body": "Each step in the deep pause maps to one of these mechanisms:\n\nFeel: affect labeling\nBreathe: parasympathetic activation\nReflect: cognitive distance\nFrame: perspective and context\nBreathe: somatic closure\nDecide: conscious choice\n\nThe brief pause keeps the essentials: Feel, Breathe, Sit, Decide."
         },
         "ritual": {
-          "title": "Not a remedy — a ritual",
-          "body": "A ritual is not a guarantee of profit. It is a repeatable way to practice composure under uncertainty. Over time, the win is fewer decisions made in the red zone of panic or euphoria — and more that match who you want to be across cycles."
+          "title": "Not a remedy: a ritual",
+          "body": "Holzen doesn't tell you what to do. It gives your prefrontal cortex space to come back online, so the decision is yours, not your amygdala's.\n\nPause. Notice. Choose deliberately."
         }
       }
     },
-    "scienceSheet": {
-      "sheetTitle": "Pause information",
-      "tabAbout": "About pauses",
-      "tabSteps": "Step science"
-    },
-    "scienceInfoAria": "The science behind this pause",
     "sessionEmptyTitle": "No pause to open",
     "reflectMissingContext": "This pause is missing market context. Go back to Home and start a new pause.",
     "sessionEmptyBody": "Start from Home with “I need a pause,” or open one from a pause-ready notification.",
@@ -1552,12 +1684,10 @@
     "muteAriaOn": "Sound on (tap to mute)",
     "muteAriaOff": "Sound off (tap to unmute)",
     "decideIntroKicker": "Step 6 · Decide",
-    "decideMirrorKicker": "Before you confirm",
     "breathIntroKickerFirst": "Step 2 · Breathe",
     "breathIntroKickerSecond": "Step 5 · Breathe",
-    "breathSecondHeadline": "Just two more breaths",
-    "breathSecondSubline1": "Decisions land differently",
-    "breathSecondSubline2": "when the body is here.",
+    "breathSecondHeadline": "Final breath",
+    "breathSecondSubline": "A breath to settle what you've moved through",
     "breathInterstitialTitle": "You stayed with it",
     "breathInterstitialBody": "When you are ready, continue into reflection.",
     "feelIntensityTitle": "How strong is this feeling?",
@@ -1595,14 +1725,80 @@
       "zoomOut": "Zoom out",
       "lookBack": "Look back",
       "signal": "Signal",
+      "readFullStory": "Read the full story",
+      "toggleSignalAria": "Expand or collapse Signal",
+      "companionSeen": "Seen",
       "imDone": "I'm done",
-      "haikuLoading": "Loading…"
+      "moveOn": "Move on",
+      "groundingArchiveHint": "Meets you where you are. Dwell on it later in your Archive.",
+      "shiftMoodTitle": "How are you feeling now?",
+      "shiftMoodHint": "Optional — tap a mood if something shifted after companions.",
+      "haikuLoading": "Loading…",
+      "lookBackContent": {
+        "marketLead": "The market has been here before.",
+        "marketOnThisDay": "BTC on this day",
+        "marketOnThisDayHeading": "BTC ON THIS DAY",
+        "marketInsightLabel": "Bitcoin · {{period}}",
+        "marketInsightFallback": "Bitcoin history",
+        "tableClosing": "Today is one moment in a longer story.",
+        "partialData": "partial",
+        "yearsAgo_one": "{{count}}y ago",
+        "yearsAgo_other": "{{count}}y ago",
+        "now": "Now",
+        "today": "Today",
+        "mirrorHeading": "A MOMENT THAT MIRRORS TODAY",
+        "analogyHeading": "Cross-asset parallel",
+        "howItResolved": "HOW IT RESOLVED",
+        "mirrorMoment": "A moment that mirrors today",
+        "mirrorMomentWithAsset": "{{assetClass}} parallel"
+      },
+      "zoomOutContent": {
+        "emptyTitle": "Perspective takes time to build.",
+        "emptyBody": "The more you pause and add notes, the richer your zoom-out view becomes. Deep-time perspective and your own words from past pauses will appear here over time.",
+        "lead": "More perspective before you decide.",
+        "storyLead": "Today is one moment in a longer story.",
+        "deepTimeLabel": "DEEP TIME",
+        "postItLabel": "Post-it",
+        "promptIntro": "YOU MIGHT ASK:",
+        "prompt1": "What feels different now?",
+        "prompt2": "Would past-me be surprised?",
+        "prompt3": "What one line do I want to remember next time?",
+        "dropWaypoint": "Drop a waypoint",
+        "yourWaypoint": "YOUR WAYPOINT",
+        "changeWaypoint": "Change"
+      },
+      "companions": {
+        "haikuHelp": "A short poem that distills your reflection.",
+        "groundingHelp": "Behavioral science and bias context to steady your story.",
+        "zoomOutHelp": "Deep-time perspective and a waypoint from your past pauses.",
+        "lookBackHelp": "BTC on this day, a historical mirror, and a cross-asset analogy.",
+        "signalHelp": "Curated external context tied to what you shared."
+      }
     },
     "reflect": {
       "title": "Reflect",
       "subtitle": "Take your time",
+      "landLabel": "Land",
+      "nameItTitle": "Name it",
+      "feelRecap": "You said: {{mood}} ({{intensity}}/5)",
+      "feelRecapNoIntensity": "You said: {{mood}}",
+      "feelTile": "“{{tile}}”",
+      "hypothesisLabel": "What might be underneath",
+      "contextStripTitle": "Why might markets move?",
+      "contextStripDisclaimer": "Common narratives, not financial advice.",
+      "fallbackLand": "This moment can feel loud. You do not need to decide anything right now — just notice what is here.",
+      "generationFailedNotice": "We could not refresh this reflection. Here is a starting point — you can still continue.",
       "cardAria": "Reflection",
+      "letterAria": "Your reflection",
+      "marketContextTitle": "Market context",
+      "haikuAside": "Haiku",
+      "yourNoteSection": "Your note (optional)",
       "addPostIt": "Add your post-it",
+      "editPostIt": "Edit your post-it",
+      "savedPostItLabel": "Your post-it",
+      "changePostIt": "Change",
+      "postItDialogBody": "Write something to remember.",
+      "postItDialogPlaceholder": "Your reflection within the reflection...",
       "favoriteAria": "Favorite this reflection",
       "heading": "Sit with this reflection",
       "subcopy": "Read at your own pace. Notes and tags are optional; open a companion when you want another angle.",
@@ -1627,7 +1823,19 @@
       "tagsPlaceholder": "Add tags…"
     },
     "done": {
-      "reinforcementKicker": "Carry this with you"
+      "heroTitle": "You paused",
+      "heroSubcopy": "You held yourself. What was done is done.",
+      "generateWallpaper": "Generate wallpaper",
+      "reinforcementKicker": "Carry this with you",
+      "summary": {
+        "started": "Started",
+        "time": "Time",
+        "frame": "Frame",
+        "choice": "Choice",
+        "presence": "Presence",
+        "presenceXp": "+{{count}} XP",
+        "ended": "Ended"
+      }
     },
     "couldNotLoadPause": "Could not load this pause"
   },
@@ -1679,7 +1887,7 @@
   "testimonial": {
     "title": "Enjoying Holzen?",
     "subtitle": "Share a short quote about your experience — it may appear on our landing page.",
-    "placeholder": "e.g. \"Holzen helped me stop panic-selling during dips.\"",
+    "placeholder": "e.g. \"Holzen helped me pause before acting when the market moved.\"",
     "submit": "Submit",
     "thanks": "Thank you! Your testimonial is under review.",
     "nameLabel": "Display name",
@@ -1994,10 +2202,10 @@
   "volatility": {
     "title": "Volatility Tolerance",
     "grades": {
-      "ironHands": "Iron hands",
+      "ironHands": "Unshakable",
       "steady": "Steady",
       "shaky": "Shaky",
-      "paperHands": "Paper hands"
+      "paperHands": "Reactive"
     },
     "descriptions": {
       "high": "You stay remarkably composed during drops — even heavy ones.",
@@ -2038,9 +2246,9 @@
     "companionBreakdown": "Companion breakdown",
     "comparedToBaseline": "Compared to {{percent}}% baseline (no companions)",
     "basedOnDecisions": "Based on {{count}} decisions with recorded outcomes",
-    "pauseHigher": "When you pause before acting, your hold rate is {{delta}}pp higher.",
-    "pauseSame": "Your hold rate is the same whether you pause or not — keep reflecting.",
-    "pauseSimilar": "Interesting — your hold rate is similar regardless of pausing. The practice may be helping in ways beyond outcomes.",
+    "pauseHigher": "When you pause before acting, your steadiness rate is {{delta}}pp higher.",
+    "pauseSame": "Your steadiness rate is the same whether you pause or not — keep reflecting.",
+    "pauseSimilar": "Interesting — your steadiness rate is similar regardless of pausing. The practice may be helping in ways beyond outcomes.",
     "keepReflecting": "Keep reflecting to see how pausing affects your decisions.",
     "held": "{{percent}}% held",
     "companionLabels": {
@@ -2066,7 +2274,7 @@
     "basedOnSkills": "Based on your last 30 pauses. Measures composure skills, not feelings."
   },
   "ritualFlow": {
-    "rememberWhy": "Remember why you hold",
+    "rememberWhy": "Remember your why",
     "ritualComplete": "Ritual complete",
     "decision": "Decision",
     "return": "Return",
@@ -2099,10 +2307,10 @@
   "cooldownBanner": {
     "youDecidedTo": "You decided to <strong>{{decision}}</strong> — sit with it.",
     "decisions": {
-      "held": "hold",
+      "held": "make no change",
       "sold": "sell",
       "bought": "buy",
-      "nothing": "do nothing"
+      "nothing": "wait"
     }
   },
   "onboardingSample": {
@@ -2117,7 +2325,7 @@
     "thisWeek": "This week",
     "lastWeek": "Last week",
     "reflections": "Pauses",
-    "holdRate": "Hold rate",
+    "holdRate": "Steadiness rate",
     "composure": "Composure",
     "companionUse": "Companion use",
     "noDataPrevious": "No data for {{period}} — comparisons will appear next {{next}}.",
@@ -2154,8 +2362,8 @@
     "composed": "Composed",
     "mixed": "Mixed",
     "reactive": "Reactive",
-    "holdRate": "Hold Rate",
-    "holdRateDescription": "% of weeks where you held or did nothing after pausing"
+    "holdRate": "Steadiness rate",
+    "holdRateDescription": "% of weeks where you stayed steady or chose to wait after pausing"
   },
   "volatilityTimeline": {
     "title": "Volatility Timeline",
@@ -2176,12 +2384,12 @@
     "avgDuration": "Avg Duration",
     "mostUsed": "Most Used",
     "decisionBreakdown": "Decision breakdown",
-    "bestTemplateInsight": "Your {{template}} ritual has the highest hold rate at {{rate}}%",
+    "bestTemplateInsight": "Your {{template}} ritual has the highest steadiness rate at {{rate}}%",
     "avgSuffix": "avg {{seconds}}s",
     "templateEffectiveness": "Template effectiveness",
     "stepEffectiveness": "Step-type effectiveness",
     "topStepLabel": "Most effective step",
-    "stepInsight": "Rituals with {{step}} have a {{rateWith}}% hold rate vs {{rateWithout}}% without",
+    "stepInsight": "Rituals with {{step}} have a {{rateWith}}% steadiness rate vs {{rateWithout}}% without",
     "withStep": "With",
     "withoutStep": "Without",
     "held": "held",
@@ -2210,8 +2418,8 @@
     "then": "Then",
     "now": "Now",
     "insightCalmer": "You were calmer this time facing similar conditions.",
-    "insightHeldSteady": "You held steady this time — last time you acted on impulse.",
-    "insightConsistent": "Consistent composure — you held steady both times.",
+    "insightHeldSteady": "You stayed steady this time — last time you acted on impulse.",
+    "insightConsistent": "Consistent composure — you stayed steady both times.",
     "insightSimilar": "Similar emotional response — your patterns are consistent."
   },
   "moodCharts": {
@@ -2256,9 +2464,9 @@
     "rolling7day": "trigger when BTC moves this much over 7 days (up or down)",
     "confirm": "Confirm",
     "estimator": {
-      "avg": "Average",
-      "raw": "Raw samples",
-      "result": "Estimated triggers per month"
+      "avg": "Average daily move: {{avg}}%",
+      "note": "Estimate uses threshold breaches only. Quiet hours, snooze, and open-pause reuse reduce real alerts.",
+      "result": "You'd have paused ~{{count}} times last month"
     }
   },
   "changelog": {
@@ -2327,17 +2535,23 @@
     "pauseWithThis": "Pause with this",
     "decision": "Decision",
     "decisions": {
-      "held": "hold",
+      "held": "make no change",
       "sold": "sell",
       "bought": "buy",
-      "nothing": "do nothing"
+      "nothing": "wait"
     },
     "viewHistory": "View history",
     "aiInsightsReady": "AI insights ready",
     "basedOnReflections": "Based on {{count}} pauses",
     "viewInsights": "View insights",
     "pauseReady": "Pause ready",
-    "openPause": "Open pause"
+    "openPause": "Open pause",
+    "continueYourPause": "Continue your pause",
+    "continuePause": "Continue",
+    "pauseClosed": "This pause has closed.",
+    "pauseNoLongerAvailable": "This offer is no longer available.",
+    "newPauseAvailable": "New pause available",
+    "viewOnHome": "View on Home"
   },
   "aiInsights": {
     "title": "AI Pattern Analysis",
@@ -2457,22 +2671,6 @@
     "enterPause": "Enter the pause",
     "notNow": "Not now"
   },
-  "pauseScience": {
-    "whyThisOrder": "Why this order?",
-    "title": "Each step follows research",
-    "feel": "Feel",
-    "feelDesc": "Labeling emotions ('affect labeling') reduces amygdala activation — but naming comes early so the rest of the ritual can work with what you named. (Lieberman et al., 2007)",
-    "breathe": "Breathe",
-    "breatheDesc": "Slow breathing activates the parasympathetic nervous system, shifting from fight-or-flight to regulation before deeper reflection. (Porges, 2011)",
-    "reflect": "Reflect",
-    "reflectDesc": "Cognitive reappraisal after regulation leads to better decisions than suppression. (Gross, 2002)",
-    "frame": "Frame",
-    "frameDesc": "Step back into tools and companions — metacognitive choice about where to look next before you decide. (Flavell, 1979)",
-    "breath2": "Breathe again",
-    "breath2Desc": "A second regulation pass after reframing lowers arousal again before commitment. (Lehrer & Gevirtz, 2014)",
-    "decide": "Decide",
-    "decideDesc": "System 2 is now online. You can act from intention, not impulse. (Kahneman, 2011)"
-  },
   "breathe": {
     "startTimer": "Start a 60s timer"
   },
@@ -2538,31 +2736,13 @@
     "suggestReplay": "Revisit a past reflection with fresh eyes",
     "replayUntitled": "Pause"
   },
-  "mirror": {
-    "title": "Decision Mirror",
-    "sell": {
-      "q1": "Is this decision aligned with your long-term plan — or driven by today's price?",
-      "q2": "If the price recovers next week, will you regret this?",
-      "q3": "Are you selling because of data — or because of a feeling?"
-    },
-    "buy": {
-      "q1": "Is this purchase part of your strategy — or are you chasing momentum?",
-      "q2": "If the price drops 20% tomorrow, will you still feel good about this?",
-      "q3": "Are you buying because of conviction — or because of FOMO?"
-    },
-    "confirm": {
-      "sell": "I still want to sell",
-      "buy": "I still want to buy"
-    },
-    "reconsider": "Let me reconsider"
-  },
   "bulkHold": {
     "kicker": "Waiting for you",
     "title": "{{count}} pauses while you were away",
-    "subtitle": "Mark all as Hold with one tap, or open Review to see dates. Your Archive has full detail on each pause.",
-    "teaserHint": "Tap to hold all, review dates, or open your Archive.",
+    "subtitle": "Mark all as no change with one tap, or open Review to see dates. Your Archive has full detail on each pause.",
+    "teaserHint": "Tap to log no change on all, review dates, or open your Archive.",
     "openSheet": "Manage",
-    "holdAll": "Hold all",
+    "holdAll": "No change on all",
     "review": "Review",
     "back": "Back",
     "openArchive": "Open Archive",
@@ -2570,38 +2750,49 @@
     "reviewScreenTitle": "Your pauses",
     "reviewLead": "Look back at each moment.\nWhat did you do?",
     "sectionToday": "Today",
-    "outcomeHeld": "I held",
-    "outcomeBought": "I bought",
-    "outcomeSold": "I sold",
+    "outcomeHeld": "No change",
+    "outcomeBought": "Bought",
+    "outcomeSold": "Sold",
     "outcomeGroupAria": "What did you do for this pause?",
     "reviewNoContext": "No reflection line was saved for this pause.",
     "openArchiveFullDetail": "Open Archive for full detail",
-    "heldAllPill": "Held all",
-    "heldRest": "Held rest",
+    "heldAllPill": "All no change",
+    "heldRest": "Rest no change",
     "applyFailed": "Could not save outcomes. Check your connection and try again.",
     "applyPartialFailed": "{{count}} pause(s) could not be saved. Fix your connection or try again.",
     "reviewTitle": "Pauses to review",
     "reviewSub": "These expired without an outcome. Open your Archive for full detail on each pause.",
-    "successHeadline": "Held through your stack",
-    "successSub": "Your outcomes are logged. Echoes capture what surfaced during each pause.",
+    "successHeadline": "Logged your choices",
+    "successSub": "Your outcomes are saved. Echoes capture what surfaced during each pause.",
     "successChosen": "You chose deliberately",
-    "successHeldLine": "Held through {{count}} pauses",
-    "successConviction": "+{{count}} conviction",
+    "successHeldLine": "No change on {{count}} pauses",
+    "successConviction": "+{{count}} pauses logged",
     "echoesCardTitle": "Echoes",
     "echoesCardBody": "Revisit reflections and artifacts from these pauses in Echoes.",
     "viewEchoes": "View Echoes",
-    "allMarkedHold": "{{count}} pauses marked as Hold"
+    "allMarkedHold": "{{count}} pauses marked as no change"
   },
   "snooze": {
-    "toolbarAria": "Snooze automatic pauses",
+    "toolbarAria": "Silence automatic pauses",
+    "panelTitle": "Snoozed pauses",
+    "silencePauses": "Silence pauses",
+    "selectHowLong": "Select how long",
+    "2h": "2 hours",
+    "6h": "6 hours",
+    "untilSpecificTime": "Until a specific time",
+    "untilLabel": "Until",
+    "untilTimeSuffix": "Until {{time}}",
+    "hour": "Hour",
+    "save": "Save",
+    "activatedPreset": "Pauses silenced for {{hours}} hours",
+    "activatedUntil": "Pauses silenced until {{summary}}",
+    "cancelled": "Silence cancelled",
     "pausePauses": "Snooze pauses",
     "snoozeFor": "Snooze for",
-    "2h": "2 hours",
     "4h": "4 hours",
     "8h": "8 hours",
     "12h": "12 hours",
     "activated": "Pauses snoozed for {{hours}}h",
-    "cancelled": "Snooze cancelled",
     "activeLabel": "Snoozed · {{time}} left",
     "wake": "Wake",
     "untilTomorrow": "Until tomorrow (8am)",
@@ -2614,6 +2805,7 @@
   },
   "quietWindows": {
     "add": "Add window",
+    "deleteWindow": "Delete quiet window",
     "added": "Quiet window added",
     "empty": "No extended quiet windows yet.",
     "labelPlaceholder": "Label (e.g. Work hours)",

@@ -14,7 +14,6 @@ import { RejectionEntry } from '@/screens/admin/components/RejectionEntry';
 import { CuratedContentManager } from '@/screens/admin/components/CuratedContentManager';
 import { HardcodedFallbacksManager } from '@/screens/admin/components/HardcodedFallbacksManager';
 import { SourceCatalogViewer } from '@/screens/admin/components/SourceCatalogViewer';
-import { SourceSuggestionsPanel } from '@/screens/admin/components/SourceSuggestionsPanel';
 import { AdminSubNav } from '@/screens/admin/components/AdminSubNav';
 import { AppConfigTools } from '@/screens/admin/components/AppConfigTools';
 import { MigrationStatus } from '@/screens/admin/components/MigrationStatus';
@@ -91,7 +90,7 @@ export default function Admin() {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const { toast } = useToast();
   const {
-    cacheHits, costs, failures, feedback, cacheEntries, signalSources,
+    cacheHits, cacheHitsForPeriod, costs, failures, feedback, cacheEntries, signalSources,
     period, setPeriod, periodStats, prevPeriodStats, notificationStats,
     rejections, recentContent, sessions, libraryEntries,
     loading, error, refresh, refreshCacheEntries, refreshCompanionCacheUi, refreshRejections, lastUpdated,
@@ -319,7 +318,7 @@ export default function Admin() {
         <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/80">System Monitor</h2>
         <div className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3">
           <p className="text-xs text-destructive/70">{error}</p>
-          <button onClick={refresh} className="mt-2 text-[10px] font-sans font-medium text-nox-text-link/70 hover:text-nox-text-link flex items-center gap-1">
+          <button type="button" onClick={refresh} className="mt-2 text-[10px] font-sans font-medium text-nox-text-link/70 hover:text-nox-text-link flex items-center gap-1">
             <RefreshCw className="h-3 w-3" /> Retry
           </button>
         </div>
@@ -352,7 +351,7 @@ export default function Admin() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/80">System Monitor</h2>
-        <button onClick={refresh} className="flex items-center gap-1.5 text-[10px] font-sans font-medium text-muted-foreground/60 hover:text-nox-text-link transition-colors">
+        <button type="button" onClick={refresh} className="flex items-center gap-1.5 text-[10px] font-sans font-medium text-muted-foreground/60 hover:text-nox-text-link transition-colors">
           <RefreshCw className="h-3 w-3" />
           {lastUpdated && <span>{lastUpdated.toLocaleTimeString()}</span>}
         </button>
@@ -385,8 +384,8 @@ export default function Admin() {
             <div className={`rounded-xl border px-4 py-2.5 space-y-1 ${
               issues.length > 0 ? 'border-destructive/20 bg-destructive/5' : 'border-border/20 bg-card/10'
             }`}>
-              {[...issues.map(msg => ({ msg, level: 'issue' as const })), ...tips.map(msg => ({ msg, level: 'tip' as const }))].map(({ msg, level }, i) => (
-                <p key={i} className={`text-[10px] font-mono ${level === 'issue' ? 'text-destructive/70' : 'text-muted-foreground/50'}`}>
+              {[...issues.map(msg => ({ msg, level: 'issue' as const })), ...tips.map(msg => ({ msg, level: 'tip' as const }))].map(({ msg, level }) => (
+                <p key={`${level}-${msg}`} className={`text-[10px] font-mono ${level === 'issue' ? 'text-destructive/70' : 'text-muted-foreground/50'}`}>
                   {level === 'issue' ? '⚠' : '💡'} {msg}
                 </p>
               ))}
@@ -407,7 +406,7 @@ export default function Admin() {
           {/* Period Selector */}
           <div className="flex items-center gap-1.5">
             {PERIOD_OPTIONS.map(opt => (
-              <button key={opt.value} onClick={() => setPeriod(opt.value)}
+              <button type="button" key={opt.value} onClick={() => setPeriod(opt.value)}
                 className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${
                   period === opt.value ? 'bg-muted/60 text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground/80 hover:bg-muted/20'
                 }`}>
@@ -456,7 +455,9 @@ export default function Admin() {
                       labelStyle={{ fontSize: '10px', color: 'hsl(var(--muted-foreground) / 0.6)' }}
                     />
                     <Bar dataKey="total" radius={[4, 4, 0, 0]} maxBarSize={24}>
-                      {costChartData.map((_, i) => <Cell key={i} fill="hsl(var(--primary) / 0.3)" />)}
+                      {costChartData.map((entry) => (
+                        <Cell key={entry.day} fill="hsl(var(--primary) / 0.3)" />
+                      ))}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
@@ -516,16 +517,21 @@ export default function Admin() {
 
           {/* Cache Hit Rates */}
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Cache Hit Rates <span className="text-muted-foreground/40 normal-case">(30 days)</span></p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+              Cache hit rate by companion <span className="text-muted-foreground/40 normal-case">({periodLabel})</span>
+            </p>
             <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
-              One row per <code className="text-muted-foreground/55">companion_type</code> in serves. Two “Zoom” rows mean timeline zoom vs deep-time zoom are stored as different types.
+              Share of <code className="text-muted-foreground/55">companion_serves</code> served from the shared pool (
+              <code className="text-muted-foreground/55">companion_cache</code> or catalog), not live AI — primary ROI signal for{' '}
+              <code className="text-muted-foreground/55">pregenerate-companions</code>. One row per{' '}
+              <code className="text-muted-foreground/55">companion_type</code>; two Zoom rows = timeline vs deep-time.
             </p>
             <div className="space-y-1.5">
-              {cacheHits.map((row, i) => {
+              {cacheHitsForPeriod.map((row, i) => {
                 const pct = row.cache_hit_pct ?? 0;
                 const type = row.companion_type ?? 'unknown';
                 return (
-                  <div key={i} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2">
+                  <div key={type} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] font-mono text-foreground/80">{label(type)}</span>
                       <span className="text-[10px] font-mono text-muted-foreground/60">{pct.toFixed(0)}% · {row.total_serves ?? 0} serves</span>
@@ -534,15 +540,20 @@ export default function Admin() {
                       <div className="h-full rounded-full transition-all duration-500"
                         style={{ width: `${Math.min(pct, 100)}%`, backgroundColor: TYPE_COLORS[type] ?? 'hsl(var(--primary) / 0.4)' }} />
                     </div>
-                    <div className="flex gap-3 mt-1">
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
                       <span className="text-[9px] text-muted-foreground/50">live: {row.live_generated ?? 0}</span>
                       <span className="text-[9px] text-muted-foreground/50">cache: {row.cache_hits ?? 0}</span>
+                      {(row.library_hits ?? 0) > 0 && (
+                        <span className="text-[9px] text-muted-foreground/50">library: {row.library_hits}</span>
+                      )}
                       <span className="text-[9px] text-muted-foreground/50">curated: {row.curated_fallbacks ?? 0}</span>
                     </div>
                   </div>
                 );
               })}
-              {cacheHits.length === 0 && <p className="text-[10px] text-muted-foreground/50 text-center py-3">No serve data yet</p>}
+              {cacheHitsForPeriod.length === 0 && (
+                <p className="text-[10px] text-muted-foreground/50 text-center py-3">No serve data yet</p>
+              )}
             </div>
             <p className="text-[9px] font-mono text-muted-foreground/40 leading-relaxed">
               <span className="text-muted-foreground/50">live</span> = generated on demand. <span className="text-muted-foreground/50">cache</span> = row from <code className="text-muted-foreground/45">companion_cache</code> or a Library pick (library serves are still labeled cache in telemetry). <span className="text-muted-foreground/50">curated</span> = hardcoded fallback strings when DB pool is empty — not editable here; use <span className="text-muted-foreground/55">Library</span> + <span className="text-muted-foreground/55">Cache</span> tabs to manage DB-backed fallbacks.
@@ -561,7 +572,10 @@ export default function Admin() {
                 const isAlert = failPct > 20;
                 const rateLimited = Number((row as { rate_limited?: number }).rate_limited ?? 0);
                 return (
-                  <div key={i} className={`rounded-lg border px-3 py-2 ${isAlert ? 'border-destructive/20 bg-destructive/5' : 'border-border/10 bg-card/5'}`}>
+                  <div
+                    key={`${row.companion_type ?? 'unknown'}-${row.model ?? 'default'}`}
+                    className={`rounded-lg border px-3 py-2 ${isAlert ? 'border-destructive/20 bg-destructive/5' : 'border-border/10 bg-card/5'}`}
+                  >
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0">
                         <span className="text-[10px] font-mono text-foreground/80">
@@ -654,7 +668,7 @@ export default function Admin() {
                 const pct = row.approval_pct ?? 0;
                 const total = (row.total_thumbs_up ?? 0) + (row.total_thumbs_down ?? 0);
                 return (
-                  <div key={i} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
+                  <div key={row.companion_type ?? `feedback-${i}`} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-mono text-foreground/80">{label(row.companion_type)}</span>
                       <div className="flex items-center gap-2">
@@ -840,7 +854,6 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="sources" className="mt-0 space-y-4">
-          <SourceSuggestionsPanel onCatalogChanged={refresh} />
           <SourceCatalogViewer sources={signalSources} onRefresh={refresh} libraryEntries={libraryEntries} />
         </TabsContent>
 

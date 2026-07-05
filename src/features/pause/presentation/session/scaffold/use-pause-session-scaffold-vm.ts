@@ -1,3 +1,4 @@
+import { buildCurrentFeelForReflect } from '@/features/pause/domain/reflect/generation/build-current-feel-for-reflect';
 import { usePauseSessionScaffoldPresentation } from './use-pause-session-scaffold-presentation';
 import type {
   PauseSessionScaffoldVmChromeSlots,
@@ -11,13 +12,13 @@ export function usePauseSessionScaffoldVm(
   step: PauseSessionStepHandlersResult,
   chrome: PauseSessionScaffoldVmChromeSlots,
 ) {
-  const { mantra, btcData, trackedAssetId, prefersReducedMotion, breathSecondLabelVariant, t } = p;
+  const { marketData, trackedAssetId, prefersReducedMotion, breathSecondLabelVariant, t } = p;
   const { shell, ritual, mood, breath, reflect, toggleFavorite, handleFrameImDone, subscribed } =
     step;
 
   const scaffold = usePauseSessionScaffoldPresentation({
     t,
-    btcData,
+    marketData,
     trackedAssetId,
     ritualEntry: ritual.ritualEntry,
     phase: ritual.phase,
@@ -36,7 +37,6 @@ export function usePauseSessionScaffoldVm(
     onFeelTilesSelect: mood.onFeelTilesSelect,
     setBriefStep: ritual.setBriefStep,
     breathingRef: breath.breathingRef,
-    mantra,
     severity: shell.severity,
     breathingFirstCompleted: ritual.breathingFirstCompleted,
     breathingSecondCompleted: ritual.breathingSecondCompleted,
@@ -44,7 +44,6 @@ export function usePauseSessionScaffoldVm(
     setBreathingFirstCompleted: ritual.setBreathingFirstCompleted,
     setBreathingSecondCompleted: ritual.setBreathingSecondCompleted,
     handleBriefBreathContinue: breath.handleBriefBreathContinue,
-    handleBriefSkipBreath: breath.handleBriefSkipBreath,
     soundMuted: ritual.soundMuted,
     briefIntegrateDone: ritual.briefIntegrateDone,
     handleBriefIntegrateComplete: breath.handleBriefIntegrateComplete,
@@ -54,20 +53,33 @@ export function usePauseSessionScaffoldVm(
     goToStep: breath.goToStep,
     handleContinueAfterFirstBreath: breath.handleContinueAfterFirstBreath,
     handleContinueAfterSecondBreath: breath.handleContinueAfterSecondBreath,
-    handleSkipFirstBreath: breath.handleSkipFirstBreath,
     handleSkipSecondBreath: breath.handleSkipSecondBreath,
     companions: shell.companions,
     companionPrefs: shell.companionPrefs,
     pauseInstanceId: shell.pauseInstanceId,
     context: shell.context,
     message: reflect.effectiveReflectionMessage,
+    reflectionContent: reflect.reflectionContent,
+    currentFeel: buildCurrentFeelForReflect({
+      mood: ritual.selectedMood,
+      intensity: ritual.feelIntensity,
+      tile: ritual.selectedBriefFace,
+      tileLabel:
+        ritual.selectedBriefFace != null
+          ? p.t(`pause.feelStep.tiles.${ritual.selectedBriefFace}`, {
+              defaultValue: ritual.selectedBriefFace,
+            })
+          : null,
+    }),
     isFavorite: ritual.isFavorite,
     toggleFavorite,
     subscribed,
+    selectedMoodAfter: ritual.selectedMoodAfter,
+    setSelectedMoodAfter: ritual.setSelectedMoodAfter,
     handleFrameImDone,
     handleDeepFirstBreathRepeat: breath.handleDeepFirstBreathRepeat,
     handleDeepSecondBreathRepeat: breath.handleDeepSecondBreathRepeat,
-    severityAbsPct: Math.abs(btcData?.changePercent ?? 0),
+    severityAbsPct: Math.abs(marketData?.changePercent ?? 0),
     reflectionLoading: reflect.reflectionLoading,
     reflectionError: reflect.reflectionError,
     onReflectionRetry: reflect.retryReflection,
@@ -75,7 +87,9 @@ export function usePauseSessionScaffoldVm(
 
   return {
     sessionOnPicker: scaffold.sessionOnPicker,
-    depthContextLine: scaffold.depthContextLine,
+    depthPickerMarketData: marketData,
+    depthPickerTrackedAssetId: trackedAssetId,
+    depthPickerContextText: shell.context,
     depthPickerOnBrief: mood.depthPickerOnBrief,
     handleDepthPickerDeep: mood.handleDepthPickerDeep,
     scaffoldRitualDerived: scaffold.scaffoldRitualDerived,

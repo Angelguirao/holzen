@@ -19,7 +19,7 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 
 ## Instrumentation status
 
-- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `home.customize_opened`, `home.optional_widget_toggled`, `home.customize_reset_layout`, `home.hero_quote_viewed`, `home.market_chart_expand_toggled`, `home.goal_why_expand_toggled`, `home.pending_pause_banner_pause_opened` (Home “Your pause” widget: user taps **Continue / open pause** on the **pending context** amber banner while an open pause exists and a `pending` offer is queued), `pause_open_dismissed` (Zen reflection **Done** or dashboard **Dismiss pause** → `pause_dismiss_current`), `pause_session_abandoned` (user confirms **Leave** after `/pause` depth picker or ritual header **Close** before completion — navigates Home without `pause_dismiss_current`), `pause.manual_started` / `pause.manual_completed` (Home “Need a moment”: instance created from market context; **silent** path includes stub `reflection_text`; non-silent defers **`holzen-reflect`** to the Reflect step), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_outcome_retrospective` (Archive sheet: `outcome_logged` on **`expired`** or **`dismissed`** without a prior outcome row; outcomes **`held` \| `bought` \| `sold`** only), `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `pause_reflect_share_tap` / `pause_reflect_wallpaper_tap` / `pause_reflect_post_it_open` (Reflect step + Done-shell share/wallpaper; post-it on Reflect only), `generation.initiated`, `companion.served`, `paywall.viewed` (feature-gate, limit hit, upgrade buttons in Settings), `paywall.subscribed` (subscription checkout return; `plan` from `check-subscription` `subscription_billing_interval` when a fresh Stripe read is available, else `unknown`), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.suggestion_refreshed` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
+- **Wired (PostHog):** `auth.*`, `navigation.primary_tab_opened`, `home.customize_opened`, `home.optional_widget_toggled`, `home.customize_reset_layout`, `home.hero_quote_viewed`, `home.market_chart_expand_toggled`, `home.pause_help_feedback_shown`, `home.pause_help_feedback_submitted`, `home.pause_help_feedback_deferred`, `home.pause_help_feedback_dismissed`, `pause_open_dismissed` (Zen reflection **Done** or dashboard **Dismiss pause** → `pause_dismiss_current`), `pause_session_abandoned` (user confirms **Leave** after `/pause` depth picker or ritual header **Close** before completion — navigates Home without `pause_dismiss_current`), `pause.manual_started` / `pause.manual_completed` (Home “Need a moment”: instance created from market context; **silent** path includes stub `reflection_text`; non-silent defers **`holzen-reflect`** to the Reflect step), `pause_instance_created` (manual new instance), `pause_engaged`, `pause_completed`, `pause_outcome_retrospective` (Archive sheet: `outcome_logged` on **`expired`** or **`dismissed`** without a prior outcome row; outcomes **`held` \| `bought` \| `sold`** only), `pause_companion_counted` / `pause_companion_not_counted` (from `pause_log_step` / `pause_log_companion` RPCs), `pause_reflect_share_tap` / `pause_reflect_wallpaper_tap` / `pause_reflect_post_it_open` (Reflect step + Done-shell share/wallpaper; post-it on Reflect only), `generation.initiated`, `companion.served`, `paywall.viewed` (feature-gate, limit hit, upgrade buttons in Settings), `paywall.subscribed` (subscription checkout return; `plan` from `check-subscription` `subscription_billing_interval` when a fresh Stripe read is available, else `unknown`), `feedback.submitted` (after `send-feedback` success), `performance.web_vital`, `ritual.suggested` / `ritual.suggestion_refreshed` / `ritual.accepted` / `ritual.declined` (Ground), plus **companion idempotency diagnostics** below.
 - **Postgres (not PostHog):** PWA install prompts (`InstallHolzenCard` → `analytics_events`), edge `trackEvent` AI call counters, etc.
 - **Convention:** every new event adds a row below AND a `trackEvent` call in source — never define events only in the PostHog UI.
 
@@ -29,7 +29,7 @@ The authoritative list of PostHog events Holzen emits. Deliberate events only �
 |------|------|------------|
 | `intervention_idempotency_skip` | Idempotency layer skips a duplicate `companion-orchestrate` intervention call | `{ pause_instance_id, layer }` |
 | `intervention_idempotency_dedup` | Two callers joined the in-flight request | `{ pause_instance_id, … }` |
-| `intervention_idempotency_storage_error` / `intervention_idempotency_fallback_used` / `intervention_first_call_latency` | Storage / latency instrumentation | (see `src/features/pause/application/use-cases/ritual/frame/intervention-idempotency.ts`) |
+| `intervention_idempotency_storage_error` / `intervention_idempotency_fallback_used` / `intervention_first_call_latency` | Storage / latency instrumentation (legacy featured intervention only) | (see `src/legacy/pause-featured-intervention/application/intervention-idempotency.ts`) |
 
 ## Active events
 
@@ -53,13 +53,14 @@ The Archive tab uses route `/archive` and reports `tab: 'archive'`.
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
-| `onboarding.completed` | User finishes the 2-step onboarding flow and `ensure-trial-subscription` succeeds | `{ steps_completed: 2 }` | @holzen |
+| `onboarding.completed` | User finishes the 4-step onboarding flow (Why → asset → threshold → trial) after Stripe trial Checkout succeeds or trial is already active | `{ steps_completed: 4, tracked_asset_id: string, threshold_up: number, threshold_down: number }` | @holzen |
 
 ### subscription
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
-| `trial.started` | Stripe trial subscription created via `ensure-trial-subscription` (`created: true`) | `{ source: 'ensure_trial' }` | @holzen |
+| `trial.started` | Stripe trial subscription created via trial Checkout or legacy ensure path | `{ source: 'trial_checkout' \| 'ensure_trial' }` | @holzen |
+| `trial.denied` | Server rejected trial start (one-trial guard, unverified email, disposable domain, prepaid card on trial Checkout, card fingerprint reuse) | `{ reason: 'trial_already_used' \| 'email_not_verified' \| 'disposable_email' \| 'trial_card_not_accepted' }` | @holzen |
 | `trial.expired` | Client entitlement transitions to `lapsed` (trial ended without active paid sub) | `{}` | @holzen |
 
 ### journey
@@ -85,8 +86,12 @@ The Archive tab uses route `/archive` and reports `tab: 'archive'`.
 | `home.customize_reset_layout` | User taps “Reset to defaults” in Customize (section order, collapse, visibility, and Zen cleared to Hold) | `{}` | @holzen |
 | `home.hero_quote_viewed` | Once per Home mount after profile is loaded (daily hero line) | `{ quote_index: number; utc_ymd: string }` — `quote_index` is `0..9` from `heroQuoteIndexForDay`; no quote text | @holzen |
 | `home.market_chart_expand_toggled` | User toggles Market chart / 24h detail (chevron next to headline price) | `{ expanded: boolean }` | @holzen |
-| `home.goal_why_expand_toggled` | User toggles “Why you stay” (hold goal details + mantra / motivations) | `{ expanded: boolean }` | @holzen |
-| `home.pending_pause_banner_pause_opened` | User taps the **pending context** banner CTA on Home (“Your pause” widget) to open `/pause` while a queued `pending` offer exists | `{ pause_instance_id?: string; open_pause_state?: 'active' \| 'engaged' }` — IDs only; no reflection text | @holzen |
+| `home.pause_help_feedback_shown` | Post–deep-pause satisfaction sheet opens on Home (Figma 581) | `{ pause_instance_id: string }` | @holzen |
+| `home.pause_help_feedback_submitted` | User sends star rating (+ optional comment) from the sheet | `{ pause_instance_id: string; rating: number; has_comment: boolean }` — no comment text | @holzen |
+| `home.pause_help_feedback_deferred` | User taps **Maybe later** | `{ pause_instance_id: string; deferral_count: number; opted_out: boolean }` — `opted_out` true after 3 deferrals | @holzen |
+| `home.pause_help_feedback_dismissed` | User closes sheet via overlay or **X** (same persistence as defer) | `{ pause_instance_id: string; deferral_count: number; opted_out: boolean }` | @holzen |
+
+**Removed (2026-06):** `home.goal_why_expand_toggled` — hold-goal expand UI moved to legacy; Home anchor is mantra + motivations only ([screens/home.md](../screens/home.md)).
 
 ### pause — Home manual message (AI)
 
@@ -106,11 +111,11 @@ Include `pause_instance_id` on each event so journeys line up with Sentry + Bett
 | Event | When | Properties | Owner |
 |---|---|---|---|
 | `pause_instance_created` | A new `pause_instances` row is created (manual hook or cron): `active` or `pending` when a new context is queued behind an open pause. | `{ pause_instance_id; template_slug; source: 'manual' \| 'cron_volatility' \| …; severity: 'mild' \| 'moderate' \| 'high'; pending_offer?: boolean }` | @holzen |
-| `pause_pending_adopted` | User confirms switching from the modal; prior open pause is expired `superseded`. | `{ pause_instance_id }` (the newly active instance) | @holzen |
-| `pause_pending_declined` | User keeps the current pause from **`PendingPauseOfferShell`** (off `/pause`) or taps **Keep current pause** in **`PauseLeaveWithPendingSheet`**; pending row expired `system_cancelled`. | `{ pause_instance_id }` (the declined pending row) | @holzen |
+| `pause_pending_adopted` | User confirms switching to the queued pause from the **Home widget** (`open_pre_reflect` / `open_engaged_pending_offer`) or **`PauseLeaveWithPendingSheet`** on `/pause`; prior open pause is expired `superseded`. | `{ pause_instance_id }` (the newly active instance) | @holzen |
+| `pause_pending_declined` | User keeps the current pause from the **Home widget** (`open_engaged_pending_offer` inline pending banner) or taps **Keep current pause** in **`PauseLeaveWithPendingSheet`** on `/pause`; pending row expired `system_cancelled`. | `{ pause_instance_id }` (the declined pending row) | @holzen |
 | `pause_open_dismissed` | User ends the open pause from Home without entering `/pause` (dashboard **Dismiss pause**); calls `pause_dismiss_current`. | `{ surface: 'home_your_pause_widget'; pause_instance_id?: string }` (legacy Zen used `home_zen_reflection` — quarantined in `src/legacy/zen-mode/`) | @holzen |
 | `pause_session_abandoned` | User taps **Close** on `/pause` (depth picker or ritual header) before completion and leaves **without** a queued `pending` pause (direct exit), or taps **Leave** in **`PauseLeaveWithPendingSheet`** when a pending pause exists; navigates Home **without** `pause_dismiss_current` and **without** clearing the persisted ritual snapshot (can resume). | `{ pause_instance_id?: string }` | @holzen |
-| `pause_engaged` | `pause_log_step` returns `engaged` (first time per instance in-tab). `volatility_v1` **brief**: first qualifying `initial_emotion_logged` with `brief_ritual` can flip to `engaged` before any `breath_completed`. **Deep**: flips once both `initial_emotion_logged` and (first-segment) `breath_completed` exist — a **set** check in Postgres; in the normal UI the user completes **Feel** then **Breathe**, so this usually fires right after the first Breathe RPC. | `{ pause_instance_id }` (optional: extend with `ms_since_created` when cheap) | @holzen |
+| `pause_engaged` | `pause_log_step` returns `engaged` (first time per instance in-tab). For `volatility_v1` **deep**, flips when **`reflection_step`** is logged (Reflect reached). **Brief never engages.** See **`docs/systems/pause-system.md`**. | `{ pause_instance_id }` (optional: extend with `ms_since_created` when cheap) | @holzen |
 | `pause_completed` | `pause_log_step` returns `completed` (first time per instance in-tab). For `volatility_v1`, this fires when **`outcome_logged`** is accepted (companions do not gate); see `docs/systems/pause-system.md` §5.1. | `{ pause_instance_id }` | @holzen |
 | `pause_outcome_retrospective` | **Removed (May 2026)** — was Archive “Log decision”; RPC path closed in `20260524120000_pause_log_step_close_retrospective_outcome.sql`. | `{ pause_instance_id; outcome: 'held' \| 'bought' \| 'sold'; surface: 'archive' }` | @holzen |
 | `pause_expired` | Sweeper or explicit expire (reasons include `window_elapsed`, `open_max_age`, `superseded`, …). | *Not emitted from the React app today* — server-side if added later. | @holzen |
@@ -119,6 +124,9 @@ Include `pause_instance_id` on each event so journeys line up with Sentry + Bett
 | `pause_reflect_share_tap` | User opens the share menu from the Reflect step **or** the Done completion shell (after outcome). | `{ surface: 'pause_reflect' \| 'pause_done'; has_pause_id?: boolean }` | @holzen |
 | `pause_reflect_wallpaper_tap` | User starts wallpaper generation from the Reflect step **or** the Done completion shell. | `{ surface: 'pause_reflect' \| 'pause_done' }` | @holzen |
 | `pause_reflect_post_it_open` | User taps **Add your post-it** on the Reflect step (reveals note + tags). | `{ surface: 'pause_reflect'; has_pause_id: boolean }` | @holzen |
+| `pause_reflect_block_viewed` | Reflect step shows structured copy (land / name-it blocks). | `{ has_pause_id?: boolean; has_draft?: boolean; schema_version?: number }` | @holzen |
+| `pause_reflect_context_strip_expanded` | User expands **Why might markets move?** on Reflect. | `{ has_pause_id?: boolean; direction?: 'down' \| 'up' \| 'flat' }` | @holzen |
+| `pause_reflect_inquiry_displayed` | Inquiry question rendered on Reflect. | `{ has_pause_id?: boolean; mood?: string }` | @holzen |
 
 PII stance unchanged: no generated pause message text, no companion content, no mood/outcome payload values — just ids, types, and numeric metadata.
 

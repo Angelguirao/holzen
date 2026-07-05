@@ -20,6 +20,12 @@ jobs:
           node-version: "22"
           cache: npm
 
+      - name: Require CI environment
+        env:
+          VITE_SUPABASE_STAGING_URL: ${{ secrets.VITE_SUPABASE_STAGING_URL }}
+          VITE_SUPABASE_STAGING_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_STAGING_PUBLISHABLE_KEY }}
+        run: node scripts/check-cicd-env.mjs --profile=ci --platform=github
+
       - name: Install
         run: npm ci
 
@@ -30,9 +36,8 @@ jobs:
       - name: test:ci
         run: npm run test:ci
 
-      - name: Production build
-        run: npm run build
+      - name: CI build (staging env, unified marketing + SPA)
+        run: npm run build:unified && npm run check:bundle-shipped
         env:
-          # CI has no Lovable env — set repo secrets or use placeholders for version-sync.
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_STAGING_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_STAGING_PUBLISHABLE_KEY }}

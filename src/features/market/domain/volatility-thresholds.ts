@@ -1,7 +1,4 @@
 export {
-  DEFAULT_CUMULATIVE_THRESHOLD,
-  effectiveCumulativeThreshold,
-  isCumulativeMoveTriggered,
   isVolatilityThresholdBreached,
   type VolatilityMoveMetrics,
   type VolatilityThresholdProfile,

@@ -2,14 +2,14 @@
 
 This guide walks a new contributor through the repository in roughly the order you would discover it while running the app locally. It complements [README.md](../README.md) (setup and scripts) and [AGENTS.md](../AGENTS.md) (conventions for automation). Deep dives on the AI pause pipeline and cron jobs live in [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) and [cron-setup.md](../ops/cron-setup.md).
 
-**Pause-first shipped path (2026-05):** sign in → **Home** (trial via `ensure-trial-subscription`) → **`/pause`** ritual → **Archive** to browse past pauses → **Journey** overview (streak/count) → **Settings**. Do not import `@/legacy/*`; full IA is tag `full-ia-pre-strip`. Manifest: [active-surface.md](../ops/active-surface.md).
+**Pause-first shipped path (2026-05):** sign in → **`/onboarding`** (Why, asset, threshold, trial via Stripe Checkout) → **Home** → **`/pause`** ritual → **Archive** to browse past pauses → **Journey** overview (streak/count) → **Settings**. Do not import `@/legacy/*`; full IA is tag `full-ia-pre-strip`. Manifest: [active-surface.md](../ops/active-surface.md).
 
 ---
 
 ## 1. Orientation: what to read first
 
 1. **[src/README.md](../../src/README.md)** + **[active-surface.md](../ops/active-surface.md)** — what ships in the active tree.
-2. **[README.md](../README.md)** — Node version, `npm install`, environment files (`.env`, `.env.hosted.local`, `.env.localstack.local`), and npm scripts (`dev` on port **8080**, Supabase CLI wrappers).
+2. **[README.md](../README.md)** — Node version, `npm install`, environment files (`.env`, `.env.prod.local`, `.env.localstack.local`), and npm scripts (`dev` on port **8080**, Supabase CLI wrappers).
 3. **[AGENTS.md](../AGENTS.md)** — Where routes, pages, hooks, and Supabase artifacts live; import alias `@/` → `src/`; note on ESLint volume.
 4. **[architecture/c4-holzen.md](../architecture/c4-holzen.md)** — C4 **System Context** and **Container** diagrams (and [workspace.dsl](../architecture/workspace.dsl) for Structurizr).
 5. **This doc** — How those pieces connect at runtime.
@@ -56,7 +56,7 @@ Routes are declared in **`src/App.tsx`**. Screen modules under **`src/screens/`*
 
 **Main shell (four tabs):** `/`, `/archive`, `/journey`, `/settings` (+ nested `/settings/about`, `/settings/billing-history`, `/settings/:section`) use **`AppLayout`** (`src/app/components/AppLayout.tsx`): max-width column, header (“Holzen” + `NotificationBell` from `features/notifications/public-hooks`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (Home, Archive, Journey, Settings). `AppLayout` uses `useShellProfile` + `ShellPauseChrome` (pause modal/banner; `useHolzen` only inside that component) and passes pause-ready state via outlet context; **`HolzenProvider`** ([`src/app/components/HolzenProvider.tsx`](../../src/app/components/HolzenProvider.tsx)) wraps signed-in routes (`useHolzenHomeContextState` in pause presentation).
 
-**Full-screen authenticated routes** (no `AppLayout`, `RobotsNoIndex`): `/pause`, companion deep links `/companion/{zoom-out,history,signal,grounding}/:pauseInstanceId`, `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage`.
+**Full-screen authenticated routes** (no `AppLayout`, `RobotsNoIndex`): `/onboarding`, `/pause`, companion deep links `/companion/{zoom-out,history,signal,grounding}/:pauseInstanceId`, `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage`.
 
 **Public / utility:** `/welcome` (landing), `/auth`, `/reset-password`, `/unsubscribe`, `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug`, `/roadmap`, `/reserve`.
 
@@ -118,6 +118,7 @@ Do **not** add global **`QueryClient` defaultOptions** lightly: they affect ever
 
 | Area | Screen module | Routes |
 |------|---------------|--------|
+| Onboarding | `screens/onboarding/OnboardingScreen.tsx` | `/onboarding` |
 | Home | `screens/home/HomeScreen.tsx` | `/` |
 | Archive | `screens/archive/ArchiveScreen.tsx` | `/archive` |
 | Journey | `screens/journey/JourneyOverviewScreen.tsx` | `/journey` |
@@ -181,7 +182,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 | `journal-prompt` | **Legacy full IA** — `src/legacy/full-shell/src/components/practice/GuidedJournal.tsx` |
 | `send-feedback` | `FeedbackForm.tsx`, `OfflineBanner.tsx` |
 | `generate-wallpaper` | **Legacy full IA** — `src/legacy/full-shell/src/components/ReflectionWallpaper.tsx` |
-| `holzen-number` | `screens/home/components/HolzenNumber.tsx` → `@/features/user/public-queries` / `public-rpc` |
+| `holzen-number` | `HomeMarketCommunityStats` / `HomeMarketWidgetFooter` → `@/features/user/public-queries` (legacy full widget: `@/legacy/holzen-pausing-now/HolzenNumber.tsx`) |
 | `reflection-insights` | **Legacy full IA** — `src/legacy/full-shell/src/components/AIInsightsPanel.tsx` (route **404** pause-first) |
 | `check-subscription`, `create-checkout`, `customer-portal` | `@/features/subscription/public-hooks` |
 | `register-push` | `@/features/notifications/public-hooks` (`usePushNotifications`) |
@@ -204,7 +205,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 ## 13. Admin (`src/screens/admin/AdminScreen.tsx`)
 
 - Route `/admin` is **protected by login** like any other `ProtectedRoute`.
-- **Authorization:** `useIsAdmin` reads `profiles.is_admin` when present; if the column/query fails, it falls back to **`VITE_ADMIN_USER_IDS`** (comma-separated user UUIDs).
+- **Authorization:** `useIsAdmin` reads `profiles.is_admin` (same flag enforced by RLS and admin edge handlers).
 - UI pulls stats and tools from `use-admin-stats` and components under `components/admin/`.
 
 ---
@@ -215,7 +216,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 - **`npm run test:ci`** — Runs **`check:edge-logging`**, **`check:edge-coverage-manifest`**, then Vitest with coverage + JUnit output (matches typical CI expectations).
 - **`npm run check:prepush`** — Full bash preflight in **`scripts/pre-push-check.sh`** (tests, build, **`check:view-migrations`**, edge checks, optional local `supabase db reset`). **Requires `bash`** — on Windows use **Git Bash** or **WSL**. Narrative checklist: [deployment-sync-guide.md](../ops/deployment-sync-guide.md).
 - **`npm run check:view-migrations`** — Blocks unsafe `CREATE OR REPLACE VIEW` column renames in **`supabase/migrations/`** (also run from **`check:prepush`**).
-- **`npm run build`** — Runs **`npm run check:version-sync`** first (`prebuild`): **`package.json` `version`** must match the latest **`changelog_entries`** row for the configured Supabase project.
+- **`npm run build`** — Runs **`npm run check:version-sync`** first (`prebuild`): validates **`package.json` `version`** semver.
 - **`npm run stamp:release`** — Writes the current **12-character** Git commit id into **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE`) for edge Sentry/BetterStack releases (also invoked at the start of **`check:prepush`**). See [AGENTS.md](../AGENTS.md) for the full script table.
 - **Tests** — Vitest discovers `src/**/*.{test,spec}.{ts,tsx}`; co-locate unit tests with `features/` and `screens/`; use **`src/test/`** for `setup.ts`, **integration flows** (`integration/flows/`), shared **fixtures**, and cross-cutting util tests — see [client-src-layout.md](client-src-layout.md) (Testing) and [src/test/README.md](../../src/test/README.md).
 - **`npm run lint`** — ESLint; the repo may have many pre-existing warnings/errors — avoid adding new ones in touched files ([AGENTS.md](../AGENTS.md)).
@@ -226,10 +227,11 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 | Script | Mode | Supabase env behavior (see `vite.config.ts`) |
 |--------|------|-----------------------------------------------|
-| `npm run dev` | `development` | Can use `.env`; **hosted fallbacks** if vars missing (`localstack` never). |
-| `npm run build` | `production` (default) | Same fallbacks if vars missing; override with `.env.production` / CI / Vercel env. |
-| `npm run dev:hosted` | `hosted` | Loads env for hosted backend (e.g. `.env.hosted` / `.env.hosted.local` per README). |
-| `npm run dev:local` | `localstack` | **No** hosted URL/key fallback — forces explicit local Supabase values. |
+| `npm run dev` | `development` | Requires explicit `VITE_SUPABASE_*` in `.env` / `.env.development*`; missing values fail fast. |
+| `npm run build` | `production` (default) | Requires explicit `VITE_SUPABASE_*` (or `SUPABASE_*` for `check:version-sync`) from `.env.production` / CI / Vercel env. |
+| `npm run dev:staging` | `staging` | Loads env for the staging backend (e.g. `.env.staging` / `.env.staging.local` per README). |
+| `npm run dev:prod` | `prod` | Loads env for the prod-like backend (e.g. `.env.prod` / `.env.prod.local` per README). |
+| `npm run dev:local` | `localstack` | Forces explicit local Supabase values from `.env.localstack*`. |
 
 ---
 
@@ -251,7 +253,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 | Changes under **`supabase/functions/`** | Edge functions **redeploy** to that project |
 | Changes under **`src/`**, `public/`, etc. | **Vercel** production build on **`main`** merge (preview builds on PRs) |
 
-**Locally**, nothing in this table runs by itself: your machine uses **`.env` / `.env.*.local`** and **`npm run dev`** (or `dev:hosted` / `dev:local`). Use **local Supabase** (`npm run supabase:start`, `supabase:reset`) to test migrations safely; use **`npx supabase functions serve`** (and [function secrets](https://supabase.com/docs/guides/functions/secrets)) to approximate hosted function behavior.
+**Locally**, nothing in this table runs by itself: your machine uses **`.env` / `.env.*.local`** and **`npm run dev`** (or `dev:staging` / `dev:prod` / `dev:local`). Use **local Supabase** (`npm run supabase:start`, `supabase:reset`) to test migrations safely; use **`npx supabase functions serve`** (and [function secrets](https://supabase.com/docs/guides/functions/secrets)) to approximate hosted function behavior.
 
 **Optional Lovable editor:** You may use [Lovable](https://lovable.dev) on **feature branches only** for UI iteration — do **not** use **Publish → Update** for prod. See [lovable-staging-and-platform-exit.md](../ops/lovable-staging-and-platform-exit.md).
 
@@ -271,7 +273,7 @@ These are observations from a structural pass — not a full security or QA audi
 
 ## 19. Learning path: pause first, then whole app
 
-**Once — run the app:** `cp .env.example .env`, fill Supabase URL + anon key, `npm install`, `npm run dev` (or `dev:hosted` / `dev:local` per [README.md](../README.md)), open `http://localhost:8080`, **sign in**.
+**Once — run the app:** `cp .env.example .env`, fill Supabase URL + anon key, `npm install`, `npm run dev` (or `dev:staging` / `dev:prod` / `dev:local` per [README.md](../README.md)), open `http://localhost:8080`, **sign in**.
 
 If SPA/React vocabulary is still fuzzy, skim [mental-models-for-contributors.md](mental-models-for-contributors.md) first, then return here.
 

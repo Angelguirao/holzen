@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import type { ReflectionContentV2 } from '@/features/pause/domain/reflect/generation/reflection-content-v2';
 import { reflectGenerator } from './pause-reflect-generation-io';
 import type {
   PauseArtifactReflectionTextFetchPhase,
@@ -24,12 +25,16 @@ export function usePauseArtifactReflectionText(
   const { pauseInstanceId, trigger } = params;
   const fetchEnabled = params.trigger === 'whenEnabled' ? params.fetchEnabled : true;
   const [artifactReflectionText, setArtifactReflectionText] = useState<string | null>(null);
+  const [artifactReflectionContent, setArtifactReflectionContent] = useState<ReflectionContentV2 | null>(
+    null,
+  );
   const [reflectionTextFetch, setReflectionTextFetch] =
     useState<PauseArtifactReflectionTextFetchPhase>('idle');
   const fetchedForPauseRef = useRef<string | null>(null);
 
   useEffect(() => {
     setArtifactReflectionText(null);
+    setArtifactReflectionContent(null);
     setReflectionTextFetch('idle');
     fetchedForPauseRef.current = null;
   }, [pauseInstanceId]);
@@ -50,11 +55,12 @@ export function usePauseArtifactReflectionText(
       setReflectionTextFetch('loading');
     }
 
-    void reflectGenerator.fetchReflectionText(myId)
-      .then((text) => {
+    void reflectGenerator.fetchReflectionContent(myId)
+      .then((content) => {
         if (cancelled) return;
         if (trigger === 'whenEnabled' && fetchedForPauseRef.current !== myId) return;
-        setArtifactReflectionText(text);
+        setArtifactReflectionContent(content);
+        setArtifactReflectionText(content?.message ?? null);
         if (trigger === 'whenEnabled') setReflectionTextFetch('done');
       })
       .catch(() => {
@@ -72,5 +78,5 @@ export function usePauseArtifactReflectionText(
     };
   }, [pauseInstanceId, trigger, fetchEnabled]);
 
-  return { artifactReflectionText, reflectionTextFetch };
+  return { artifactReflectionText, artifactReflectionContent, reflectionTextFetch };
 }

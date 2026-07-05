@@ -1,4 +1,50 @@
-project_id = "geqkxsnyqvhtascjghuu"
+# Neutral local project identifier for Supabase CLI state and Docker resources.
+# This is intentionally not a remote staging/prod ref:
+# - the app uses `VITE_SUPABASE_*`
+# - remote CLI work uses explicit project refs or target-specific scripts
+project_id = "holzen"
+
+# Holzen pins a non-default local port block to avoid Windows excluded-port
+# conflicts that commonly affect the Supabase CLI defaults in the 5432x range.
+[api]
+port = 55421
+
+[db]
+port = 55422
+shadow_port = 55420
+
+  [db.pooler]
+  port = 55429
+
+[studio]
+port = 55423
+
+[inbucket]
+port = 55424
+smtp_port = 55425
+pop3_port = 55426
+
+[analytics]
+port = 55427
+vector_port = 55428
+
+# Local Google OAuth — set SUPABASE_AUTH_EXTERNAL_GOOGLE_* in supabase/.env.local
+# See docs/ops/local-google-oauth.md (Google redirect: http://127.0.0.1:55421/auth/v1/callback)
+[auth]
+site_url = "http://localhost:8080"
+additional_redirect_urls = [
+  "http://localhost:8080",
+  "http://localhost:8080/**",
+  "http://127.0.0.1:8080",
+  "http://127.0.0.1:8080/**",
+]
+
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
+redirect_uri = "http://127.0.0.1:55421/auth/v1/callback"
+skip_nonce_check = true
 
 [functions]
   [functions.auth-email-hook]
@@ -23,33 +69,33 @@ project_id = "geqkxsnyqvhtascjghuu"
     verify_jwt = false
   [functions.holzen-number]
     verify_jwt = false
+  [functions.market-quote]
+    verify_jwt = false
   [functions.holzen-reflect]
     verify_jwt = false
   [functions.register-push]
     verify_jwt = false
   [functions.delete-account]
     verify_jwt = false
-  [functions.record-referral]
-    verify_jwt = false
-  [functions.process-referral-pending]
-    verify_jwt = false
   [functions.send-feedback]
     verify_jwt = false
   [functions.pregenerate-companions]
     verify_jwt = false
-  [functions.refresh-btc-prices]
+  [functions.refresh-market-prices]
     verify_jwt = false
-  [functions.backfill-btc-prices]
+  [functions.backfill-market-prices]
     verify_jwt = false
-  [functions.seed-btc-history]
+  [functions.seed-market-history]
     verify_jwt = false
   [functions.ai-cost-alert]
     verify_jwt = false
   [functions.companion-orchestrate]
     verify_jwt = false
-  [functions.grounding-enrich]
-    verify_jwt = false
   [functions.health]
+    verify_jwt = false
+  [functions.waitlist-signup]
+    verify_jwt = false
+  [functions.landing-ping]
     verify_jwt = false
 
   [functions.process-email-queue]

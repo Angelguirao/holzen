@@ -72,8 +72,10 @@ export interface NotificationResponseStats {
 }
 
 export interface AdminStats {
-  // View-based data (all-time aggregates)
+  // View-based data (30d rollup from v_companion_cache_hit_rate)
   cacheHits: CacheHitRow[];
+  /** Per-type rates for the selected period (from v_companion_serves_per_day). */
+  cacheHitsForPeriod: CacheHitRow[];
   costs: CostRow[];
   failures: FailureRow[];
   feedback: FeedbackRow[];
@@ -114,6 +116,46 @@ function periodToMs(period: TimePeriod): number | null {
     case 'all':
       return null;
   }
+}
+
+/** Per-type cache hit rates from `v_companion_serves_per_day` (respects admin period selector). */
+export function computeCacheHitsByCompanionType(
+  dailyServes: DailyServeRow[],
+  startDate: string | null,
+): CacheHitRow[] {
+  const filtered = startDate
+    ? dailyServes.filter((r) => r.day && r.day >= startDate)
+    : dailyServes;
+
+  const byType = new Map<
+    string,
+    { total: number; cache: number; live: number; curated: number; library: number }
+  >();
+
+  for (const row of filtered) {
+    const type = row.companion_type?.trim() || 'unknown';
+    const count = row.serve_count ?? 0;
+    const src = row.serve_source ?? '';
+    const agg = byType.get(type) ?? { total: 0, cache: 0, live: 0, curated: 0, library: 0 };
+    agg.total += count;
+    if (src === 'cache') agg.cache += count;
+    else if (src === 'live') agg.live += count;
+    else if (src === 'curated') agg.curated += count;
+    else if (src === 'library') agg.library += count;
+    byType.set(type, agg);
+  }
+
+  return [...byType.entries()]
+    .map(([companion_type, agg]) => ({
+      companion_type,
+      total_serves: agg.total,
+      cache_hits: agg.cache,
+      live_generated: agg.live,
+      curated_fallbacks: agg.curated,
+      library_hits: agg.library,
+      cache_hit_pct: agg.total > 0 ? Math.round((agg.cache / agg.total) * 1000) / 10 : 0,
+    }))
+    .sort((a, b) => (b.total_serves ?? 0) - (a.total_serves ?? 0));
 }
 
 function periodStart(period: TimePeriod): string | null {
@@ -274,7 +316,7 @@ export function useAdminStats(enabled = true): AdminStats {
 
   const bundle = statsQuery.data;
 
-  const { periodStats, prevPeriodStats, notificationStats } = useMemo(() => {
+  const { periodStats, prevPeriodStats, notificationStats, cacheHitsForPeriod } = useMemo(() => {
     if (!bundle) {
       const emptyPeriod: PeriodStats = {
         serves: 0,
@@ -299,9 +341,10 @@ export function useAdminStats(enabled = true): AdminStats {
         periodStats: emptyPeriod,
         prevPeriodStats: null as PeriodStats | null,
         notificationStats: emptyNotif,
+        cacheHitsForPeriod: [] as CacheHitRow[],
       };
     }
-    return computeAdminPeriodFields(
+    const fields = computeAdminPeriodFields(
       period,
       bundle.costs,
       bundle.cacheHits,
@@ -312,6 +355,13 @@ export function useAdminStats(enabled = true): AdminStats {
       bundle.feedbackPerDay,
       bundle.notificationPerDay,
     );
+    const start = periodStart(period);
+    const startDate = start?.slice(0, 10) ?? null;
+    const byType =
+      bundle.servesPerDay.length > 0
+        ? computeCacheHitsByCompanionType(bundle.servesPerDay, startDate)
+        : bundle.cacheHits;
+    return { ...fields, cacheHitsForPeriod: byType };
   }, [bundle, period]);
 
   const handleSetPeriod = useCallback((p: TimePeriod) => {
@@ -358,6 +408,7 @@ export function useAdminStats(enabled = true): AdminStats {
 
   return {
     cacheHits: bundle?.cacheHits ?? [],
+    cacheHitsForPeriod,
     costs: bundle?.costs ?? [],
     failures: bundle?.failures ?? [],
     feedback: bundle?.feedback ?? [],

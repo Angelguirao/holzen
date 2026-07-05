@@ -40,7 +40,7 @@ export function renderShippedApp({
   return render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter future={reactRouterFutureFlags} initialEntries={initialEntries}>
-        <Suspense fallback={<div role="status">Loading</div>}>
+        <Suspense fallback={<div>Loading</div>}>
           <App />
         </Suspense>
       </MemoryRouter>

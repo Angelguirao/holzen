@@ -4,7 +4,7 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 
 ## What this project is
 
-**Holzen** is a React + TypeScript SPA for Bitcoin-aware mindfulness: breathing/grounding flows, journaling, a library, and AI-style companions backed by **Supabase** (Postgres, auth, Row Level Security, Edge Functions). **Stripe** is used for subscriptions via edge functions.
+**Holzen** is a React + TypeScript SPA for volatility-triggered investor pause practice: breathing/grounding flows, journaling, a library, and AI-style companions backed by **Supabase** (Postgres, auth, Row Level Security, Edge Functions). **Stripe** is used for subscriptions via edge functions.
 
 ## Change map (read this before non-trivial edits)
 
@@ -14,9 +14,10 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 |----------------|------------------------|-----------------------------------------------------|
 | App boot, routing, auth wiring, Vercel vs local | [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) | [docs/systems/routing/route-gating-system.md](docs/systems/routing/route-gating-system.md) if gates change |
 | Nav, IA, primary routes, bottom nav | [docs/ops/active-surface.md](docs/ops/active-surface.md) + `src/App.tsx` / `src/lib/app-routes.ts` | [docs/design/information-architecture.md](docs/design/information-architecture.md) (§1–§3 full-IA reference; §4.5–§4.6 pause-first); [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md) if `navigation.*` or product surface names in analytics change |
-| Pause lifecycle, instances, events, artifacts, stats hooks | [docs/systems/pause-system.md](docs/systems/pause-system.md) | RPCs/migrations listed under **Where to change what → Pause**; client layout [pause-client-architecture.md](docs/systems/pause-client-architecture.md); keep `invokeEdge` / `x-cid` intact |
+| Product strategy, moats, roadmap philosophy | [docs/fundamentals/strategy-and-defensibility.md](docs/fundamentals/strategy-and-defensibility.md) | [behavioral-platform-strategy.md](docs/fundamentals/behavioral-platform-strategy.md) for surface/extension execution; [active-surface.md](docs/ops/active-surface.md) for shipped scope |
+| Pause lifecycle, instances, events, artifacts, stats hooks | [docs/systems/pause-system.md](docs/systems/pause-system.md) | **Home widget projection:** [home-pause-widget-projection.md](docs/systems/home-pause-widget-projection.md) + **client map:** [home-pause-widget-client-architecture.md](docs/systems/home-pause-widget-client-architecture.md); RPCs/migrations listed under **Where to change what → Pause**; client layout [pause-client-architecture.md](docs/systems/pause-client-architecture.md); keep `invokeEdge` / `x-cid` intact |
 | Pause AI, companions, edge orchestration, cron | [docs/systems/pause/ai-powered-pause-system.md](docs/systems/pause/ai-powered-pause-system.md) | [docs/systems/costs/ai-cost-model.md](docs/systems/costs/ai-cost-model.md) when limits/flags/cost paths change |
-| Profile stats UI and skills-first model | [docs/systems/stats-system.md](docs/systems/stats-system.md) | **Not shipped** in pause-first UI — reference `src/legacy/full-shell/`; active journey uses overview in `screens/journey/` |
+| Profile stats UI | [docs/systems/stats-system.md](docs/systems/stats-system.md) | **Pause-first:** Practice Presence XP (formula, Postgres, Home/Journey) in stats doc § MVP. **Not shipped:** Holzen Score / Profile → Stats — `src/legacy/full-shell/` |
 | Badges (families, definitions, sync) | [docs/systems/badges-system.md](docs/systems/badges-system.md) | **Not shipped** — `BadgesPanelV2` in `src/legacy/full-shell/` only |
 | Postgres functions, RLS, triggers, views | [docs/ops/migration-security-conventions.md](docs/ops/migration-security-conventions.md) | [docs/ops/migration-view-safety.md](docs/ops/migration-view-safety.md) for views; `npm run gen:types` when possible |
 | New or renamed edge HTTP handler | `supabase/functions/_shared/with-request-logging.ts`, [docs/ops/edge-logging-conventions.md](docs/ops/edge-logging-conventions.md) | `[functions.*]` in `supabase/config.toml`, `EdgeCoverage.tsx`, `npm run check:edge-logging` + `check:edge-coverage-manifest` |
@@ -48,12 +49,13 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run build` | Production build (**`prebuild`** → **`npm run check:version-sync`**) |
 | `npm run preview` | Serve built output locally |
 | `npm run test` | Vitest (jsdom), single run |
-| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, `check:active-surface`, `check:react19-leverage`, `check:no-phase-labels`, `check:invoke-edge-allowlist`, `check:bundle-shipped`, `check:bruno-active-manifest`, Vitest with coverage + JUnit |
+| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, `check:active-surface`, `check:react19-leverage`, `check:no-phase-labels`, `check:invoke-edge-allowlist`, `check:no-idle-query-polling`, `check:bruno-active-manifest`, `check:env-docs`, Vitest with coverage + JUnit |
 | `npm run check:no-phase-labels` | Plan §5.0 — fail on `mvp` / `pre-mvp` tokens in active `src/`, ops, Bruno, CI scripts (allowlisted migration filename + branch) |
-| `npm run check:bundle-shipped` | After **`build`**: no `BadgesPanelV2` / `ToolsHub` in `dist/assets` (pause-first strip guard; in **`test:ci`** and **`check:prepush`**) |
+| `npm run check:bundle-shipped` | After **`build`**: no `BadgesPanelV2` / `ToolsHub` in `dist/assets` (pause-first strip guard; in the **CI build step** and **`check:prepush`**) |
 | `npm run check:bruno-active-manifest` | Every `[functions.*]` in `config.toml` is listed in `bruno/active/functions-catalog.md` (in **`test:ci`**) |
 | `npm run check:posthog-events-allowlist` | Active `trackEvent` names ⊆ `docs/ops/event-taxonomy.md` Active section (in **`test:ci`** / **`check:prepush`**) |
 | `npm run check:feature-flags-doc` | Active `useFeatureFlag('…')` keys ⊆ `docs/ops/feature-flags.md` Active flags table (in **`test:ci`** / **`check:prepush`**) |
+| `npm run check:env-docs` | Runtime/build env names, example env files, and CI catalog entries must stay aligned with `docs/ops/environment-matrix.md` (in **`test:ci`** / **`check:prepush`**) |
 | `npm run check:i18n-active-keys` | Active `t('…')` keys must exist in `src/locales/en.json` (in **`test:ci`**) |
 | `npm run test:watch` | Vitest watch mode |
 | `npm run lint` | ESLint across the repo |
@@ -64,15 +66,18 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run check:edge-coverage-manifest` | Ensures `src/screens/ops/EdgeCoverageScreen.tsx` `COVERAGE` lists every `supabase/config.toml` `[functions.*]` name (and no extras). Run when adding/removing edge functions. |
 | `npm run check:no-root-components` | No new `src/components/*.tsx` outside `ui/` + allowlist (in **`test:ci`**) |
 | `npm run check:architecture-alignment` | Features layout, no screens-in-features (in **`test:ci`**) |
+| `npm run check:no-idle-query-polling` | Active `src/` invalidation-first TanStack Query: no timed `refetchInterval`, focus/reconnect refetch, or focus-driven `invalidateQueries` (alias: `check:invalidation-first-queries`) (in **`test:ci`** / **`check:prepush`**) |
 | `npm run check:prepush` | Full scripted preflight (`scripts/pre-push-check.sh`). **Requires `bash`** (Git Bash / WSL on Windows). |
 | `npm run smoke:edge-logging` | Optional: HTTP smoke against deployed edges — verifies `x-cid` round-trip through `withRequestLogging` (see `supabase/functions/README.md`). |
-| `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **linked** Supabase project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after DB migrations. |
+| `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **production** Supabase project ref (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Use `npm run gen:types:staging` when you intentionally want staging. |
 | `npm run design:lint` | Optional: validate root **[DESIGN.md](DESIGN.md)** ([`@google/design.md`](https://www.npmjs.com/package/@google/design.md)); uses `npx` (network on first run). |
+| `npm run doctor` | Optional: [React Doctor](https://react.doctor) health scan (`react-doctor` devDependency). Use `npm run doctor -- --verbose --diff` before/after React changes; skill `.cursor/skills/react-doctor/`. |
 | `npm run test:coverage` | Vitest with coverage reports only (no JUnit; use **`test:ci`** for the full CI gate). |
-| `npm run check:version-sync` | Ensures `package.json` **version** matches the latest **`changelog_entries`** row (REST); runs automatically as **`prebuild`** before **`npm run build`**. |
+| `npm run check:version-sync` | Validates `package.json` **version** is valid semver (runs automatically as **`prebuild`** before **`npm run build`**). |
 | `npm run stamp:release` | Writes **`git rev-parse --short=12 HEAD`** into **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE`) for edge Sentry/BetterStack **`SENTRY_RELEASE`**. Idempotent. |
 | `npm run check:release-stamp` | Exits non-zero if **`EDGE_RELEASE`** in **`release.ts`** ≠ current **`git rev-parse --short=12 HEAD`** (read-only; same comparison the stamper uses). |
-| `npm run dev:hosted` / `npm run dev:local` · `npm run build:dev` · `supabase:*` | Hosted vs localstack Vite modes and Docker Supabase CLI wrappers — see [README.md](README.md) npm scripts. |
+| `npm run env:doctor` | Prints repo-local Supabase link state, frontend targets by mode, and local Docker status. |
+| `npm run dev:staging` / `npm run dev:prod` / `npm run dev:local` · `npm run build:dev` · `supabase:*` | Staging vs prod-like vs localstack Vite modes and Docker Supabase CLI wrappers — see [README.md](README.md) npm scripts. |
 
 **Linting:** There are many **pre-existing** ESLint issues (~300). Do not treat cleaning the whole tree as part of a small task; avoid introducing *new* problems in files you touch.
 
@@ -106,7 +111,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 
 ## Supabase and edge functions
 
-- **Migrations:** `supabase/migrations/` — SQL is the source of truth for schema; follow the project’s normal flow to apply (CLI linked project, dashboard, etc.).
+- **Migrations:** `supabase/migrations/` — SQL is the source of truth for schema; follow the project’s normal flow to apply (target-specific scripts, explicit project refs, or dashboard SQL).
 - **SQL function conventions (mandatory):** every function in `supabase/migrations/` must `SET search_path = public` (or `public, extensions` when calling `net.*` / extension code), and use `SECURITY DEFINER` **only** when bypassing RLS is required — and then validate the caller and strip privileged columns. See [docs/ops/migration-security-conventions.md](docs/ops/migration-security-conventions.md) for templates and the pre-push checklist; companion rules for views are in [docs/ops/migration-view-safety.md](docs/ops/migration-view-safety.md).
 - **Edge functions:** `supabase/functions/<name>/index.ts` (Deno). Shared helpers: `supabase/functions/_shared/`. Larger handlers (e.g. **`companion-orchestrate`**) also use **`_shared/companion-orchestrate-*.ts`** (types, parse, logging, skip-cache, tasks, assemble). Add **`[functions.<name>]`** in **`supabase/config.toml`** for **every** new function (same PR). Unlisted names use **Supabase defaults** and can **401** on `invoke` or disagree with `functions serve` until you add the block and redeploy. **401** → session/`Authorization`, dashboard secrets, deployed `config.toml`. After editing edge TS, run **`npm run check:edge`** when Deno is installed.
 - **Deploy path:** Migrations and edge functions deploy to **owned Supabase** (staging / prod) via CI or CLI; the **React app** deploys on **Vercel** when `main` merges. See [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §17 and [docs/ops/vercel-frontend-setup.md](docs/ops/vercel-frontend-setup.md).
@@ -114,9 +119,10 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 
 ## Environment variables
 
+- Full environment inventory and per-environment behavior: [docs/ops/environment-matrix.md](docs/ops/environment-matrix.md).
 - **Required for a custom project:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (see `.env.example` and `src/integrations/supabase/client.ts`).
-- **Optional:** `VITE_ADMIN_USER_IDS` — comma-separated auth user UUIDs allowed to use `/admin`.
-- `vite.config.ts` uses `loadEnv`; when `VITE_*` are missing and mode is not `localstack`, **dev server and `vite build`** may inject Holzen hosted Supabase URL/key (see `vite.config.ts`). Set `VITE_SUPABASE_*` explicitly for another project or stricter CI.
+- **Admin `/admin` routes:** grant via `profiles.is_admin = true` in Supabase (see `docs/ops/environment-matrix.md`).
+- `vite.config.ts` uses `loadEnv`; `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` are required for Vite dev/build, and `scripts/check-version-sync.mjs` also needs explicit Supabase env (`VITE_*` or `SUPABASE_*`) during `npm run build`.
 
 Never commit `.env` or service role keys.
 

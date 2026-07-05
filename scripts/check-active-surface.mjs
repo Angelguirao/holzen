@@ -45,17 +45,23 @@ const TIER_B_TABLES = [
   'night_reflections',
 ];
 
-/** User Archive collections — quarantined in `src/legacy/archive-collections/` (not MVP). */
+/** User Archive collections — quarantined in `src/legacy/archive-collections/` (not in shipped scope). */
 const CLIENT_QUARANTINED_TABLES = ['collections', 'collection_items'];
 
-/** Zen Home — quarantined in `src/legacy/zen-mode/` (not MVP). */
+/** Referral program — quarantined in `src/legacy/referrals/` (not in shipped scope). */
+const REFERRAL_QUARANTINED_TABLES = ['referrals', 'referral_rewards', 'referral_pending_jobs'];
+
+/** Public roadmap voting — quarantined in `src/legacy/marketing-roadmap-reserve/` (not in shipped scope). */
+const ROADMAP_QUARANTINED_TABLES = ['roadmap_items', 'roadmap_votes'];
+
+/** Zen Home — quarantined in `src/legacy/zen-mode/` (not in shipped scope). */
 const ZEN_MODE_FORBIDDEN = [
   { re: /\bZenModeHome\b/, label: 'ZenModeHome (use legacy/zen-mode)' },
   { re: /\bHomeZenModeRoute\b/, label: 'HomeZenModeRoute (use legacy/zen-mode)' },
   { re: /\buseHomeZenMode\b/, label: 'useHomeZenMode (use legacy/zen-mode)' },
   { re: /\buseZenModeHomeRouteProps\b/, label: 'useZenModeHomeRouteProps (use legacy/zen-mode)' },
   { re: /\bbuildZenModeHomeRouteProps\b/, label: 'buildZenModeHomeRouteProps (use legacy/zen-mode)' },
-  { re: /holzen_zen_mode/, label: 'holzen_zen_mode localStorage (Zen mode not MVP)' },
+  { re: /holzen_zen_mode/, label: 'holzen_zen_mode localStorage (Zen mode not in shipped scope)' },
 ];
 
 const TIER_B_FROM_RES = TIER_B_TABLES.map(
@@ -68,6 +74,26 @@ const QUARANTINED_FROM_RES = CLIENT_QUARANTINED_TABLES.map(
     label: `.from('${t}') (user collections — use legacy/archive-collections)`,
   }),
 );
+
+const REFERRAL_FROM_RES = REFERRAL_QUARANTINED_TABLES.map(
+  (t) => ({
+    re: new RegExp(`\\.from\\(['"]${t}['"]\\)`),
+    label: `.from('${t}') (referrals — use legacy/referrals)`,
+  }),
+);
+
+const ROADMAP_FROM_RES = ROADMAP_QUARANTINED_TABLES.map(
+  (t) => ({
+    re: new RegExp(`\\.from\\(['"]${t}['"]\\)`),
+    label: `.from('${t}') (roadmap — use legacy/marketing-roadmap-reserve)`,
+  }),
+);
+
+const REFERRAL_FORBIDDEN = [
+  { re: /['"]holzen_ref['"]/, label: 'holzen_ref localStorage (referrals not in shipped scope)' },
+  { re: /record-referral/, label: 'record-referral edge invoke (legacy/referrals)' },
+  { re: /process-referral-pending/, label: 'process-referral-pending edge (legacy/referrals)' },
+];
 
 const SKIP_TIER_B_FILES = new Set([
   'src/integrations/supabase/types.ts',
@@ -89,13 +115,13 @@ for (const file of walk(srcRoot)) {
   const rel = relative(root, file).replace(/\\/g, '/');
   if (rel.startsWith('src/legacy/')) continue;
   const text = readFileSync(file, 'utf8');
-  for (const { re, label } of [...FORBIDDEN_PATTERNS, ...ZEN_MODE_FORBIDDEN]) {
+  for (const { re, label } of [...FORBIDDEN_PATTERNS, ...ZEN_MODE_FORBIDDEN, ...REFERRAL_FORBIDDEN]) {
     if (re.test(text)) {
       violations.push({ file: rel, label });
     }
   }
   if (!SKIP_TIER_B_FILES.has(rel)) {
-    for (const { re, label } of [...TIER_B_FROM_RES, ...QUARANTINED_FROM_RES]) {
+    for (const { re, label } of [...TIER_B_FROM_RES, ...QUARANTINED_FROM_RES, ...REFERRAL_FROM_RES, ...ROADMAP_FROM_RES]) {
       if (re.test(text)) {
         violations.push({ file: rel, label });
       }

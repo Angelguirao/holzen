@@ -78,3 +78,42 @@ Well-aligned relative to other contexts — see [src/features/market/README.md](
 ## 7. Related
 
 - Pause home orchestration: `useHolzenHomeContextState` in pause presentation (composes market + pause)
+- **Home market product logic (tiers, non-goals, experiments):** [home-market-logical-surface.md](../backlog/home-market-logical-surface.md)
+
+---
+
+## 8. Automatic pause trigger signal (server)
+
+**Authority:** `check-volatility` edge + `profiles` threshold columns. Client displays context and frequency estimates; it does **not** decide eligibility.
+
+### Shipped contract
+
+| Signal | Window | Profile fields | Breach rule |
+|--------|--------|----------------|-------------|
+| Daily move | Rolling 24h | `threshold` (up), `threshold_down` (down) | Signed % change vs direction-specific threshold |
+
+**Legacy (not active):** rolling 7d cumulative auto-pause — archived in `src/legacy/cumulative-threshold/` and `supabase/functions/_shared/legacy/volatility-thresholds-cumulative-legacy.ts`. Column `profiles.cumulative_threshold` dropped Jun 2026. Context fingerprints no longer hash a cumulative bucket (`cb` removed from `computeContextFingerprint`).
+
+Metrics come from CoinGecko `market_chart?days=1` in the cron worker (`fetchAssetVolatilityForCurrency`). Shared pure helpers: `supabase/functions/_shared/volatility-thresholds.ts` and `src/features/market/domain/volatility-thresholds.ts` (keep in sync).
+
+Gating after breach: cooldown (`claim_trigger_slot`), quiet hours / `quiet_windows`, snooze, email/push prefs — see [notifications-delivery.md](notifications-delivery.md) and [phase-3-server-cron-triggers.md](../reviews/phase-3-server-cron-triggers.md).
+
+### Why percent, not absolute price levels
+
+Automatic offers target **volatility-driven checking**, not trading alerts at fixed spot prices. **Percentage deviation** stays meaningful as BTC spot drifts; absolute "$X" levels go stale and match a different product job.
+
+**Decision record:** [2026-06-03-percent-volatility-triggers.md](../decisions/2026-06-03-percent-volatility-triggers.md).
+
+**Future (optional):** personal anchor thresholds (entry, round numbers) layered **on top of** % logic — [volatility-anchor-thresholds.md](../backlog/volatility-anchor-thresholds.md).
+
+---
+
+## 9. Tracked asset catalog (multi-class prep)
+
+**Shipped:** bitcoin only in `TRACKED_ASSETS` — see `src/features/market/domain/tracked-assets.ts`.
+
+**Model:** `TrackedAssetDefinition` (`id`, `symbol`, `kind`, `provider`) + `profiles.tracked_asset_id` as provider-native string. **Quote type:** prefer `MarketQuote`; `BtcPriceData` is a deprecated alias.
+
+**BTC-only product features** should use `isBitcoinTrackedAsset()` (on-chain, unit display mode, zoom-out anniversary). Active call sites use the helper in client fetch, pause context, Settings, Home, and edge `check-volatility` / `market-quote` / zoom-out.
+
+**Full 360° gap analysis and rollout steps:** [tracked-asset-class-evolution.md](../backlog/tracked-asset-class-evolution.md).

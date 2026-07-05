@@ -22,12 +22,29 @@ describe('resolveFrameHaikuDisplayBody', () => {
     ).toBe('my reflection');
   });
 
-  it('returns empty while idle without artifact', () => {
+  it('uses reflection while idle or loading when artifact is missing', () => {
     expect(
       resolveFrameHaikuDisplayBody({
         artifactHaiku: '',
         haikuFetch: 'idle',
         reflectionMessage: 'text',
+      }),
+    ).toBe('text');
+    expect(
+      resolveFrameHaikuDisplayBody({
+        artifactHaiku: null,
+        haikuFetch: 'loading',
+        reflectionMessage: '  loading copy ',
+      }),
+    ).toBe('loading copy');
+  });
+
+  it('returns empty when artifact and reflection are both missing', () => {
+    expect(
+      resolveFrameHaikuDisplayBody({
+        artifactHaiku: null,
+        haikuFetch: 'done',
+        reflectionMessage: '   ',
       }),
     ).toBe('');
   });

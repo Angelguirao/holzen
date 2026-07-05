@@ -1,5 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
 import { usePauseSessionDecideHandler } from './use-pause-session-decide-handler';
@@ -43,9 +45,13 @@ vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-queries', () => ({
-  invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
-}));
+vi.mock('@/features/pause/public-queries', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/pause/public-queries')>();
+  return {
+    ...actual,
+    invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
+  };
+});
 
 vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({
@@ -56,6 +62,14 @@ vi.mock('@/features/auth/public', () => ({
 }));
 
 const t = ((k: string) => k) as TFunction;
+
+function renderDecideHandler(input: UsePauseSessionDecideHandlerParams) {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const wrapper = ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+  return renderHook(() => usePauseSessionDecideHandler(input), { wrapper });
+}
 
 function baseInput(overrides: Partial<UsePauseSessionDecideHandlerParams> = {}) {
   const decidingRef: MutableRefObject<boolean> = { current: false };
@@ -78,6 +92,16 @@ function baseInput(overrides: Partial<UsePauseSessionDecideHandlerParams> = {}) 
     shiftIntensity: null as number | null,
     reflectionMessage: 'Reflection text',
     haiku: null as string | null,
+    ritualStartedAtMs: Date.now() - 120_000,
+    companionPrefs: {
+      breathing: true,
+      haiku: true,
+      grounding: true,
+      signal: true,
+      zoomOut: true,
+      history: true,
+    },
+    isFavorite: false,
     ...overrides,
   };
 }
@@ -94,7 +118,7 @@ describe('usePauseSessionDecideHandler', () => {
   it('completes without outcome RPC when no pause instance id', async () => {
     pauseReflectOutcomeLogMock.mockResolvedValueOnce({ status: 'no_instance' });
     const input = baseInput();
-    const { result } = renderHook(() => usePauseSessionDecideHandler(input));
+    const { result } = renderDecideHandler(input);
     await act(async () => {
       await result.current.handleDecide('hold');
     });
@@ -112,7 +136,7 @@ describe('usePauseSessionDecideHandler', () => {
   it('logs outcome and completes when RPC returns completed', async () => {
     pauseReflectOutcomeLogMock.mockResolvedValueOnce({ status: 'completed' });
     const input = baseInput({ pauseInstanceId: 'pi-1' });
-    const { result } = renderHook(() => usePauseSessionDecideHandler(input));
+    const { result } = renderDecideHandler(input);
     await act(async () => {
       await result.current.handleDecide('hold');
     });
@@ -129,7 +153,7 @@ describe('usePauseSessionDecideHandler', () => {
   it('toasts and aborts when outcome RPC throws', async () => {
     pauseReflectOutcomeLogMock.mockResolvedValueOnce({ status: 'sync_failed' });
     const input = baseInput({ pauseInstanceId: 'pi-1' });
-    const { result } = renderHook(() => usePauseSessionDecideHandler(input));
+    const { result } = renderDecideHandler(input);
     await act(async () => {
       await result.current.handleDecide('hold');
     });
@@ -145,12 +169,14 @@ describe('usePauseSessionDecideHandler', () => {
       outcomeState: 'pending',
     });
     const input = baseInput({ pauseInstanceId: 'pi-1' });
-    const { result } = renderHook(() => usePauseSessionDecideHandler(input));
+    const { result } = renderDecideHandler(input);
     await act(async () => {
       await result.current.handleDecide('hold');
     });
     expect(showPauseOutcomeNotCompletedToast).toHaveBeenCalledWith(t);
-    expect(invalidatePauseStatsMock).toHaveBeenCalledWith('user-decide-handler-test');
+    expect(invalidatePauseStatsMock).toHaveBeenCalledWith('user-decide-handler-test', {
+      pauseInstanceId: 'pi-1',
+    });
     expect(input.refreshSubscription).toHaveBeenCalled();
     expect(input.setDecision).not.toHaveBeenCalled();
     expect(clearSessionMock).not.toHaveBeenCalled();

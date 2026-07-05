@@ -5,6 +5,10 @@ import { cn } from '@/lib/utils';
 
 export interface HomeSectionCardProps {
   title: string;
+  /** When true, title is visually hidden but available to screen readers. */
+  hideTitle?: boolean;
+  /** Optional icon before title (e.g. moon on Your pause). */
+  titleLeading?: ReactNode;
   /** Optional summary on the header row (e.g. hold goal compact line); truncates on small widths. */
   headerSubtitle?: ReactNode;
   headerRight?: ReactNode;
@@ -22,6 +26,8 @@ export interface HomeSectionCardProps {
  */
 export function HomeSectionCard({
   title,
+  hideTitle = false,
+  titleLeading,
   headerSubtitle,
   headerRight,
   children,
@@ -39,7 +45,15 @@ export function HomeSectionCard({
     <div className={cn('rounded-xl border border-border/40 bg-card/40', className)}>
       <div className="flex items-center gap-2 px-4 py-3">
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <span className="shrink-0 text-xs font-normal uppercase tracking-wide text-secondary-foreground">{title}</span>
+          {titleLeading ? <span className="shrink-0">{titleLeading}</span> : null}
+          <span
+            className={cn(
+              'shrink-0 text-xs font-normal uppercase tracking-wide text-secondary-foreground',
+              hideTitle && 'sr-only',
+            )}
+          >
+            {title}
+          </span>
           {headerSubtitle ? (
             <span className="min-w-0 truncate text-xs font-medium tabular-nums text-muted-foreground">
               {headerSubtitle}
@@ -76,7 +90,9 @@ export function HomeSectionCard({
         ) : null}
       </AnimatePresence>
 
-      {footer ? <div className="border-t border-border/30 px-4 py-3">{footer}</div> : null}
+      {footer ? (
+        <div className="flex min-h-11 items-center border-t border-border/30 px-4 py-3">{footer}</div>
+      ) : null}
     </div>
   );
 }

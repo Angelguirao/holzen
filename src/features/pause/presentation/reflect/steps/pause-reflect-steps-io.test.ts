@@ -8,11 +8,11 @@ import {
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
-  pauseDeclinePendingOfferWithRepository,
+  pauseDeclinePendingOfferWithRepository
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   messageFromReflectGenerationResult,
@@ -21,7 +21,7 @@ import {
   reflectGenerator,
   resolveReflectGenerationPrefetch,
   runReflectGeneration,
-  shouldCommitReflectGeneration,
+  shouldCommitReflectGeneration
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   buildFeelTilesMoodLogOptions,
@@ -29,35 +29,33 @@ import {
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
-  reflectPauseRepository as moodReflectPauseRepository,
+  reflectPauseRepository as moodReflectPauseRepository
 } from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
   reflectPauseRepository as hubReflectPauseRepository,
-  resolveShiftFrameHubDonePresentation,
+  resolveShiftFrameHubDonePresentation
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
   buildReflectionShareTelegramUrl,
   buildReflectionShareText,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-  pauseReflectionShareImage,
+  pauseReflectionShareImage
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   buildPauseSessionStepRitualBundle,
-  buildPauseSessionStepShellBundle,
+  buildPauseSessionStepShellBundle
 } from '@/features/pause/presentation/session/pause-session-step-handlers-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
-  resolvePauseSessionReflectAndDecidePreflight,
+  resolvePauseSessionReflectAndDecidePreflight
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   pauseReflectFavoriteToggle,
@@ -70,7 +68,7 @@ import {
   pauseReflectionStepLogOnceWithRepository,
   reflectPauseRepository,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from './pause-reflect-steps-io';
 
 const runPauseReflectionStepLogOnceMock = vi.hoisted(() => vi.fn());
@@ -86,7 +84,7 @@ vi.mock(
     >();
     return {
       ...actual,
-      runPauseFavoriteToggle: runPauseFavoriteToggleMock,
+      runPauseFavoriteToggle: runPauseFavoriteToggleMock
     };
   },
 );
@@ -99,7 +97,7 @@ vi.mock(
     >();
     return {
       ...actual,
-      runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
+      runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock
     };
   },
 );
@@ -112,7 +110,7 @@ vi.mock(
     >();
     return {
       ...actual,
-      runPauseReflectNoteUpdate: runPauseReflectNoteUpdateMock,
+      runPauseReflectNoteUpdate: runPauseReflectNoteUpdateMock
     };
   },
 );
@@ -125,23 +123,23 @@ vi.mock(
     >();
     return {
       ...actual,
-      runPauseReflectTagUpdate: runPauseReflectTagUpdateMock,
+      runPauseReflectTagUpdate: runPauseReflectTagUpdateMock
     };
   },
 );
 
 vi.mock('@/features/pause/domain/reflect/steps/favorite-toggle', () => ({
-  shouldShowFavoriteProHint: vi.fn(),
+  shouldShowFavoriteProHint: vi.fn()
 }));
 
 vi.mock('@/features/pause/domain/reflect/steps/reflection-step-log', () => ({
-  shouldLogPauseReflectionStep: vi.fn(),
+  shouldLogPauseReflectionStep: vi.fn()
 }));
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectStepsRepository' },
   reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
-  supabaseReflectGenerator: { port: 'reflectGenerator' },
+  supabaseReflectGenerator: { port: 'reflectGenerator' }
 }));
 
 describe('pause-reflect-steps-io', () => {
@@ -168,12 +166,12 @@ describe('pause-reflect-steps-io', () => {
 
     await pauseReflectFavoriteToggle({
       pauseInstanceId: 'pi-1',
-      isFavorite: true,
+      isFavorite: true
     });
 
     expect(runPauseFavoriteToggleMock).toHaveBeenCalledWith(reflectPauseRepository, {
       pauseInstanceId: 'pi-1',
-      isFavorite: true,
+      isFavorite: true
     });
   });
 
@@ -184,7 +182,7 @@ describe('pause-reflect-steps-io', () => {
 
     expect(runPauseReflectTagUpdateMock).toHaveBeenCalledWith(reflectPauseRepository, {
       pauseInstanceId: 'pi-tags',
-      tags: ['calm'],
+      tags: ['calm']
     });
   });
 
@@ -195,7 +193,7 @@ describe('pause-reflect-steps-io', () => {
 
     expect(runPauseReflectNoteUpdateMock).toHaveBeenCalledWith(reflectPauseRepository, {
       pauseInstanceId: 'pi-note',
-      text: 'breathe',
+      text: 'breathe'
     });
   });
 
@@ -376,8 +374,6 @@ describe('pause-reflect-steps-io', () => {
     expect(pauseReflectionStepLogOnce).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(reflectPauseRepository).not.toBe(buildPauseScoreImpacts);
     expect(pauseReflectFavoriteToggleWithRepository).not.toBe(pauseReflectOutcomeLog);
-    expect(pauseReflectNoteUpdateWithRepository).not.toBe(formatReinforcementQuoteFromSession);
-    expect(pauseReflectTagUpdateWithRepository).not.toBe(getSessionQuote);
     expect(pauseReflectionStepLogOnceWithRepository).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(shouldShowFavoriteProHint).not.toBe(pauseReflectOutcomeLog);
     expect(shouldLogPauseReflectionStep).not.toBe(pauseReflectOutcomeLogWithRepository);

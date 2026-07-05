@@ -31,8 +31,8 @@ const PREGENERATE_TOPUP_KEYS: PregenerateCacheTopupKey[] = [...PREGENERATE_CACHE
 const PREGENERATE_TOPUP_LABELS: Record<PregenerateCacheTopupKey, string> = {
   ground_nudge: 'Grounding',
   signal: 'Signal',
-  historical_insight: 'History',
-  zoom_out_deep_time: 'Zoom out (deep time)',
+  historical_insight: 'Look Back',
+  zoom_out_deep_time: 'Zoom Out (deep time)',
 };
 
 export function AppConfigTools() {
@@ -138,7 +138,7 @@ export function AppConfigTools() {
           <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
             Spend today
           </p>
-          <button
+          <button type="button"
             onClick={() => void refresh()}
             className="flex items-center gap-1 text-[10px] font-sans font-medium text-muted-foreground/50 hover:text-nox-text-link"
           >
@@ -173,7 +173,7 @@ export function AppConfigTools() {
         <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
           Panic mode
         </p>
-        <button
+        <button type="button"
           onClick={() => {
             const next = !state.panic_mode;
             const optimistic = { ...state, panic_mode: next };
@@ -304,6 +304,7 @@ export function AppConfigTools() {
         </p>
         <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
           Targets for the scheduled <code className="text-muted-foreground/55">pregenerate-companions</code> job.
+          Warms the shared <code className="text-muted-foreground/55">companion_cache</code> pool (reused across users) — it does not use anyone&apos;s Companions &amp; guidance allowance.
           Each type: minimum &quot;healthy&quot; rows (quality ≥ 2, not expired) before the cron skips generation;
           max rows to add per run caps API spend. Picked up by edge within ~30s. Set max to 0 to disable top-up for that type.
         </p>
@@ -394,6 +395,7 @@ export function AppConfigTools() {
               <input
                 type="text"
                 value={state.ai_cost_alert_recipients.join(', ')}
+                aria-label="Recipient emails"
                 placeholder="ops@example.com, ceo@example.com"
                 onChange={(e) => {
                   const list = e.target.value
@@ -616,6 +618,7 @@ function NumberRow({
         value={raw}
         min={min}
         step={step}
+        aria-label={label}
         placeholder="—"
         onChange={(e) => {
           const v = e.target.value;

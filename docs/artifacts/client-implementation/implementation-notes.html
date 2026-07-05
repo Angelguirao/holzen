@@ -245,6 +245,39 @@
   <h3 class="initiative" id="initiative-general">General / cross-cutting</h3>
   <p class="empty-initiative">Feature epics, auth UX, settings flows, and other work that does not fit a named initiative — use initiative tag <code>general</code> and link the owner doc from the AGENTS change map.</p>
 
+  <h3 class="initiative" id="initiative-home-pause-widget">Home pause widget (Figma 4.1)</h3>
+
+  <article class="note" id="note-home-pause-widget-figma-2026-05">
+    <header>
+      <span class="initiative-tag">home-pause-widget</span>
+      <span>2026-05-27</span>
+      <span>Figma 469:14301 · pause-system §3</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Home widget surface projection + opening preview</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>
+        Widget surfaces are a client read-model (<code>resolveHomePauseWidgetSurface</code>), not new Postgres states.
+        Postgres maps to surfaces: <code>active</code> → <code>open_pre_reflect</code>, <code>engaged</code> → <code>open_engaged</code> (deep + <code>reflection_step</code>).
+        See <a href="../../docs/systems/home-pause-widget-projection.md">home-pause-widget-projection.md</a>.
+        Pre-Reflect empathy line uses deterministic i18n from <code>context_snapshot</code> — no holzen-reflect at cron/Home open.
+      </dd>
+      <dt>Calm-waters</dt>
+      <dd>
+        When cron expires <code>active|pending</code> with <code>context_lost</code>, show reassurance copy (not <code>open_pre_reflect</code>);
+        optional Sonner toast; query <code>fetchRecentContextLostPause</code> within 24h.
+      </dd>
+      <dt>Mode E gate (2026-05-27 follow-up)</dt>
+      <dd>
+        <strong>E</strong> only when profile cooldown + <code>completedPauseCount &gt; 0</code> + open instance has no
+        <code>pause_step_events</code> yet; <strong>active + pending</strong> resolves to <strong>B</strong> (inline banner).
+      </dd>
+      <dt>Deviation</dt>
+      <dd>None from pause-system lifecycle; RPC and reflect write timing unchanged.</dd>
+    </dl>
+  </article>
+
   <!--
   ── Template: copy above the closing comment; newest first within initiative ──
   Update Contents → Running notes if adding a new anchor id.

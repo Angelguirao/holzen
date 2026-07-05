@@ -1,7 +1,7 @@
 /**
  * Budget-aware LLM model tiering — downgrade models as daily global spend rises.
  */
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 export type LlmBudgetTier = "normal" | "economy" | "critical";
 

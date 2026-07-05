@@ -20,8 +20,9 @@ export function usePauseSessionBreathReflectHandlers(
   },
   mood: PauseSessionBreathReflectMoodSlice,
 ) {
-  const { t, dismissMessage, btcData, subscribed, subLoading, requirePro, refreshSubscription } = p;
-  const { restored, message, context, pauseInstanceId, companions } = shell;
+  const { t, dismissMessage, marketData, subscribed, subLoading, requirePro, refreshSubscription } = p;
+  const { restored, message, context, pauseInstanceId, companions, companionPrefs, pauseInstanceMetadata } =
+    shell;
   const {
     step,
     phase,
@@ -30,9 +31,12 @@ export function usePauseSessionBreathReflectHandlers(
     breathingFirstCompleted,
     breathingSecondCompleted,
     selectedMood,
+    selectedBriefFace,
     selectedMoodAfter,
     feelIntensity,
     shiftIntensity,
+    isFavorite,
+    ritualStartedAtMs,
     setSwipeDirection,
     setStep,
     setBriefStep,
@@ -75,6 +79,8 @@ export function usePauseSessionBreathReflectHandlers(
     pauseInstanceId,
     t,
     lastShiftLogKeyRef: mood.lastShiftLogKeyRef,
+    frameShiftMood: selectedMoodAfter,
+    frameShiftIntensity: shiftIntensity,
     setFrameDone,
     setMoodAfterDone,
     goToStep: breath.goToStep,
@@ -87,7 +93,7 @@ export function usePauseSessionBreathReflectHandlers(
     pauseInstanceId,
     context,
     message,
-    btcData,
+    marketData,
     companionsHaiku: companions.haiku ?? null,
     dismissMessage,
     refreshSubscription,
@@ -95,11 +101,16 @@ export function usePauseSessionBreathReflectHandlers(
     setPauseImpactData,
     setPhase,
     selectedMood,
+    selectedBriefFace,
     selectedMoodAfter,
     breathingFirstCompleted,
     breathingSecondCompleted,
     feelIntensity,
     shiftIntensity,
+    ritualStartedAtMs,
+    companionPrefs,
+    isFavorite,
+    pauseInstanceMetadata,
   });
 
   return { breath, reflect, handleFrameImDone };

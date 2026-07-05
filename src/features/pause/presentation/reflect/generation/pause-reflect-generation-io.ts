@@ -29,7 +29,10 @@ import {
   runReflectGeneration,
   type RunReflectGenerationInput,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation';
-import { messageFromReflectGenerationResult } from '@/features/pause/domain/reflect/generation/message-from-reflect-generation-result';
+import {
+  contentFromReflectGenerationResult,
+  messageFromReflectGenerationResult,
+} from '@/features/pause/domain/reflect/generation/message-from-reflect-generation-result';
 import {
   resolveReflectGenerationPrefetch,
   type ReflectGenerationPrefetch,
@@ -45,6 +48,7 @@ import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator'
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 
 export {
+  contentFromReflectGenerationResult,
   messageFromReflectGenerationResult,
   reflectGenerationPrerequisite,
   reflectGenerationUserErrorMessage,

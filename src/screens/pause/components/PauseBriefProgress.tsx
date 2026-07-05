@@ -20,18 +20,16 @@ export function PauseBriefProgress({ currentStep }: Props) {
   const currentIndex = BRIEF_PAUSE_ORDER.indexOf(currentStep);
 
   return (
-    <div
-      className="flex w-full items-start justify-between gap-1 sm:gap-2"
-      role="list"
+    <ol
+      className="flex w-full list-none items-start justify-between gap-1 p-0 sm:gap-2"
       aria-label={t('pause.brief.stepsAria', { defaultValue: 'Brief pause steps' })}
     >
       {BRIEF_PAUSE_ORDER.map((step, i) => {
         const isActive = i === currentIndex;
         const isPast = i < currentIndex;
         return (
-          <div
+          <li
             key={step}
-            role="listitem"
             className="flex min-w-0 flex-1 flex-col items-center gap-2"
             aria-current={isActive ? 'step' : undefined}
           >
@@ -49,9 +47,9 @@ export function PauseBriefProgress({ currentStep }: Props) {
             >
               {labels[step]}
             </span>
-          </div>
+          </li>
         );
       })}
-    </div>
+    </ol>
   );
 }

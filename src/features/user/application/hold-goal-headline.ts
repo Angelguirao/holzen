@@ -12,7 +12,7 @@ function kindLabel(goalType: HoldGoalHeadlineGoal['type'], t: HeadlineT): string
 }
 
 /**
- * Single-line summary for Home section header and HoldGoalWidget wireframe title row
+ * Single-line summary for legacy HoldGoalWidget wireframe title row (full-shell / journey).
  * (e.g. `Forever · 1y 2d and counting`).
  */
 export function computeHoldGoalCompactHeadline(

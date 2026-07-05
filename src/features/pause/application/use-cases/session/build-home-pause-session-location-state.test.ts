@@ -8,7 +8,7 @@ describe('buildHomePauseSessionLocationState', () => {
         message: ' Breathe ',
         context: 'btc_move',
         pauseInstanceId: 'inst-1',
-        companions: { haiku: 'line', groundingTitle: null, groundingBody: null },
+        companions: { haiku: 'line' },
         companionPrefs: {
           breathing: true,
           haiku: true,
@@ -23,7 +23,7 @@ describe('buildHomePauseSessionLocationState', () => {
       reflectionMessage: ' Breathe ',
       context: 'btc_move',
       pauseInstanceId: 'inst-1',
-      companions: { haiku: 'line', groundingTitle: null, groundingBody: null },
+      companions: { haiku: 'line' },
       companionPrefs: {
         breathing: true,
         haiku: true,
@@ -36,13 +36,63 @@ describe('buildHomePauseSessionLocationState', () => {
     });
   });
 
+  it('sets startAtDepthPicker when requested', () => {
+    expect(
+      buildHomePauseSessionLocationState({
+        message: null,
+        context: 'btc_move',
+        pauseInstanceId: 'inst-1',
+        companions: { haiku: null },
+        companionPrefs: {
+          breathing: false,
+          haiku: false,
+          grounding: false,
+          signal: false,
+          zoomOut: false,
+          history: false,
+        },
+        severity: 'mild',
+        startAtDepthPicker: true,
+      }),
+    ).toMatchObject({
+      reflectionMessage: '',
+      startAtDepthPicker: true,
+      pauseInstanceId: 'inst-1',
+    });
+  });
+
+  it('sets openingManualPause for optimistic idle navigation', () => {
+    expect(
+      buildHomePauseSessionLocationState({
+        message: null,
+        context: 'btc_move',
+        pauseInstanceId: undefined,
+        companions: { haiku: null },
+        companionPrefs: {
+          breathing: false,
+          haiku: false,
+          grounding: false,
+          signal: false,
+          zoomOut: false,
+          history: false,
+        },
+        severity: 'mild',
+        startAtDepthPicker: true,
+        openingManualPause: true,
+      }),
+    ).toMatchObject({
+      openingManualPause: true,
+      startAtDepthPicker: true,
+    });
+  });
+
   it('coerces null message to empty reflectionMessage', () => {
     expect(
       buildHomePauseSessionLocationState({
         message: null,
         context: null,
         pauseInstanceId: undefined,
-        companions: { haiku: null, groundingTitle: null, groundingBody: null },
+        companions: { haiku: null },
         companionPrefs: {
           breathing: false,
           haiku: false,

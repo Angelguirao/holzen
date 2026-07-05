@@ -1,19 +1,17 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabasePauseRepository: { port: 'reflectPauseRepository' }
 }));
 
 import * as handlersIo from '@/features/pause/presentation/session/pause-session-step-handlers-io';
 import {
   buildPauseSessionStepRitualBundle,
-  buildPauseSessionStepShellBundle,
+  buildPauseSessionStepShellBundle
 } from '@/features/pause/presentation/session/pause-session-step-handlers-io';
 import * as flowsIo from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository,
@@ -21,7 +19,7 @@ import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeSaveFailedToast
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
 /**
@@ -55,8 +53,6 @@ describe('pause-session-step-handlers-io ↔ pause-reflect-flows-io sibling pari
     expect(buildPauseSessionStepShellBundle).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(buildPauseSessionStepRitualBundle).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(buildPauseSessionStepShellBundle).not.toBe(buildPauseScoreImpacts);
-    expect(buildPauseSessionStepRitualBundle).not.toBe(formatReinforcementQuoteFromSession);
-    expect(buildPauseSessionStepShellBundle).not.toBe(getSessionQuote);
     expect(buildPauseSessionStepRitualBundle).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(buildPauseSessionStepShellBundle).not.toBe(showPauseOutcomeNotCompletedToast);
     expect(buildPauseSessionStepRitualBundle).not.toBe(showPauseOutcomeSaveFailedToast);
@@ -69,8 +65,6 @@ describe('pause-session-step-handlers-io ↔ pause-reflect-flows-io sibling pari
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(buildPauseSessionStepShellBundle);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(buildPauseSessionStepRitualBundle);
     expect(buildPauseScoreImpacts).not.toBe(buildPauseSessionStepShellBundle);
-    expect(formatReinforcementQuoteFromSession).not.toBe(buildPauseSessionStepRitualBundle);
-    expect(getSessionQuote).not.toBe(buildPauseSessionStepShellBundle);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(buildPauseSessionStepRitualBundle);
     expect(showPauseOutcomeNotCompletedToast).not.toBe(buildPauseSessionStepShellBundle);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(buildPauseSessionStepRitualBundle);

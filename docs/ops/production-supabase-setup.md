@@ -21,7 +21,10 @@ One-time and ongoing steps for the **owned production project** after leaving Lo
 npx supabase login
 npx supabase link --project-ref geqkxsnyqvhtascjghuu
 npm run prod:deploy   # db push + active edge functions (after preflight locally)
+npm run prod:reschedule-crons   # optional: rewire pg_cron after Vault/project URL changes
 ```
+
+The manual `prod:*` scripts relink the CLI to the production ref before they push, so they do not depend on whichever remote project was linked earlier in your shell.
 
 Day-to-day prod backend deploys should go through [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) (merge to `main` + **production** environment approval).
 
@@ -57,8 +60,8 @@ Copy staging values where appropriate; swap to **live** vendor keys where noted.
 
 | Secret | Notes |
 |--------|--------|
-| `GOOGLE_AI_API_KEY` | Primary Gemini |
-| `OPENROUTER_API_KEY` | Recommended failover |
+| `OPENROUTER_API_KEY` | **Required** — all Gemini LLM traffic ([llm-openrouter.md](llm-openrouter.md)) |
+| `OPENROUTER_HTTP_REFERER` / `OPENROUTER_APP_TITLE` | Recommended attribution headers |
 | `PERPLEXITY_API_KEY` | Companions / library ingest |
 | `RESEND_API_KEY` | Production-only Resend API key |
 | `RESEND_WEBHOOK_SECRET` | Resend → prod `handle-email-suppression` |

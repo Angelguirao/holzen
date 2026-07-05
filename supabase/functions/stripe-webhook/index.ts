@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import type { createLogger } from "../_shared/observe.ts";
 import {
@@ -12,6 +12,10 @@ import {
   resolveUserIdForSubscription,
   syncProfileFromStripeSubscription,
 } from "../_shared/subscription-profile-sync.ts";
+import {
+  finalizeTrialCheckoutSubscription,
+  isTrialCheckoutSession,
+} from "../_shared/trial-checkout-finalize.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -123,18 +127,51 @@ serve(
         if (subRef) {
           const subId = typeof subRef === "string" ? subRef : subRef.id;
           const sub = await stripe.subscriptions.retrieve(subId);
-          await syncProfileFromStripeSubscription(
-            svcClient,
-            userId,
-            sub,
-            Deno.env.get("STRIPE_PRICE_ID_PRO") ?? null,
-          );
-          log("checkout subscription profile cache updated", {
-            user_id: userId,
-            checkout_session_id: session.id,
-            subscription_id: sub.id,
-            status: sub.status,
-          });
+          const proPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO") ?? null;
+
+          if (isTrialCheckoutSession(session)) {
+            const customer = await stripe.customers.retrieve(
+              typeof sub.customer === "string" ? sub.customer : sub.customer.id,
+            );
+            const email =
+              session.customer_details?.email ??
+              (customer.deleted ? null : customer.email);
+            if (!email) {
+              log.warn("trial_checkout_missing_customer_email", {
+                user_id: userId,
+                subscription_id: sub.id,
+              });
+            } else {
+              const result = await finalizeTrialCheckoutSubscription({
+                stripe,
+                svcClient,
+                sub,
+                userId,
+                email,
+                proPriceId,
+                log,
+              });
+              log("trial_checkout_finalize", {
+                user_id: userId,
+                checkout_session_id: session.id,
+                subscription_id: sub.id,
+                result,
+              });
+            }
+          } else {
+            await syncProfileFromStripeSubscription(
+              svcClient,
+              userId,
+              sub,
+              proPriceId,
+            );
+            log("checkout subscription profile cache updated", {
+              user_id: userId,
+              checkout_session_id: session.id,
+              subscription_id: sub.id,
+              status: sub.status,
+            });
+          }
         }
       }
 

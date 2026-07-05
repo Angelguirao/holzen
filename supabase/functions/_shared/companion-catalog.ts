@@ -5,8 +5,9 @@
  * Phase ordering: `_shared/phase-config.ts` (`COMPANION_PHASE_CATALOG`).
  */
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { COMPANION_SERVE_FRESHNESS_DAYS } from "./companion-serve-freshness.ts";
+import { normalizeSignalKeyIdeas } from "./signal-key-ideas.ts";
 
 export interface CatalogEntry {
   id: string;
@@ -283,12 +284,15 @@ export function essayToSignal(entry: CatalogEntry): {
   source: string;
   url: string;
   quote?: string;
+  keyIdeas?: string[];
 } {
+  const body = entry.summary;
   return {
     title: entry.title,
-    body: entry.summary,
+    body,
     source: entry.author || "Unknown",
     url: entry.original_url || entry.url || "",
+    keyIdeas: normalizeSignalKeyIdeas({ body, keyIdeas: undefined }),
     ...(entry.key_quote ? { quote: entry.key_quote } : {}),
   };
 }
@@ -309,7 +313,7 @@ export function paperToGrounding(entry: CatalogEntry): {
 
 export function eventToHistory(entry: CatalogEntry): {
   title: string;
-  btcInsight: string;
+  marketInsight: string;
   analogy: string;
   assetClass: string;
   period: string;
@@ -319,7 +323,7 @@ export function eventToHistory(entry: CatalogEntry): {
 } {
   return {
     title: entry.title,
-    btcInsight: entry.summary,
+    marketInsight: entry.summary,
     analogy: entry.analogy || "",
     assetClass: entry.asset_class || "",
     period: entry.event_date || "",

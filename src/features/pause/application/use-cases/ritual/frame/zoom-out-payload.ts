@@ -1,5 +1,18 @@
 import type { EchoUserWord, ZoomOutData, ZoomOutEchoData } from '@/features/pause/domain/zoom-out-display';
 
+/** BTC "on this day" rows for Look Back market context (sourced from zoom-out orchestrate). */
+export type ZoomOutBtcMarketContext = Pick<ZoomOutData, 'onThisDay' | 'currentPrice' | 'partial'>;
+
+/** Returns price timeline when orchestrate included BTC cache rows; otherwise null. */
+export function zoomOutBtcMarketContext(data: ZoomOutData | null | undefined): ZoomOutBtcMarketContext | null {
+  if (!data?.currentPrice || data.onThisDay.length === 0) return null;
+  return {
+    currentPrice: data.currentPrice,
+    onThisDay: data.onThisDay,
+    partial: data.partial,
+  };
+}
+
 /** Default short label (empty preview line, library bookmark title when no deep-time title). */
 export const ZOOM_OUT_DEFAULT_LABEL = 'Zoom Out';
 /** Default body when the model returns no deep-time or echo text (library autosave). */

@@ -1,18 +1,12 @@
 /**
  * Home pause widget read-model helpers (no Supabase).
- * Scheduling quarter-hour math: `public-scheduling`. Home widget reads + conductors (pending-offer, completed count, dismiss outlet, pause actions, context previews, manual trigger, HolzenProvider state) live here (§6 peel).
+ * Scheduling volatility-check hour math: `public-scheduling`. Home widget reads + conductors (pending-offer, completed count, dismiss outlet, pause actions, context previews, manual trigger, HolzenProvider state) live here (§6 peel).
  * Screens/home and `PauseHomeProvider` **read** pause/market state here; profile via `user/public-hooks`. Adopt/decline mutations: `public-session`.
  */
 export {
   resolvePauseArrivalToneAction,
   type PauseArrivalToneAction,
 } from './domain/home/resolve-pause-arrival-tone-action';
-export {
-  buildHomePauseCardBodyProps,
-  type BuildHomePauseCardBodyPropsInput,
-  type HomePauseCardBodyPropsProjection,
-  type PauseContextHomePreview,
-} from './presentation/home/home-pause-card-body-props';
 export {
   pauseHomeErrorKind,
   pauseHomeErrorStrings,
@@ -27,11 +21,34 @@ export {
   type UsePauseCardProjectionParams,
 } from './presentation/home/use-pause-card-projection';
 export {
+  useHomePauseWidgetProjection,
+  HOME_PAUSE_WIDGET_EXPANDED_STORAGE_KEY,
+  type UseHomePauseWidgetScreenDeps,
+} from './presentation/home/use-home-pause-widget-projection';
+export type {
+  HomePauseWidgetProjection,
+  HomePauseWidgetBodyProjection,
+} from './domain/home/home-pause-widget-projection-types';
+export {
+  homePauseWidgetSectionTitleKey,
+  homePauseWidgetSurfaceIsManualCooldownFirstPause,
+  homePauseWidgetSurfaceIsManualCooldownWithArchive,
+  resolveHomePauseWidgetSurface,
+  type HomePauseWidgetSurface,
+} from './domain/home/home-pause-widget-surface';
+export { hasReachedReflectForHome } from './domain/home/has-reached-reflect-for-home';
+export {
   useCompletedPauseCount,
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
   fetchCompletedPauseCount,
   getCompletedPauseCountQueryOptions,
 } from './presentation/home/use-completed-pause-count';
+export { useHomePracticeStats, type HomePracticeStats } from './presentation/home/use-home-practice-stats';
+export {
+  fetchHomePracticeStats,
+  getHomePracticeStatsQueryOptions,
+  HOME_PRACTICE_STATS_QUERY_KEY,
+} from './infrastructure/queries/home-practice-stats-query';
 export { useDismissOutletPauseReady } from './presentation/home/use-dismiss-outlet-pause-ready';
 export {
   usePendingPauseOffer,
@@ -47,8 +64,13 @@ export {
   useHomePauseActions,
   type PauseDismissAnalyticsSurface,
 } from './presentation/home/use-home-pause-actions';
-export { usePauseContextHomePreviews } from './presentation/home/use-pause-context-home-previews';
-export { useOpenPauseHomePreview } from './presentation/reflect/generation/manual-open/use-open-pause-home-preview';
+export { useHomePendingPauseOfferActions } from './presentation/home/use-home-pending-pause-offer-actions';
+export {
+  usePauseContextHomePreviews,
+  type PauseContextHomePreview,
+} from './presentation/home/use-pause-context-home-previews';
+export { useOpenPauseHomePreview } from './presentation/home/use-open-pause-home-preview';
+export type { UseOpenPauseHomePreviewOptions } from './presentation/home/use-open-pause-home-preview';
 export {
   useManualPauseTrigger,
   type UseManualPauseTriggerParams,
@@ -71,3 +93,12 @@ export {
   trackHomeOptionalWidgetToggled,
   trackOnboardingCompleted,
 } from './presentation/home/home-screen-telemetry-io';
+export type { HomePauseWidgetPreviewLine } from './domain/home/resolve-home-pause-widget-preview-line';
+export type { HomePauseMarketBlock } from './domain/home/format-home-pause-market-block';
+export { computeManualCooldownReadyAtMs } from './domain/reflect/generation/compute-pause-trigger-cooldowns';
+export { useHomePauseHelpFeedback } from './presentation/home/use-home-pause-help-feedback';
+export {
+  isPauseOpenMaxExpired,
+  resolvePauseOpenMaxAnchorAt,
+} from './domain/pause-open-max-anchor';
+export { resolveHomePauseWidgetOpenMaxAnchorAt } from './domain/home/resolve-home-pause-widget-open-max-anchor';

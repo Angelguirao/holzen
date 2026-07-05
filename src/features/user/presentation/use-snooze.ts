@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useOptimistic } from 'react';
+import { useCallback, useMemo, useOptimistic, useTransition } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
 import {
@@ -24,34 +24,51 @@ export function useSnooze() {
     snoozedUntilCommitted,
     (_current, next: Date | null) => next,
   );
+  const [isPending, startTransition] = useTransition();
 
   const bumpProfileCache = useCallback(() => {
     if (!userId) return;
     void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
   }, [queryClient, userId]);
 
-  const snooze = useCallback(
-    async (hours: number) => {
-      if (!userId) return;
-      const until = new Date(Date.now() + hours * 60 * 60 * 1000);
-      addOptimisticSnoozedUntil(until);
-      const iso = until.toISOString();
-      const { error } = await updateProfileSnoozedUntil(userId, iso);
-      if (!error) bumpProfileCache();
-      else void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
+  const snoozeUntil = useCallback(
+    (until: Date): Promise<void> => {
+      if (!userId || until <= new Date()) return Promise.resolve();
+      return new Promise((resolve) => {
+        startTransition(async () => {
+          addOptimisticSnoozedUntil(until);
+          const iso = until.toISOString();
+          const { error } = await updateProfileSnoozedUntil(userId, iso);
+          if (!error) bumpProfileCache();
+          else void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
+          resolve();
+        });
+      });
     },
-    [userId, addOptimisticSnoozedUntil, bumpProfileCache, queryClient],
+    [userId, addOptimisticSnoozedUntil, bumpProfileCache, queryClient, startTransition],
   );
 
-  const cancelSnooze = useCallback(async () => {
-    if (!userId) return;
-    addOptimisticSnoozedUntil(null);
-    const { error } = await updateProfileSnoozedUntil(userId, null);
-    if (!error) bumpProfileCache();
-    else void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
-  }, [userId, addOptimisticSnoozedUntil, bumpProfileCache, queryClient]);
+  const snooze = useCallback(
+    async (hours: number) => {
+      await snoozeUntil(new Date(Date.now() + hours * 60 * 60 * 1000));
+    },
+    [snoozeUntil],
+  );
+
+  const cancelSnooze = useCallback((): Promise<void> => {
+    if (!userId) return Promise.resolve();
+    return new Promise((resolve) => {
+      startTransition(async () => {
+        addOptimisticSnoozedUntil(null);
+        const { error } = await updateProfileSnoozedUntil(userId, null);
+        if (!error) bumpProfileCache();
+        else void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
+        resolve();
+      });
+    });
+  }, [userId, addOptimisticSnoozedUntil, bumpProfileCache, queryClient, startTransition]);
 
   const isActive = snoozedUntil ? snoozedUntil > new Date() : false;
 
-  return { snoozedUntil, isActive, snooze, cancelSnooze };
+  return { snoozedUntil, isActive, isPending, snooze, snoozeUntil, cancelSnooze };
 }

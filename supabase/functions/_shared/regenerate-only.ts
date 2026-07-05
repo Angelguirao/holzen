@@ -11,23 +11,24 @@ import { generateGrounding } from "./generators/grounding.ts";
 import { generateHistory } from "./generators/history.ts";
 import { generateZoomOut } from "./generators/zoom-out.ts";
 import { determineSessionIntent } from "./session-intent.ts";
-import { bucketSeverity } from "./intervention-selector.ts";
+import { bucketSeverity } from "./market-context.ts";
 import { fetchGroundingSourcesForOrchestrate, fetchSignalSourcesForOrchestrate } from "./pause-cron-parity.ts";
 import { fetchRecentSignalCitationUrls, mergeRecentSignalUrls } from "./recent-signal-urls.ts";
 import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";
 import { logCompanionSlotResolved } from "./companion-orchestrate-slot-telemetry.ts";
 import type { createLogger } from "./observe.ts";
+import { resolveTierFromProfile, tierLimits } from "./subscription-entitlements.ts";
 import {
-  consumeAllowanceOrCredits,
-  resolveTierFromProfile,
-  tierLimits,
-} from "./subscription-entitlements.ts";
+  checkPremiumCompanionQuota,
+  consumePremiumCompanionUnitsAfterSuccess,
+} from "./companion-orchestrate-billing.ts";
+import { contentSatisfiesCompanion } from "./companion-orchestrate-parse.ts";
 import { PROMPT_VERSION as SIGNAL_VERSION } from "./generators/signal.ts";
 import { PROMPT_VERSION as GROUNDING_VERSION } from "./generators/grounding.ts";
 import { PROMPT_VERSION as HISTORY_VERSION } from "./generators/history.ts";
 import { PROMPT_VERSION as ZOOM_OUT_VERSION } from "./generators/zoom-out.ts";
 import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "./ai-user-messages.ts";
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -80,39 +81,17 @@ export async function handleRegenerateOnly(params: {
   // ZoomOut remains outside the premium companion meter.
   const consumesPremiumCompanion = slot === "signal" || slot === "grounding" || slot === "history";
   if (consumesPremiumCompanion) {
-    if (tier === "free") {
-      return new Response(
-        JSON.stringify({
-          error: "Premium companions require an active plan.",
-          code: "companions_upgrade_required",
-        }),
-        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-    const quota = await consumeAllowanceOrCredits(svcClient, {
+    const quotaBlock = await checkPremiumCompanionQuota(svcClient, {
       userId,
-      feature: "premium_companion",
+      tier,
       limit: limits.premium_companion,
       amount: 1,
-      reason: "companions_overage",
-      source: "companion-regenerate",
-      sourceRef: pauseInstanceId,
-      metadata: { slot },
     });
-    if (!quota.allowed) {
-      return new Response(
-        JSON.stringify({
-          error: "You've used this month's premium companion allowance.",
-          code: "companions_quota_exceeded",
-          tier,
-          companion_limit: quota.limit,
-          companion_used: quota.used,
-          companion_remaining: quota.remainingAllowance,
-          credits_balance: quota.creditsBalance,
-          credits_needed: Math.max(0, quota.creditCost - quota.creditsBalance),
-        }),
-        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+    if (quotaBlock) {
+      return new Response(JSON.stringify(quotaBlock.body), {
+        status: quotaBlock.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
   }
 
@@ -418,6 +397,24 @@ export async function handleRegenerateOnly(params: {
       event: "companion_regenerate",
       metadata: { pause_instance_id: pauseInstanceId, slot, source: result.source },
     });
+
+    if (
+      consumesPremiumCompanion &&
+      contentSatisfiesCompanion(companionType, result.data)
+    ) {
+      await consumePremiumCompanionUnitsAfterSuccess(
+        svcClient,
+        {
+          userId,
+          limit: limits.premium_companion,
+          amount: 1,
+          source: "companion-regenerate",
+          sourceRef: pauseInstanceId,
+          metadata: { slot },
+        },
+        (msg, extra) => log(msg, extra),
+      );
+    }
   } catch (e) {
     log(`regenerate persist error: ${e instanceof Error ? e.message : String(e)}`);
     return new Response(JSON.stringify({ error: "Failed to save regenerated companion" }), {
