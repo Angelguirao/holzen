@@ -18,7 +18,7 @@ Human checklist for shipping pause-first to production. **Quick ticks:** [ship-c
 
 - Platform exit path documented: [platform-exit-runbook.md](./platform-exit-runbook.md) · [branch-model.md](./branch-model.md).
 - Stripe webhook includes `customer.subscription.created|updated|deleted` and subscription `checkout.session.completed`.
-- Observability secrets per [observability-setup.md](./observability-setup.md) — **Vercel** (`VITE_*`) + **Supabase Edge** (`SENTRY_*`, `LOG_DRAIN_*`).
+- Observability secrets: **required secrets** on Supabase Edge are wired for CI; **BetterStack log drain + Slack alerts** still TODO — [observability-edge-secrets-setup.md](../backlog/observability-edge-secrets-setup.md) · full setup [observability-setup.md](./observability-setup.md).
 
 ## 1. Repo gate (local or CI)
 
