@@ -7,6 +7,8 @@ Source of truth: `supabase/config.toml` + [active-surface.md](../../docs/ops/act
 | Name | Folder | Auth | Smoke |
 | --- | --- | --- | --- |
 | `health` | `platform/` | Anon `apikey` | Y |
+| `landing-ping` | `public/` | Anon `apikey` | Y |
+| `waitlist-signup` | `public/` | Anon `apikey` | Y |
 | `holzen-number` | `public/` | Anon `apikey` | Y |
 | `market-quote` | `public/` | User JWT | Y |
 | `holzen-reflect` | `pause-pipeline/` | User JWT | Y |

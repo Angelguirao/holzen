@@ -40,6 +40,7 @@ const COVERAGE: Row[] = [
   { name: "holzen-number", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "market-quote", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "holzen-reflect", wrl: true, edgeError: false, logger: true, audit: false },
+  { name: "landing-ping", wrl: true, edgeError: true, logger: false, audit: false },
   { name: "list-checkout-events", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "notify-checkout-confirmation", wrl: false, edgeError: false, logger: false, audit: false },
   { name: "pregenerate-companions", wrl: true, edgeError: false, logger: true, audit: false },
@@ -52,6 +53,7 @@ const COVERAGE: Row[] = [
   { name: "send-feedback", wrl: true, edgeError: true, logger: false, audit: false },
   { name: "send-transactional-email", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "stripe-webhook", wrl: true, edgeError: false, logger: false, audit: false },
+  { name: "waitlist-signup", wrl: true, edgeError: true, logger: false, audit: false },
 ];
 
 // Functions exempt from full wrapper coverage. `health` is the obvious one (verify_jwt=false probe).
