@@ -1,0 +1,78 @@
+---
+interface Props {
+  source?: string;
+  ref?: string | null;
+  compact?: boolean;
+}
+
+const { source = 'welcome', ref = null, compact = false } = Astro.props;
+---
+
+<form
+  class:list={['waitlist-form', compact && 'waitlist-form--compact']}
+  data-waitlist-form
+  data-waitlist-source={source}
+  data-waitlist-ref={ref ?? ''}
+>
+  <label class="waitlist-label" for="waitlist-email">Email</label>
+  <div class="waitlist-row">
+    <input
+      id="waitlist-email"
+      class="waitlist-input"
+      type="email"
+      name="email"
+      autocomplete="email"
+      placeholder="you@example.com"
+      required
+    />
+    <button class="cta waitlist-submit" type="submit">Join waitlist</button>
+  </div>
+  <p class="waitlist-hint muted">Early access when we open — no trial signup required.</p>
+  <p class="waitlist-status" data-waitlist-status hidden></p>
+</form>
+
+<script>
+  import { pingLandingView, submitWaitlistEmail } from '../lib/waitlist';
+
+  void pingLandingView('/welcome');
+
+  const forms = document.querySelectorAll('[data-waitlist-form]');
+  forms.forEach((form) => {
+    if (!(form instanceof HTMLFormElement)) return;
+    const statusEl = form.querySelector('[data-waitlist-status]');
+    if (!(statusEl instanceof HTMLElement)) return;
+
+    const source = form.dataset.waitlistSource ?? 'welcome';
+    const ref = form.dataset.waitlistRef?.trim() || null;
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const input = form.querySelector('input[name="email"]');
+      if (!(input instanceof HTMLInputElement)) return;
+
+      const email = input.value.trim();
+      const submit = form.querySelector('button[type="submit"]');
+      if (submit instanceof HTMLButtonElement) {
+        submit.disabled = true;
+        submit.textContent = 'Joining…';
+      }
+      statusEl.hidden = true;
+
+      void submitWaitlistEmail(email, { source, ref }).then((result) => {
+        if (submit instanceof HTMLButtonElement) {
+          submit.disabled = false;
+          submit.textContent = 'Join waitlist';
+        }
+        statusEl.hidden = false;
+        if (result.ok) {
+          statusEl.textContent = "You're on the list — we'll email when it's your turn.";
+          statusEl.dataset.state = 'ok';
+          form.reset();
+        } else {
+          statusEl.textContent = result.error;
+          statusEl.dataset.state = 'error';
+        }
+      });
+    });
+  });
+</script>

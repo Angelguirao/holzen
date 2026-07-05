@@ -93,6 +93,10 @@ skip_nonce_check = true
     verify_jwt = false
   [functions.health]
     verify_jwt = false
+  [functions.waitlist-signup]
+    verify_jwt = false
+  [functions.landing-ping]
+    verify_jwt = false
 
   [functions.process-email-queue]
     verify_jwt = true

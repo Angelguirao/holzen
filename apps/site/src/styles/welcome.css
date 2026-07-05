@@ -342,6 +342,95 @@
   color: hsl(var(--nox-color-text-muted) / 0.5);
 }
 
+/* Waitlist */
+.waitlist-form {
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.waitlist-form--compact {
+  margin-top: 0;
+}
+
+.waitlist-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.waitlist-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 480px) {
+  .waitlist-row {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+.waitlist-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid hsl(var(--color-border));
+  background: hsl(var(--color-card) / 0.6);
+  color: hsl(var(--nox-color-text-primary));
+  font-size: 0.9375rem;
+}
+
+.waitlist-input:focus {
+  outline: 2px solid hsl(var(--color-highlight) / 0.5);
+  outline-offset: 2px;
+}
+
+.waitlist-submit {
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.waitlist-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.waitlist-hint {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+}
+
+.waitlist-status {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+}
+
+.waitlist-status[data-state='ok'] {
+  color: hsl(var(--color-highlight));
+}
+
+.waitlist-status[data-state='error'] {
+  color: hsl(var(--color-destructive));
+}
+
+.waitlist-secondary {
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+}
+
+.waitlist-secondary a {
+  color: hsl(var(--color-highlight));
+}
+
 .contact-email {
   font-size: 0.75rem;
   color: hsl(var(--nox-color-text-muted));
