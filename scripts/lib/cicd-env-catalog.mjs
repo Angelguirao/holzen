@@ -321,7 +321,7 @@ const supabaseEdgeSpecs = {
     label: "BetterStack log ingest URL",
     where: "Supabase Dashboard → {project} → Edge Functions → Secrets",
     how: "BetterStack → Sources → HTTP → ingest URL (e.g. `https://in.logs.betterstack.com`).",
-    tier: "required",
+    tier: "recommended",
     docs: "docs/ops/observability-setup.md",
   },
   LOG_DRAIN_TOKEN: {
@@ -329,7 +329,7 @@ const supabaseEdgeSpecs = {
     label: "BetterStack source token",
     where: "Supabase Dashboard → {project} → Edge Functions → Secrets",
     how: "BetterStack source token (not the account API token).",
-    tier: "required",
+    tier: "recommended",
     docs: "docs/ops/observability-setup.md",
   },
   SLACK_WEBHOOK_URL: {
@@ -337,7 +337,7 @@ const supabaseEdgeSpecs = {
     label: "Slack #holzen-alerts webhook",
     where: "Supabase Dashboard → {project} → Edge Functions → Secrets",
     how: "Slack → Apps → Incoming Webhooks → `#holzen-alerts` URL (`https://hooks.slack.com/services/…`).",
-    tier: "required",
+    tier: "recommended",
     docs: "docs/ops/observability-setup.md",
   },
   OPENROUTER_API_KEY: {
