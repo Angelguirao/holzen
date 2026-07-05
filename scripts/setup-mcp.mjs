@@ -85,7 +85,6 @@ function writeGeminiKey(key) {
     ? parseDotenv(readFileSync(secretsPath, "utf8"))
     : {};
   current.GEMINI_API_KEY = key;
-  current.GOOGLE_AI_API_KEY = key;
   const header = [
     "# Local MCP secrets — do not commit (see mcp-secrets.env.example)",
     "# Updated by: npm run mcp:setup",
@@ -116,6 +115,11 @@ async function main() {
   mkdirSync(cursorDir, { recursive: true });
   ensureFile(mcpExamplePath, mcpJsonPath, "mcp.json");
   ensureFile(secretsExamplePath, secretsPath, "mcp-secrets.env");
+  if (ensureFile(stagingSecretsExamplePath, stagingSecretsPath, ".env.staging.secrets")) {
+    console.log(
+      "Add OPENROUTER_API_KEY to .env.staging.secrets for edge LLM (see docs/ops/llm-openrouter.md).",
+    );
+  }
 
   let result = syncMcpSecrets();
 
@@ -144,11 +148,10 @@ async function main() {
   console.log(`  IONOS binary: ${result.ionosPathExists ? "ok" : "missing"}`);
 
   if (!probe.gemini) {
-    console.log("\nGemini key still missing. Options:");
+    console.log("\nGEMINI_API_KEY missing (optional — only for Cursor aistudio MCP). Options:");
     console.log("  1. npm run mcp:setup -- --key YOUR_KEY");
-    console.log("  2. Add GOOGLE_AI_API_KEY to .env.staging.secrets, then npm run mcp:sync-secrets");
-    console.log("  3. Set GEMINI_API_KEY in .cursor/mcp-secrets.env manually");
-    process.exit(1);
+    console.log("  2. Set GEMINI_API_KEY in .cursor/mcp-secrets.env manually");
+    console.log("  Edge LLM uses OPENROUTER_API_KEY — npm run edge:env:bootstrap");
   }
 
   console.log("\nRestart Cursor to reload MCP servers.");

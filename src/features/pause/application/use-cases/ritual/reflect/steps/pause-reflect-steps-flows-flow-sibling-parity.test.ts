@@ -2,14 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   runPauseOutcomeLog,
   showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeSaveFailedToast
 } from '../flows/pause-reflect-flows-flow';
 import * as flowsFlow from '../flows/pause-reflect-flows-flow';
 import {
@@ -18,7 +16,7 @@ import {
   runPauseReflectTagUpdate,
   runPauseReflectionStepLogOnce,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from './pause-reflect-steps-flow';
 import * as stepsFlow from './pause-reflect-steps-flow';
 
@@ -36,20 +34,16 @@ describe('pause-reflect-steps-flow ↔ pause-reflect-flows-flow sibling parity',
     expect(typeof shouldLogPauseReflectionStep).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecideAfterGeneration).toBe('function');
-    expect(typeof formatReinforcementQuoteFromSession).toBe('function');
     expect(typeof resolvePauseDecideOutcomeFlow).toBe('function');
     expect(typeof runPauseOutcomeLog).toBe('function');
-    expect(typeof getSessionQuote).toBe('function');
     expect(typeof showPauseOutcomeNotCompletedToast).toBe('function');
     expect(typeof showPauseOutcomeSaveFailedToast).toBe('function');
     expect(typeof buildPauseScoreImpacts).toBe('function');
 
     expect('resolvePauseSessionReflectAndDecidePreflight' in stepsFlow).toBe(false);
     expect('resolvePauseSessionReflectAndDecideAfterGeneration' in stepsFlow).toBe(false);
-    expect('formatReinforcementQuoteFromSession' in stepsFlow).toBe(false);
     expect('resolvePauseDecideOutcomeFlow' in stepsFlow).toBe(false);
     expect('runPauseOutcomeLog' in stepsFlow).toBe(false);
-    expect('getSessionQuote' in stepsFlow).toBe(false);
     expect('showPauseOutcomeNotCompletedToast' in stepsFlow).toBe(false);
     expect('showPauseOutcomeSaveFailedToast' in stepsFlow).toBe(false);
     expect('buildPauseScoreImpacts' in stepsFlow).toBe(false);
@@ -64,11 +58,9 @@ describe('pause-reflect-steps-flow ↔ pause-reflect-flows-flow sibling parity',
   it('steps umbrella exports stay off reflect+decide flows and outcome helpers', () => {
     expect(runPauseFavoriteToggle).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(runPauseReflectNoteUpdate).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
-    expect(runPauseReflectTagUpdate).not.toBe(formatReinforcementQuoteFromSession);
     expect(runPauseReflectionStepLogOnce).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(shouldShowFavoriteProHint).not.toBe(runPauseOutcomeLog);
     expect(shouldLogPauseReflectionStep).not.toBe(runPauseOutcomeLog);
-    expect(runPauseFavoriteToggle).not.toBe(getSessionQuote);
     expect(shouldShowFavoriteProHint).not.toBe(showPauseOutcomeNotCompletedToast);
     expect(shouldLogPauseReflectionStep).not.toBe(buildPauseScoreImpacts);
   });
@@ -76,11 +68,9 @@ describe('pause-reflect-steps-flow ↔ pause-reflect-flows-flow sibling parity',
   it('flows umbrella exports stay off step mutations and domain step gates', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(runPauseFavoriteToggle);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(runPauseReflectNoteUpdate);
-    expect(formatReinforcementQuoteFromSession).not.toBe(runPauseReflectTagUpdate);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(shouldShowFavoriteProHint);
     expect(runPauseOutcomeLog).not.toBe(runPauseReflectionStepLogOnce);
     expect(runPauseOutcomeLog).not.toBe(shouldLogPauseReflectionStep);
-    expect(getSessionQuote).not.toBe(runPauseFavoriteToggle);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(runPauseReflectTagUpdate);
     expect(buildPauseScoreImpacts).not.toBe(shouldShowFavoriteProHint);
   });

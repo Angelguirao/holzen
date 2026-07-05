@@ -1,7 +1,7 @@
 {
   "name": "Holzen",
   "short_name": "Holzen",
-  "description": "Pause before you act. Bitcoin volatility reflections.",
+  "description": "Pause before you act. Volatility-triggered practice for investors — starting with Bitcoin.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#151719",

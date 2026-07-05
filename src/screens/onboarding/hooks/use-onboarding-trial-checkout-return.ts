@@ -1,0 +1,83 @@
+import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import {
+  fetchTrialCheckoutGrantStatus,
+  ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY,
+  trackTrialDenied,
+} from '@/features/subscription/public';
+
+type Args = {
+  userId: string | null;
+  profileLoaded: boolean;
+  finishAndGoHome: () => Promise<void>;
+  refreshSubscription: () => Promise<unknown>;
+};
+
+/** Finishes onboarding after Stripe trial Checkout returns to `/onboarding?trial_checkout=success`. */
+export function useOnboardingTrialCheckoutReturn({
+  userId,
+  profileLoaded,
+  finishAndGoHome,
+  refreshSubscription,
+}: Args) {
+  const { t } = useTranslation();
+  const handledRef = useRef(false);
+
+  useEffect(() => {
+    if (!userId || !profileLoaded || handledRef.current) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const result = params.get('trial_checkout');
+    if (!result) return;
+
+    const pending = sessionStorage.getItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+    if (!pending) return;
+
+    handledRef.current = true;
+    sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete('trial_checkout');
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+
+    if (result === 'cancelled') {
+      toast.info(
+        t('home.subscription.trialCheckoutCancelled', {
+          defaultValue: 'Trial setup was cancelled. You can try again when ready.',
+        }),
+      );
+      return;
+    }
+
+    if (result !== 'success') return;
+
+    void (async () => {
+      try {
+        await refreshSubscription();
+        const granted = userId ? await fetchTrialCheckoutGrantStatus(userId) : false;
+        if (!granted) {
+          trackTrialDenied('trial_card_not_accepted');
+          toast.error(
+            t('home.subscription.trialCardNotAccepted', {
+              defaultValue:
+                'We could not start your trial with this card. Free trials require a standard debit or credit card — prepaid and virtual cards are not supported.',
+            }),
+          );
+          return;
+        }
+        await finishAndGoHome();
+      } catch {
+        toast.error(
+          t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
+        );
+      }
+    })();
+  }, [
+    finishAndGoHome,
+    profileLoaded,
+    refreshSubscription,
+    t,
+    userId,
+  ]);
+}

@@ -27,7 +27,7 @@ On **holzen-prod**, use `https://geqkxsnyqvhtascjghuu.supabase.co`.
 
 ```sh
 # Vault: holzen_project_url + CRON_SECRET (or holzen_cron_service_role)
-npx supabase db query --linked --file scripts/sql/staging-reschedule-owned-crons.sql
+npm run staging:reschedule-crons
 ```
 
 See [cron-setup.md](cron-setup.md) for Vault bearer setup. Migration `20260524120500_…` attempts an in-place rewrite at apply time but skips when privileges are insufficient.
@@ -39,7 +39,7 @@ npx supabase login
 npx supabase link --project-ref ksplyxxdvandkwzundql
 ```
 
-Committed [`supabase/config.toml`](../../supabase/config.toml) `project_id` is **holzen-prod** (`geqkxsnyqvhtascjghuu`); **link metadata** in `.supabase/` points the CLI at staging on your machine when you `supabase link --project-ref ksplyxxdvandkwzundql`.
+Committed [`supabase/config.toml`](../../supabase/config.toml) `project_id` is the neutral local id **`holzen`**. Repo-local link metadata in `.supabase/project.json` points the raw CLI at staging on your machine when you `supabase link --project-ref ksplyxxdvandkwzundql`.
 
 Optional: set `SUPABASE_STAGING_PROJECT_REF` in shell or `.env.staging.local` for scripts.
 
@@ -53,6 +53,8 @@ npm run staging:functions-deploy  # 31 active edges (config.toml manifest)
 npm run staging:deploy            # both
 ```
 
+These manual `staging:*` scripts relink the CLI to the staging ref before they push, so they do not depend on whatever project happened to be linked previously in your shell.
+
 **Production (after staging sign-off):** link prod ref, then `npm run prod:deploy` for manual deploys — prefer [deploy-production.yml](../../.github/workflows/deploy-production.yml) on merge to `main`. See [production-supabase-setup.md](production-supabase-setup.md).
 
 Deploy uses [scripts/deploy-active-edge-functions.mjs](../../scripts/deploy-active-edge-functions.mjs) — **`supabase/functions/legacy/**` is never deployed** to owned projects ([active-surface.md](active-surface.md)).
@@ -65,7 +67,7 @@ Supabase Dashboard → Project Settings → Edge Functions → Secrets, **or** f
 
 ```sh
 cp .env.staging.secrets.example .env.staging.secrets
-# fill RESEND_*, STRIPE_* (test), GOOGLE_AI_API_KEY, observability keys
+# fill RESEND_*, STRIPE_* (test), OPENROUTER_API_KEY, observability keys
 npm run staging:secrets-set
 ```
 
@@ -73,7 +75,7 @@ npm run staging:secrets-set
 
 | Secret | Staging value |
 |--------|----------------|
-| `GOOGLE_AI_API_KEY` | Google AI Studio key (Gemini) |
+| `OPENROUTER_API_KEY` | **Required** — all Gemini LLM via OpenRouter ([llm-openrouter.md](llm-openrouter.md)) |
 | `OPENROUTER_API_KEY` | Optional Gemini failover |
 | `PERPLEXITY_API_KEY` | Perplexity API key |
 | `RESEND_API_KEY` | Staging-only Resend API key |
@@ -149,4 +151,4 @@ Configure GitHub repository secrets (Settings → Secrets and variables → Acti
 
 Optional CI build secrets: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` — see [observability-setup.md](observability-setup.md).
 
-Then run workflow **Staging backend** (`.github/workflows/staging-backend.yml`) or push to branch `staging`.
+Then run workflow **Staging deploy** (`.github/workflows/staging-deploy.yml`) or push to branch `staging`.

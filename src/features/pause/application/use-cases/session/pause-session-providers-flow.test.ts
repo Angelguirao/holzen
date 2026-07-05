@@ -18,11 +18,11 @@ describe('pause-session-providers-flow', () => {
     const dismissMessage = async () => {};
     const resyncOpenPauseFromDb = () => {};
     const source: PickPauseHolzenProvidersSliceSource = {
-      mantra: 'breathe',
       dismissMessage,
+      dismissOpenPauseFromWidget: () => {},
       message: null,
       context: null,
-      companions: { haiku: null, groundingTitle: null, groundingBody: null },
+      companions: { haiku: null },
       lastPauseInstanceId: null,
       companionPrefs: {
         breathing: true,
@@ -35,14 +35,14 @@ describe('pause-session-providers-flow', () => {
       severity: 'mild',
       profileLoaded: false,
       resyncOpenPauseFromDb,
-      btcData: null,
+      marketData: null,
       trackedAssetId: 'bitcoin',
     };
 
     const viaFlow: PauseHolzenProvidersSlice = pickPauseHolzenProvidersSlice(source);
     const direct: SliceDirect = pickDirect(source as SourceDirect);
 
-    expect(viaFlow.mantra).toBe('breathe');
+    expect(viaFlow.trackedAssetId).toBe('bitcoin');
     expect(viaFlow).toEqual(direct);
     expect(pickPauseHolzenProvidersSlice).toBe(pickDirect);
   });

@@ -71,6 +71,7 @@ The labels **domain / application / infrastructure** are useful **mental** bucke
 ## Server state vs UI-only state
 
 - **Server-shaped data** (profiles, subscriptions, lists owned by the backend): prefer **TanStack Query** (`useQuery` / `useMutation`) with clear **query keys** and **invalidation** (or targeted `setQueryData`) after writes. Operational rules: [navigating-the-codebase.md](navigating-the-codebase.md) §6.1 and [backlog/data-fetching-conventions.md](../backlog/data-fetching-conventions.md).
+- **Invalidation-first (shipped surface):** fetch on **mount**, **user action**, **Realtime**, or explicit **`invalidateQueries`** — not `refetchInterval`, `refetchOnWindowFocus`, or `refetchOnReconnect` “just in case.” Enforced in CI by `npm run check:no-idle-query-polling` (alias `check:invalidation-first-queries`); admin ops dashboards are the only allowlisted exception. Local UI timers (breath, cooldown display) and infra probes (SW, offline health) are out of scope.
 - **Ephemeral UI** (modal open, selected row id, local filters): `useState`, React context, or—only if cross-cutting— a small client store. **Do not** treat a second copy of API rows in a global store as the source of truth when Query already caches them.
 
 Holzen does not mandate **Zustand**; if you introduce it for UI-only state, keep it **strictly non-authoritative** and avoid duplicating Query caches.

@@ -1,8 +1,13 @@
-import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
 import {
+  reflectionContentFromLegacyMessage,
+  type ReflectionContentV2,
+} from '@/features/pause/domain/reflect/generation/reflection-content-v2';
+import {
+  contentFromReflectGenerationResult,
   messageFromReflectGenerationResult,
   pauseReflectGeneration,
   reflectGenerationPrerequisite,
@@ -17,27 +22,49 @@ import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-
 
 export type { UsePauseReflectGenerationParams } from './use-pause-reflect-generation-types';
 
+function initialContentFromMessage(message: string): ReflectionContentV2 | null {
+  const trimmed = message.trim();
+  if (!trimmed) return null;
+  return reflectionContentFromLegacyMessage(trimmed);
+}
+
 export function usePauseReflectGeneration({
   pauseInstanceId,
   context,
   initialReflectionMessage,
   severityAbsPct,
+  currentFeel,
   enabled,
 }: UsePauseReflectGenerationParams) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const profile = useProfile();
+  const profileForReflect = useMemo(
+    () => ({
+      reflectionTone: 'stoic',
+      reflectionStyle: 'standard',
+      customPrompt: '',
+      motivations: profile.motivations ?? [],
+      mantra: profile.mantra ?? '',
+      currency: profile.currency,
+      language: profile.language,
+    }),
+    [profile.motivations, profile.mantra, profile.currency, profile.language],
+  );
 
-  const [reflectionMessage, setReflectionMessage] = useState(initialReflectionMessage);
+  const [reflectionContent, setReflectionContent] = useState<ReflectionContentV2 | null>(() =>
+    initialContentFromMessage(initialReflectionMessage),
+  );
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  /** Bumped when `pauseInstanceId` changes so stale async work cannot commit. */
   const validityRef = useRef(0);
-  /** Aborts the in-flight `holzen-reflect` when superseded, `pauseInstanceId` changes, `enabled` turns false, or the effect cleans up. */
   const reflectGenAbortRef = useRef<AbortController | null>(null);
+  const runGenerationRef = useRef<() => void>(() => {});
+
+  const reflectionMessage = reflectionContent?.message ?? '';
 
   const navSeedEmpty = !initialReflectionMessage.trim();
-  const { artifactReflectionText } = usePauseArtifactReflectionText({
+  const { artifactReflectionText, artifactReflectionContent } = usePauseArtifactReflectionText({
     pauseInstanceId,
     trigger: 'whenEnabled',
     fetchEnabled: enabled && navSeedEmpty,
@@ -49,17 +76,26 @@ export function usePauseReflectGeneration({
   }, [pauseInstanceId]);
 
   useEffect(() => {
-    setReflectionMessage(initialReflectionMessage);
+    setReflectionContent(initialContentFromMessage(initialReflectionMessage));
     setError(null);
   }, [pauseInstanceId, initialReflectionMessage]);
 
-  /** Show persisted `reflection_text` while holzen-reflect runs (nav seed empty). */
   useEffect(() => {
-    if (!enabled || !navSeedEmpty || !artifactReflectionText) return;
-    setReflectionMessage((prev) =>
-      resolveEffectiveReflectionCopy(prev, artifactReflectionText),
-    );
-  }, [enabled, navSeedEmpty, artifactReflectionText]);
+    if (!enabled || !navSeedEmpty) return;
+    if (artifactReflectionContent) {
+      setReflectionContent((prev) =>
+        prev?.message === artifactReflectionContent.message ? prev : artifactReflectionContent,
+      );
+      return;
+    }
+    if (!artifactReflectionText) return;
+    setReflectionContent((prev) => {
+      const next = reflectionContentFromLegacyMessage(
+        resolveEffectiveReflectionCopy(prev?.message ?? '', artifactReflectionText),
+      );
+      return prev?.message === next.message ? prev : next;
+    });
+  }, [enabled, navSeedEmpty, artifactReflectionContent, artifactReflectionText]);
 
   const runGeneration = useCallback(() => {
     const prefetch = resolveReflectGenerationPrefetch(
@@ -83,7 +119,7 @@ export function usePauseReflectGeneration({
       return;
     }
     if (prefetch.kind === 'seed') {
-      setReflectionMessage(prefetch.message);
+      setReflectionContent(reflectionContentFromLegacyMessage(prefetch.message));
       return;
     }
 
@@ -103,21 +139,36 @@ export function usePauseReflectGeneration({
             context: context!.trim(),
             initialReflectionMessage,
             severityAbsPct,
-            profile,
+            profile: profileForReflect,
+            currentFeel,
             signal: ac.signal,
           },
           reflectGenerator,
         );
         if (!shouldCommitReflectGeneration(validityTicket, validityRef.current)) return;
-        const message = messageFromReflectGenerationResult(result);
-        if (message != null) setReflectionMessage(message);
+        const content = contentFromReflectGenerationResult(result);
+        if (content) setReflectionContent(content);
       } catch (e: unknown) {
         if (!shouldCommitReflectGeneration(validityTicket, validityRef.current)) return;
+        setReflectionContent(null);
         const raw = e instanceof Error ? e.message : String(e);
         setError(reflectGenerationUserErrorMessage(raw));
       }
     });
-  }, [t, enabled, pauseInstanceId, user, context, initialReflectionMessage, severityAbsPct, profile, startTransition]);
+  }, [
+    t,
+    enabled,
+    pauseInstanceId,
+    user,
+    context,
+    initialReflectionMessage,
+    severityAbsPct,
+    profileForReflect,
+    currentFeel,
+    startTransition,
+  ]);
+
+  runGenerationRef.current = runGeneration;
 
   useEffect(() => {
     if (!enabled) {
@@ -126,19 +177,30 @@ export function usePauseReflectGeneration({
         reflectGenAbortRef.current?.abort();
       };
     }
-    runGeneration();
+    runGenerationRef.current();
     return () => {
       reflectGenAbortRef.current?.abort();
     };
-  }, [enabled, runGeneration]);
+  }, [
+    enabled,
+    pauseInstanceId,
+    context,
+    initialReflectionMessage,
+    user?.id,
+    severityAbsPct,
+    profileForReflect,
+    currentFeel,
+  ]);
 
   const retry = useCallback(() => {
+    setError(null);
     validityRef.current += 1;
     runGeneration();
   }, [runGeneration]);
 
   return {
     reflectionMessage,
+    reflectionContent,
     loading: isPending,
     error,
     retry,

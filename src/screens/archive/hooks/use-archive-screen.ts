@@ -1,9 +1,7 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMemo, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  getArchivePausesTabHasRowsQueryOptions,
   usePauseArchiveList,
   type PauseArchiveRow,
   type PauseArchiveSegment,
@@ -11,58 +9,27 @@ import {
 } from '@/features/pause/public-hooks';
 import { useInfiniteScroll } from '@/app/hooks/use-infinite-scroll';
 import { usePullToRefresh } from '@/app/hooks/use-pull-to-refresh';
-import { useAuth } from '@/features/auth/public';
-import {
-  collectArchiveTags,
-  filterAndSortArchiveRows,
-} from '@/screens/archive/lib/archive-list-filter';
 import {
   readArchiveMainSegment,
   readArchivePausesScope,
-  type ArchiveSortMode,
 } from '@/screens/archive/lib/archive-screen-params';
 
 /**
- * Archive tab conductor — URL segments, list query, client filters, pull-to-refresh.
+ * Archive tab conductor — URL segments, list query, pull-to-refresh.
  */
 export function useArchiveScreen() {
   const { t } = useTranslation();
-  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const mainSegment = useMemo(() => readArchiveMainSegment(searchParams), [searchParams]);
   const pausesScope = useMemo(() => readArchivePausesScope(searchParams), [searchParams]);
   const libraryListFavoritesOnly = mainSegment === 'pauses' && pausesScope === 'favorites';
 
-  const [search, setSearch] = useState('');
-  const [tagFilter, setTagFilter] = useState<string | null>(null);
-  const [sortMode, setSortMode] = useState<ArchiveSortMode>('newest');
-
   const pauseSeg: PauseArchiveSegment = mainSegment === 'echoes' ? 'echoes' : 'pauses';
   const pauseArchive = usePauseArchiveList({
     segment: pauseSeg,
     favoritesOnly: mainSegment === 'pauses' ? libraryListFavoritesOnly : false,
-    listSort: sortMode,
     enabled: mainSegment === 'pauses' || mainSegment === 'echoes',
   });
-  const [pausesArchiveCountNonce, setPausesArchiveCountNonce] = useState(0);
-
-  const pausesArchiveCountQuery = useQuery(
-    getArchivePausesTabHasRowsQueryOptions({
-      userId: user?.id,
-      nonce: pausesArchiveCountNonce,
-      enabled: Boolean(user?.id && mainSegment === 'pauses'),
-    }),
-  );
-
-  const pausesTabHasArchiveRows = useMemo((): boolean | null => {
-    if (mainSegment !== 'pauses') return false;
-    if (!user?.id) return null;
-    if (pausesArchiveCountQuery.isPending) return null;
-    if (pausesArchiveCountQuery.isError) return null;
-    return pausesArchiveCountQuery.data ?? null;
-  }, [mainSegment, user?.id, pausesArchiveCountQuery.isPending, pausesArchiveCountQuery.isError, pausesArchiveCountQuery.data]);
-
-  const hasActiveFilters = !!tagFilter || !!search.trim();
 
   const setMainSegment = useCallback(
     (seg: ArchiveMainSegment) => {
@@ -122,11 +89,8 @@ export function useArchiveScreen() {
   }, [mainSegment, pausesScope, setSearchParams]);
 
   const handleRefresh = useCallback(async () => {
-    if (mainSegment === 'pauses' || mainSegment === 'echoes') {
-      setPausesArchiveCountNonce((n) => n + 1);
-    }
     await pauseArchive.refetch();
-  }, [pauseArchive, mainSegment]);
+  }, [pauseArchive]);
 
   const { pullDistance, refreshing, handlers } = usePullToRefresh({
     onRefresh: handleRefresh,
@@ -142,22 +106,15 @@ export function useArchiveScreen() {
 
   const rows = pauseArchive.rows;
 
-  const segmentBase = useMemo(() => {
+  const items = useMemo((): PauseArchiveRow[] => {
     if (mainSegment !== 'pauses' && mainSegment !== 'echoes') return [];
     return rows.filter((r) => !!r.id);
   }, [rows, mainSegment]);
 
-  const availableTags = useMemo(() => collectArchiveTags(segmentBase), [segmentBase]);
-
-  const filtered = useMemo(
-    () => filterAndSortArchiveRows(segmentBase, { tagFilter, search, sortMode }),
-    [segmentBase, tagFilter, search, sortMode],
-  );
-
   const hasAnyPauseArchiveContent = useMemo(() => {
     if (mainSegment !== 'pauses') return false;
-    return pausesTabHasArchiveRows ?? segmentBase.length > 0;
-  }, [mainSegment, pausesTabHasArchiveRows, segmentBase.length]);
+    return items.length > 0 || pauseArchive.hasMore;
+  }, [mainSegment, items.length, pauseArchive.hasMore]);
 
   const hasAnyEchoesContent = useMemo(() => {
     if (mainSegment !== 'echoes') return false;
@@ -176,7 +133,7 @@ export function useArchiveScreen() {
       }
     }
     if (mainSegment === 'pauses') {
-      if (!hasAnyPauseArchiveContent && pausesScope === 'all' && !hasActiveFilters) {
+      if (!pauseArchive.loading && !hasAnyPauseArchiveContent && pausesScope === 'all') {
         return {
           emptyStateMessage: t('archive.emptyPauseFirst'),
           emptyStateHint: '',
@@ -184,7 +141,7 @@ export function useArchiveScreen() {
           emptyCtaTo: '/pause',
         };
       }
-      if (pausesScope === 'favorites' && filtered.length === 0 && hasAnyPauseArchiveContent) {
+      if (!pauseArchive.loading && pausesScope === 'favorites' && items.length === 0) {
         return {
           emptyStateMessage: t('archive.emptyFavs'),
           emptyStateHint: '',
@@ -192,14 +149,6 @@ export function useArchiveScreen() {
           emptyCtaTo: undefined as string | undefined,
         };
       }
-    }
-    if (hasActiveFilters && filtered.length === 0) {
-      return {
-        emptyStateMessage: t('archive.noResults'),
-        emptyStateHint: '',
-        emptyCtaLabel: undefined as string | undefined,
-        emptyCtaTo: undefined as string | undefined,
-      };
     }
     return {
       emptyStateMessage: undefined as string | undefined,
@@ -212,28 +161,10 @@ export function useArchiveScreen() {
     hasAnyEchoesContent,
     hasAnyPauseArchiveContent,
     pausesScope,
-    hasActiveFilters,
-    filtered.length,
+    items.length,
+    pauseArchive.loading,
     t,
   ]);
-
-  const cycleSortMode = useCallback(() => {
-    setSortMode((prev) =>
-      prev === 'newest' ? 'oldest' : prev === 'oldest' ? 'alphabetical' : 'newest',
-    );
-  }, []);
-
-  const sortLabel =
-    sortMode === 'newest'
-      ? t('library.sortNewest', { defaultValue: 'Newest' })
-      : sortMode === 'oldest'
-        ? t('library.sortOldest', { defaultValue: 'Oldest' })
-        : t('library.sortAlpha', { defaultValue: 'A–Z' });
-
-  const clearAllFilters = useCallback(() => {
-    setTagFilter(null);
-    setSearch('');
-  }, []);
 
   return {
     t,
@@ -241,22 +172,12 @@ export function useArchiveScreen() {
     pausesScope,
     setMainSegment,
     setPausesScope,
-    search,
-    setSearch,
-    tagFilter,
-    setTagFilter,
-    hasActiveFilters,
-    clearAllFilters,
-    sortLabel,
-    cycleSortMode,
     pauseArchive,
     pullDistance,
     refreshing,
     pullHandlers: handlers,
     loadMoreRef,
-    rows,
-    filtered,
-    availableTags,
+    items,
     emptyLibraryItemsProps,
   };
 }

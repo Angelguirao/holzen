@@ -5,7 +5,7 @@ import type { PauseScaffoldChromeRegistry } from '@/features/pause/public-sessio
 /** `/pause` scaffold header slot renderers — wired into `usePauseSessionScreen`. */
 export const pauseSessionScaffoldChromeRegistry: PauseScaffoldChromeRegistry = {
   renderBriefStepper: (briefStep) => <PauseBriefProgress currentStep={briefStep} />,
-  renderEngagedOpenMaxCountdown: (engagedAtIso) => (
-    <PauseEngagedOpenMaxCountdown engagedAtIso={engagedAtIso} />
+  renderEngagedOpenMaxCountdown: (anchorIso) => (
+    <PauseEngagedOpenMaxCountdown anchorIso={anchorIso} />
   ),
 };

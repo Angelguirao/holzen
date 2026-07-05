@@ -5,11 +5,15 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
 import {
   createCheckoutSession,
-  ensureTrialSubscription,
   openCustomerPortal,
 } from '../public-rpc';
 import { holzenLog } from '@/lib/holzen-console';
 import { getCheckoutSuppressionWindowMs } from '../application/checkout-suppression-window';
+import {
+  ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY,
+  TRIAL_CHECKOUT_STARTED_KEY,
+  type TrialCheckoutOutcome,
+} from '../application/trial-checkout-flow';
 import {
   canEngagePauseFromEntitlement,
   deriveEntitlement,
@@ -24,21 +28,29 @@ import {
   readSubCache,
   subscriptionQueryKey,
 } from '../public-queries';
-import { trackTrialExpired, trackTrialStarted } from '../application/paywall-telemetry';
+import {
+  trackTrialDenied,
+  trackTrialExpired,
+  trackTrialStarted,
+  type TrialDeniedReason,
+} from '../application/paywall-telemetry';
+import { fetchTrialCheckoutGrantStatus } from '../application/trial-checkout-grant';
+import type { EnsureTrialDenyReason } from '../infrastructure/edge/subscription-billing-edge';
 
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
 /** Set when a checkout return includes `?subscribed=true` (timestamp for PaywallSubscribedTracker TTL) */
 export const POST_CHECKOUT_SUBSCRIBE_FLAG = 'holzen_post_checkout_subscribe';
-/** Next fetch uses `{ force: true }` on check-subscription (window focus, refresh(), etc.). */
-let subscriptionForceNext = false;
+/** Next fetch mode for check-subscription (consumed in queryFn). */
+type SubFetchMode = 'default' | 'force' | 'usage_only';
+let subscriptionNextFetchMode: SubFetchMode = 'default';
 
 /**
  * Trigger source for the next subscription fetch. Lets us prove in logs whether
  * a `check-subscription` call came from the user's explicit Refresh button
- * (`manual_retry`) vs. the initial mount, focus, or interval refetch — so we
+ * (`manual_retry`) vs. the initial mount or explicit invalidation — so we
  * can verify back-navigation / param stripping never invokes `manual_retry`.
  */
-type SubFetchSource = 'mount' | 'manual_retry' | 'focus' | 'interval' | 'invalidate';
+type SubFetchSource = 'mount' | 'manual_retry' | 'interval' | 'invalidate';
 let subscriptionNextFetchSource: SubFetchSource | null = null;
 
 export type { SubscriptionBillingInterval } from '../domain/subscription-snapshot';
@@ -79,39 +91,80 @@ export function useSubscription() {
   const queryClient = useQueryClient();
   const userId = user?.id ?? null;
   const [isCheckoutPending, startCheckoutTransition] = useTransition();
-  const [isTrialPending, startTrialTransition] = useTransition();
+  const [isTrialCheckoutInFlight, setIsTrialCheckoutInFlight] = useState(false);
   const [isPortalPending, startPortalTransition] = useTransition();
   const [checkoutLoadingTarget, setCheckoutLoadingTarget] = useState<
     'pro' | 'flex_pack_s' | 'flex_pack_m' | null
   >(null);
   const lastLoggedSubRef = useRef<{ subscribed: boolean; monthlyRemaining: number | undefined } | null>(null);
+  const trialReturnHandledRef = useRef(false);
+
+  const handleTrialDenied = useCallback(
+    async (reason: EnsureTrialDenyReason) => {
+      if (!userId) return;
+      trackTrialDenied(reason as TrialDeniedReason);
+      subscriptionNextFetchMode = 'force';
+      subscriptionNextFetchSource = 'invalidate';
+      await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
+
+      if (reason === 'trial_already_used') {
+        toast.info(
+          t('home.subscription.trialAlreadyUsed', {
+            defaultValue: 'Your free trial has already been used. Subscribe to continue.',
+          }),
+        );
+        return;
+      }
+      if (reason === 'email_not_verified') {
+        toast.error(
+          t('home.subscription.trialEmailNotVerified', {
+            defaultValue: 'Confirm your email before starting your trial.',
+          }),
+        );
+        return;
+      }
+      if (reason === 'disposable_email') {
+        toast.error(
+          t('home.subscription.trialDisposableEmail', {
+            defaultValue: 'Use a permanent email address to start a trial.',
+          }),
+        );
+      }
+    },
+    [queryClient, t, userId],
+  );
 
   const query = useQuery({
     queryKey: userId != null ? subscriptionQueryKey(userId) : (['subscription', null] as const),
     enabled: !!userId,
-    // Tightened from 5min → 30s so credit changes (regenerate, wallpaper,
-    // insights) reconcile within the same interaction window even if a
-    // call site forgets to invalidate. Optimistic decrement still gives
-    // an instant UI; this is the safety net.
-    staleTime: 30 * 1000,
+    // Invalidation-first: credit spend paths call `refresh()` (usage_only).
+    // No idle polling, focus refetch, or reconnect refetch — entitlements change
+    // on user action, checkout return, or explicit refresh().
+    staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-    refetchInterval: userId ? 60 * 1000 : false,
+    refetchInterval: false,
     refetchOnWindowFocus: false,
-    refetchOnReconnect: true,
+    refetchOnReconnect: false,
     retry: 1,
     queryFn: async () => {
-      let force = subscriptionForceNext;
-      subscriptionForceNext = false;
+      const mode = subscriptionNextFetchMode;
+      subscriptionNextFetchMode = 'default';
+      const force = mode === 'force';
+      const usageOnly = mode === 'usage_only';
       // Initial mount = no explicit source set yet AND no cached query data.
       const source: SubFetchSource =
         subscriptionNextFetchSource ??
         (queryClient.getQueryData(subscriptionQueryKey(userId!)) ? 'interval' : 'mount');
       subscriptionNextFetchSource = null;
-      if (!force) {
-        force = consumeInitialCheckoutForce(userId!);
+      let effectiveForce = force;
+      if (!effectiveForce && !usageOnly) {
+        effectiveForce = consumeInitialCheckoutForce(userId!);
       }
-      holzenLog.subscription('fetch', { source, force });
-      return fetchSubscriptionSnapshot(userId!, force);
+      holzenLog.subscription('fetch', { source, force: effectiveForce, usageOnly });
+      return fetchSubscriptionSnapshot(userId!, {
+        force: effectiveForce,
+        usageOnly: usageOnly && !effectiveForce,
+      });
     },
   });
 
@@ -127,12 +180,6 @@ export function useSubscription() {
           companionLimit: cacheFallback.companionLimit,
           companionUsed: cacheFallback.companionUsed,
           companionRemaining: cacheFallback.companionRemaining,
-          wallpaperLimit: cacheFallback.wallpaperLimit,
-          wallpaperUsed: cacheFallback.wallpaperUsed,
-          wallpaperRemaining: cacheFallback.wallpaperRemaining,
-          insightsLimit: cacheFallback.insightsLimit,
-          insightsUsed: cacheFallback.insightsUsed,
-          insightsRemaining: cacheFallback.insightsRemaining,
           flexCreditsBalance: cacheFallback.flexCreditsBalance,
           subscriptionStatus: null,
           subscriptionEnd: null,
@@ -142,17 +189,6 @@ export function useSubscription() {
         }
       : undefined);
 
-  useEffect(() => {
-    if (!userId) return;
-    const onFocus = () => {
-      subscriptionForceNext = true;
-      subscriptionNextFetchSource = 'focus';
-      void queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
-    };
-    window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
-  }, [userId, queryClient]);
-
   const subscribed = effectiveSnapshot?.subscribed ?? false;
   const tier = effectiveSnapshot?.tier ?? 'free';
   const monthlyUsed = effectiveSnapshot?.monthlyUsed ?? 0;
@@ -160,12 +196,6 @@ export function useSubscription() {
   const companionLimit = effectiveSnapshot?.companionLimit ?? 0;
   const companionUsed = effectiveSnapshot?.companionUsed ?? 0;
   const companionRemaining = effectiveSnapshot?.companionRemaining ?? 0;
-  const wallpaperLimit = effectiveSnapshot?.wallpaperLimit ?? 0;
-  const wallpaperUsed = effectiveSnapshot?.wallpaperUsed ?? 0;
-  const wallpaperRemaining = effectiveSnapshot?.wallpaperRemaining ?? 0;
-  const insightsLimit = effectiveSnapshot?.insightsLimit ?? 0;
-  const insightsUsed = effectiveSnapshot?.insightsUsed ?? 0;
-  const insightsRemaining = effectiveSnapshot?.insightsRemaining ?? 0;
   const flexCreditsBalance = effectiveSnapshot?.flexCreditsBalance ?? 0;
   const subscriptionStatus = effectiveSnapshot?.subscriptionStatus ?? null;
   const subscriptionEnd = effectiveSnapshot?.subscriptionEnd ?? null;
@@ -186,11 +216,9 @@ export function useSubscription() {
       monthlyRemaining,
       monthlyUsed,
       companionRemaining,
-      wallpaperRemaining,
-      insightsRemaining,
       flexCreditsBalance,
     });
-  }, [loading, subscribed, tier, monthlyRemaining, monthlyUsed, companionRemaining, wallpaperRemaining, insightsRemaining, flexCreditsBalance]);
+  }, [loading, subscribed, tier, monthlyRemaining, monthlyUsed, companionRemaining, flexCreditsBalance]);
 
   const startCheckout = useCallback((
     target: 'pro' | 'flex_pack_s' | 'flex_pack_m' = 'pro',
@@ -237,32 +265,68 @@ export function useSubscription() {
     });
   }, [t, startCheckoutTransition]);
 
-  const ensureTrial = useCallback((): Promise<void> => {
-    if (!userId) return Promise.resolve();
-    holzenLog.subscription('trial', { action: 'ensure' });
-    return new Promise((resolve, reject) => {
-      startTrialTransition(async () => {
-        try {
-          const { data, error } = await ensureTrialSubscription();
-          if (error) throw error;
-          if (!data?.ok) throw new Error('Trial not started');
-          if (data.created) {
-            trackTrialStarted('ensure_trial');
-          }
-          subscriptionForceNext = true;
+  const startTrialCheckout = useCallback(
+    async (options?: { fromOnboarding?: boolean }): Promise<TrialCheckoutOutcome | void> => {
+      if (!userId) return 'no_user';
+      holzenLog.subscription('trial', { action: 'checkout', fromOnboarding: options?.fromOnboarding === true });
+      setIsTrialCheckoutInFlight(true);
+      let redirecting = false;
+      try {
+        if (options?.fromOnboarding) {
+          sessionStorage.setItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY, '1');
+        }
+        sessionStorage.setItem(TRIAL_CHECKOUT_STARTED_KEY, String(Date.now()));
+
+        const { data, error } = await createCheckoutSession({
+          checkoutKind: 'subscription',
+          trial: true,
+          trialReturnTo: options?.fromOnboarding ? 'onboarding' : 'home',
+        });
+        if (error) throw error;
+
+        if (data?.trial_denied && data.reason) {
+          sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+          await handleTrialDenied(data.reason);
+          return 'trial_denied';
+        }
+
+        if (data?.trial_already_active) {
+          sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+          subscriptionNextFetchMode = 'force';
           subscriptionNextFetchSource = 'invalidate';
           await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
-          resolve();
-        } catch (e) {
-          console.error('Trial error:', e);
-          toast.error(
-            t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
-          );
-          reject(e);
+          holzenLog.subscription('trial', { action: 'already_active', fromOnboarding: options?.fromOnboarding === true });
+          return 'trial_already_active';
         }
-      });
-    });
-  }, [userId, queryClient, t, startTrialTransition]);
+
+        if (!data?.url) throw new Error('Trial checkout did not return a link');
+
+        redirecting = true;
+        try {
+          if (window.self !== window.top && window.top) {
+            window.top.location.href = data.url;
+          } else {
+            window.location.href = data.url;
+          }
+        } catch {
+          window.location.href = data.url;
+        }
+      } catch (e) {
+        sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+        console.error('Trial checkout error:', e);
+        toast.error(
+          t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
+        );
+        throw e;
+      } finally {
+        if (!redirecting) setIsTrialCheckoutInFlight(false);
+      }
+    },
+    [handleTrialDenied, queryClient, t, userId],
+  );
+
+  /** @deprecated alias — trial starts via Stripe Checkout (`startTrialCheckout`). */
+  const ensureTrial = startTrialCheckout;
 
   const openPortal = useCallback(() => {
     holzenLog.subscription('portal', { action: 'open' });
@@ -292,7 +356,7 @@ export function useSubscription() {
    */
   const refresh = useCallback(() => {
     if (!userId) return Promise.resolve();
-    subscriptionForceNext = true;
+    subscriptionNextFetchMode = 'usage_only';
     subscriptionNextFetchSource = 'invalidate';
     return queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
   }, [userId, queryClient]);
@@ -304,11 +368,56 @@ export function useSubscription() {
    */
   const manualRetry = useCallback(() => {
     if (!userId) return Promise.resolve();
-    subscriptionForceNext = true;
+    subscriptionNextFetchMode = 'force';
     subscriptionNextFetchSource = 'manual_retry';
     holzenLog.subscription('manual_retry', { trigger: 'user_click' });
     return queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
   }, [userId, queryClient]);
+
+  useEffect(() => {
+    if (!userId || trialReturnHandledRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const result = params.get('trial_checkout');
+    if (!result) return;
+
+    const pendingOnboarding = sessionStorage.getItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+    if (pendingOnboarding) return;
+
+    trialReturnHandledRef.current = true;
+    const url = new URL(window.location.href);
+    url.searchParams.delete('trial_checkout');
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+
+    if (result === 'cancelled') {
+      toast.info(
+        t('home.subscription.trialCheckoutCancelled', {
+          defaultValue: 'Trial setup was cancelled. You can try again when ready.',
+        }),
+      );
+      return;
+    }
+
+    if (result === 'success') {
+      void fetchTrialCheckoutGrantStatus(userId).then((granted) => {
+        if (!granted) {
+          trackTrialDenied('trial_card_not_accepted');
+          toast.error(
+            t('home.subscription.trialCardNotAccepted', {
+              defaultValue:
+                'We could not start your trial with this card. Free trials require a standard debit or credit card — prepaid and virtual cards are not supported.',
+            }),
+          );
+          return;
+        }
+        trackTrialStarted('trial_checkout');
+        toast.success(
+          t('home.subscription.trialStarted', {
+            defaultValue: 'Your free trial is active.',
+          }),
+        );
+      });
+    }
+  }, [t, userId]);
 
   /**
    * Optimistically decrement a feature counter (and/or flex credits) in the
@@ -317,25 +426,17 @@ export function useSubscription() {
    * action — if the action fails, just call `refresh()` to roll back.
    */
   const applyOptimisticDecrement = useCallback(
-    (feature: 'companion' | 'wallpaper' | 'insight', amount = 1) => {
+    (feature: 'companion', amount = 1) => {
       if (!userId) return;
       queryClient.setQueryData<SubscriptionSnapshot | undefined>(
         subscriptionQueryKey(userId),
         (prev) => {
           if (!prev) return prev;
           const next = { ...prev };
-          // Pro/Pro+ users spend the monthly bucket first.
           if (feature === 'companion' && next.companionRemaining > 0) {
             next.companionRemaining = Math.max(0, next.companionRemaining - amount);
             next.companionUsed = next.companionUsed + amount;
-          } else if (feature === 'wallpaper' && next.wallpaperRemaining > 0) {
-            next.wallpaperRemaining = Math.max(0, next.wallpaperRemaining - amount);
-            next.wallpaperUsed = next.wallpaperUsed + amount;
-          } else if (feature === 'insight' && next.insightsRemaining > 0) {
-            next.insightsRemaining = Math.max(0, next.insightsRemaining - amount);
-            next.insightsUsed = next.insightsUsed + amount;
           } else {
-            // Bucket empty → spend a flex credit instead.
             next.flexCreditsBalance = Math.max(0, next.flexCreditsBalance - amount);
           }
           return next;
@@ -367,10 +468,11 @@ export function useSubscription() {
       subscribed: false,
       loading: false,
       checkoutLoading: isCheckoutPending,
-      trialLoading: isTrialPending,
+      trialLoading: isTrialCheckoutInFlight,
       portalLoading: isPortalPending,
       checkoutLoadingTarget,
       startCheckout,
+      startTrialCheckout,
       ensureTrial,
       openPortal,
       refresh,
@@ -382,12 +484,6 @@ export function useSubscription() {
       companionLimit: 0,
       companionUsed: 0,
       companionRemaining: 0,
-      wallpaperLimit: 0,
-      wallpaperUsed: 0,
-      wallpaperRemaining: 0,
-      insightsLimit: 0,
-      insightsUsed: 0,
-      insightsRemaining: 0,
       flexCreditsBalance: 0,
       entitlement: 'pre_trial' as Entitlement,
       canEngagePause: false,
@@ -406,10 +502,11 @@ export function useSubscription() {
     subscribed,
     loading,
     checkoutLoading: isCheckoutPending,
-    trialLoading: isTrialPending,
+    trialLoading: isTrialCheckoutInFlight,
     portalLoading: isPortalPending,
     checkoutLoadingTarget,
     startCheckout,
+    startTrialCheckout,
     ensureTrial,
     openPortal,
     refresh,
@@ -421,12 +518,6 @@ export function useSubscription() {
     companionLimit,
     companionUsed,
     companionRemaining,
-    wallpaperLimit,
-    wallpaperUsed,
-    wallpaperRemaining,
-    insightsLimit,
-    insightsUsed,
-    insightsRemaining,
     flexCreditsBalance,
     entitlement,
     canEngagePause,

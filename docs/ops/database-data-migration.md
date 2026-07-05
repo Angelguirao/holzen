@@ -81,7 +81,7 @@ Set `INCLUDE_TELEMETRY=1` to also migrate telemetry tables.
 | Storage bucket files | Supabase Storage CLI / manual copy between projects |
 | Edge secrets | Password manager → Supabase Dashboard |
 | Vault secrets (`holzen_cron_service_role`, …) | [bootstrap-owned-project.sql](bootstrap-owned-project.sql) |
-| pg_cron schedules | [cron-setup.md](cron-setup.md) / `npm run staging:reschedule-crons` pattern for prod |
+| pg_cron schedules | [cron-setup.md](cron-setup.md) / `npm run staging:reschedule-crons` or `npm run prod:reschedule-crons` |
 | Realtime publications | Re-apply `ALTER PUBLICATION` if you added custom tables |
 
 ### After restore

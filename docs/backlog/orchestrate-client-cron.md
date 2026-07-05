@@ -17,7 +17,7 @@ The manual pause path calls `companion-orchestrate` from the client (`use-compan
 
 | `holzenInvokeSource` | Set by |
 |----------------------|--------|
-| `browser_pause_intervention` | `use-companion-data` intervention-only once **`pauseInstanceId`** is set |
+| `browser_pause_intervention` | **Legacy only** — `src/legacy/pause-featured-intervention/` when re-enabled; **not** shipped in pause-first UI |
 | `browser_lazy_fetch` | `use-companion-data` `fetchCompanion` (single slot on card tap) |
 | `browser_regenerate` | `use-companion-data` `regenerateCompanion` |
 | `cron_check_volatility` | Historical: `check-volatility` fetch body (**removed** Pause V2 automatic claim path) |

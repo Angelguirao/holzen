@@ -7,6 +7,7 @@ export interface PauseCreateOrReuseResult {
   reused_reason: 'fingerprint_match' | 'recent_dismissal' | null;
   pending_offer?: boolean;
   prior_open_instance_id?: string | null;
+  context_refreshed?: boolean;
 }
 
 export interface PauseAdoptPendingResult {

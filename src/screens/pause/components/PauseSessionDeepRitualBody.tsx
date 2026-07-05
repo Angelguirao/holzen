@@ -22,7 +22,6 @@ export function PauseSessionDeepRitualBody({
   onFeelTilesSelect,
   goToStep,
   breathingRef,
-  mantra,
   severity,
   breathingFirstCompleted,
   breathingSecondCompleted,
@@ -31,7 +30,6 @@ export function PauseSessionDeepRitualBody({
   onSecondBreathPatternComplete,
   onContinueAfterFirstBreath,
   onContinueAfterSecondBreath,
-  onSkipFirstBreath,
   onSkipSecondBreath,
   ritualSoundMuted,
   prefersReducedMotion,
@@ -39,13 +37,19 @@ export function PauseSessionDeepRitualBody({
   companionPrefs,
   pauseInstanceId,
   context,
+  marketData,
+  trackedAssetId,
   reflectionMessage,
+  reflectionContent,
+  currentFeel,
+  severityAbsPct,
   reflectionLoading,
   reflectionError,
   onReflectionRetry,
   isFavorite,
   onToggleFavorite,
   subscribed,
+  mood,
   onFrameImDone,
   onDecide,
   onRepeatDeepFirstBreathPattern,
@@ -69,6 +73,9 @@ export function PauseSessionDeepRitualBody({
             feelIntensity={feelIntensity}
             onSelect={onFeelTilesSelect}
             onContinue={() => goToStep('breathe')}
+            marketData={marketData}
+            trackedAssetId={trackedAssetId}
+            contextText={context}
           />
         </motion.div>
       )}
@@ -80,14 +87,12 @@ export function PauseSessionDeepRitualBody({
             key="breath-segment-first"
             breathSegment="first"
             ritualVariant="deep"
-            mantra={mantra}
             severity={severity}
             feelTile={selectedBriefFace}
             completed={breathingFirstCompleted}
             onTimedBreathingChange={onTimedBreathingChange}
             onPatternComplete={onFirstBreathPatternComplete}
             onContinueAfterBreath={onContinueAfterFirstBreath}
-            onSkipBreath={onSkipFirstBreath}
             ritualSoundMuted={ritualSoundMuted}
             onRepeatDeepFirstBreathPattern={onRepeatDeepFirstBreathPattern}
           />
@@ -100,10 +105,12 @@ export function PauseSessionDeepRitualBody({
             pauseInstanceId={pauseInstanceId}
             context={context}
             reflectionMessage={reflectionMessage}
+            reflectionContent={reflectionContent ?? null}
+            currentFeel={currentFeel}
+            severityAbsPct={severityAbsPct}
             reflectionLoading={reflectionLoading}
             reflectionError={reflectionError}
             onReflectionRetry={onReflectionRetry}
-            companionHaikuEnabled={companionPrefs.haiku}
             isFavorite={isFavorite}
             onToggleFavorite={() => {
               void onToggleFavorite();
@@ -121,6 +128,9 @@ export function PauseSessionDeepRitualBody({
             reflectionMessage={reflectionMessage}
             companionPrefs={companionPrefs}
             companions={companions}
+            context={context}
+            mood={mood}
+            severity={severity}
             isFavorite={isFavorite}
             onToggleFavorite={() => {
               void onToggleFavorite();
@@ -138,7 +148,6 @@ export function PauseSessionDeepRitualBody({
             key="breath-segment-second"
             breathSegment="second"
             ritualVariant="deep"
-            mantra={mantra}
             severity={severity}
             feelTile={selectedBriefFace}
             completed={breathingSecondCompleted}

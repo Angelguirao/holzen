@@ -47,11 +47,9 @@ describe('pause-home-reflect-io', () => {
         direction: 'up',
         currency: 'USD',
         changePercent: 2,
-        cumulativeChangePercent: 3,
         fearGreed: { value: 25, label: 'Fear' },
         onChain: null,
       },
-      5,
       'bitcoin',
     );
     expect(market.assetId).toBe('bitcoin');
@@ -67,7 +65,6 @@ describe('pause-home-reflect-io', () => {
   it('re-exports buildManualPauseOpenParams and default manual-open ports', () => {
     const params = buildManualPauseOpenParams({
       userId: 'u1',
-      silentMode: false,
       data: {
         coinId: 'bitcoin',
         currentPrice: 100000,
@@ -75,11 +72,9 @@ describe('pause-home-reflect-io', () => {
         direction: 'up',
         currency: 'USD',
         changePercent: 1,
-        cumulativeChangePercent: 2,
         fearGreed: null,
         onChain: null,
       },
-      cumulativeThreshold: 5,
       profileTrackedAssetId: 'bitcoin',
     });
     expect(params.userId).toBe('u1');

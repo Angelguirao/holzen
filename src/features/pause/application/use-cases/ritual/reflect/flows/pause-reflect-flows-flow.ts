@@ -38,13 +38,13 @@ export {
   formatReinforcementQuoteFromSession,
   resolvePauseDecideOutcomeFlow,
 } from '@/features/pause/domain/decide/pause-decide-outcome-flow';
+export { getSessionQuote } from '../../decide/wisdom-quotes';
 export type { PauseImpactData } from '../../decide/impact-data';
 export { runPauseOutcomeLog } from '../../decide/run-pause-outcome-log';
 export {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
 } from '../../decide/outcome-toast';
-export { getSessionQuote } from '../../decide/wisdom-quotes';
 export {
   buildPauseScoreImpacts,
   parseScoreImpactVolatilityPct,

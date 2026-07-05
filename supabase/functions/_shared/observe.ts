@@ -3,7 +3,7 @@
  * Centralises cost tracking, attempt logging, and analytics events.
  */
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { EDGE_RELEASE } from "./release.ts";
 
 // ── Cost estimation per 1M tokens [input, output] in USD ──

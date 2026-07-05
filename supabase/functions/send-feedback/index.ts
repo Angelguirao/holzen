@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { EdgeError } from "../_shared/edge-error.ts";
 import { logDependencyCall } from "../_shared/deps.ts";
@@ -23,9 +23,10 @@ const CATEGORY_EMOJI: Record<string, string> = {
   bug: "🐛",
   feature: "💡",
   question: "❓",
+  pause_help: "⭐",
 };
 
-const VALID_CATEGORIES = new Set(["bug", "feature", "question"]);
+const VALID_CATEGORIES = new Set(["bug", "feature", "question", "pause_help"]);
 
 /** Trim + hard-cap incoming text so no single column blows up (defense in depth). */
 function trimTo(text: unknown, max: number): string | null {

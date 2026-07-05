@@ -3,7 +3,7 @@
  * Centralises the cache fallback chain logic used by all companion functions.
  */
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { COMPANION_SERVE_FRESHNESS_DAYS } from "./companion-serve-freshness.ts";
 
 /** `companion_cache.companion_type` for zoom-out deep-time entries */

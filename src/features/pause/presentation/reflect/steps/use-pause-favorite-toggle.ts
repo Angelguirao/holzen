@@ -1,4 +1,4 @@
-import { useCallback, useOptimistic } from 'react';
+import { useCallback, useTransition } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useAuth } from '@/features/auth/public';
@@ -29,30 +29,41 @@ export function usePauseFavoriteToggle(input: {
     t,
   } = input;
 
-  const toggleFavorite = useCallback(async () => {
-    if (!pauseInstanceId) return;
-    const attempted = !isFavoriteCommitted;
-    addOptimisticFavorite(attempted);
-    hapticFeedback('light');
+  const [, startTransition] = useTransition();
 
-    const outcome = await pauseReflectFavoriteToggle({
-      pauseInstanceId,
-      isFavorite: isFavoriteCommitted,
+  const toggleFavorite = useCallback((): Promise<void> => {
+    if (!pauseInstanceId) return Promise.resolve();
+    return new Promise((resolve) => {
+      startTransition(async () => {
+        const attempted = !isFavoriteCommitted;
+        addOptimisticFavorite(attempted);
+        hapticFeedback('light');
+
+        const outcome = await pauseReflectFavoriteToggle({
+          pauseInstanceId,
+          isFavorite: isFavoriteCommitted,
+        });
+        if (outcome.status === 'no_instance') {
+          resolve();
+          return;
+        }
+
+        if (outcome.status === 'sync_failed') {
+          setIsFavorite(!outcome.attemptedValue);
+          resolve();
+          return;
+        }
+
+        setIsFavorite(outcome.newValue);
+        if (user?.id) {
+          void queryClient.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(user.id) });
+        }
+        if (shouldShowFavoriteProHint(outcome.newValue, subscribed)) {
+          showPauseFavoriteProHintToast(t);
+        }
+        resolve();
+      });
     });
-    if (outcome.status === 'no_instance') return;
-
-    if (outcome.status === 'sync_failed') {
-      setIsFavorite(!outcome.attemptedValue);
-      return;
-    }
-
-    setIsFavorite(outcome.newValue);
-    if (user?.id) {
-      void queryClient.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(user.id) });
-    }
-    if (shouldShowFavoriteProHint(outcome.newValue, subscribed)) {
-      showPauseFavoriteProHintToast(t);
-    }
   }, [
     pauseInstanceId,
     isFavoriteCommitted,
@@ -62,6 +73,7 @@ export function usePauseFavoriteToggle(input: {
     t,
     user?.id,
     queryClient,
+    startTransition,
   ]);
 
   return { toggleFavorite };

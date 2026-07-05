@@ -1,0 +1,55 @@
+---
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import { fetchAllPublishedBlogPosts, fetchBlogPostBySlug, formatBlogDate } from '../../lib/blog';
+import en from '../../../../../src/locales/en.json';
+
+export async function getStaticPaths() {
+  const posts = await fetchAllPublishedBlogPosts();
+  return posts.map((post) => ({ params: { slug: post.slug } }));
+}
+
+const blog = en.blog;
+const { slug } = Astro.params;
+const post = slug ? await fetchBlogPostBySlug(slug) : null;
+
+if (!post) {
+  return Astro.redirect('/blog');
+}
+
+const postPath = `/blog/${post.slug}`;
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.title,
+  description: post.excerpt ?? undefined,
+  datePublished: post.published_at ?? undefined,
+  author: { '@type': 'Organization', name: 'Holzen' },
+  publisher: { '@type': 'Organization', name: 'Holzen' },
+  mainEntityOfPage: new URL(postPath, Astro.site).href,
+};
+---
+
+<MarketingLayout
+  title={`${post.title} — Holzen Blog`}
+  description={post.excerpt ?? 'Read this article on the Holzen blog.'}
+  canonicalPath={postPath}
+  jsonLd={articleJsonLd}
+>
+  <article class="marketing-page">
+    <a class="back-link" href="/blog">← {blog.title}</a>
+
+    {post.published_at ? <p class="blog-date">{formatBlogDate(post.published_at, 'long')}</p> : null}
+    <h1 class="page-title">{post.title}</h1>
+    {post.excerpt ? <p class="blog-post-excerpt">{post.excerpt}</p> : null}
+
+    <div class="blog-body">{post.body}</div>
+
+    <nav class="blog-post-nav" aria-label="Post footer">
+      <a href="/welcome">{blog.home}</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="/blog">{blog.title}</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="/about">{blog.about}</a>
+    </nav>
+  </article>
+</MarketingLayout>

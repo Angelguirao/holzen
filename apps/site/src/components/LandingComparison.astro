@@ -1,0 +1,45 @@
+---
+import { landingCopy } from '../lib/landing-content';
+
+const { reaction, reflection } = landingCopy;
+---
+
+<div class="comparison">
+  <article class="comparison-panel comparison-panel--reaction">
+    <header class="comparison-panel-head">
+      <span class="comparison-panel-badge comparison-panel-badge--reaction" aria-hidden="true"></span>
+      <h3 class="comparison-panel-title">{reaction.label}</h3>
+    </header>
+    <ol class="timeline">
+      {
+        reaction.steps.map((title, i) => (
+          <li class="timeline-item">
+            {i < reaction.steps.length - 1 ? (
+              <span class="timeline-line timeline-line--reaction" aria-hidden="true" />
+            ) : null}
+            <span class="timeline-dot timeline-dot--reaction" aria-hidden="true" />
+            <p class="timeline-text timeline-text--muted">{title}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </article>
+
+  <article class="comparison-panel comparison-panel--reflection">
+    <header class="comparison-panel-head">
+      <span class="comparison-panel-badge comparison-panel-badge--reflection" aria-hidden="true"></span>
+      <h3 class="comparison-panel-title">{reflection.label}</h3>
+    </header>
+    <ol class="timeline">
+      {
+        reflection.steps.map((title, i) => (
+          <li class="timeline-item">
+            {i < reflection.steps.length - 1 ? <span class="timeline-line" aria-hidden="true" /> : null}
+            <span class="timeline-dot timeline-dot--reflection" aria-hidden="true" />
+            <p class="timeline-text">{title}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </article>
+</div>

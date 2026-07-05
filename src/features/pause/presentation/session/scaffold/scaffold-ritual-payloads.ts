@@ -1,5 +1,10 @@
 import type { RefObject } from 'react';
+import type { MarketQuote } from '@/features/market/public';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
+import type {
+  CurrentFeelForReflect,
+  ReflectionContentV2,
+} from '@/features/pause/domain/reflect/generation/reflection-content-v2';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { PauseBreathingHandle } from '@/features/pause/presentation/session/breath/pause-breathing-handle';
@@ -30,7 +35,6 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   onFeelTilesSelect: PauseSessionBriefRitualBodyProps['onFeelTilesSelect'];
   setBriefStep: (next: BriefPauseStep) => void;
   breathingRef: RefObject<PauseBreathingHandle | null>;
-  mantra: string | null;
   severity: 'mild' | 'moderate' | 'high';
   breathingFirstCompleted: boolean;
   breathingSecondCompleted: boolean;
@@ -38,7 +42,6 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   setBreathingFirstCompleted: (done: boolean) => void;
   setBreathingSecondCompleted: (done: boolean) => void;
   handleBriefBreathContinue: () => void | Promise<unknown>;
-  handleBriefSkipBreath: PauseSessionBriefRitualBodyProps['onSkipBriefBreath'];
   soundMuted: boolean;
   prefersReducedMotion: boolean;
   briefIntegrateDone: boolean;
@@ -49,16 +52,21 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   goToStep: PauseSessionDeepRitualBodyProps['goToStep'];
   handleContinueAfterFirstBreath: () => void | Promise<unknown>;
   handleContinueAfterSecondBreath: () => void | Promise<unknown>;
-  handleSkipFirstBreath: PauseSessionDeepRitualBodyProps['onSkipFirstBreath'];
   handleSkipSecondBreath: PauseSessionDeepRitualBodyProps['onSkipSecondBreath'];
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
   pauseInstanceId: string | null;
   context: string | null;
+  marketData: MarketQuote | null;
+  trackedAssetId: string;
   message: string;
+  reflectionContent: ReflectionContentV2 | null;
+  currentFeel?: CurrentFeelForReflect;
   isFavorite: boolean;
   toggleFavorite: PauseSessionDeepRitualBodyProps['onToggleFavorite'];
   subscribed: boolean;
+  selectedMoodAfter: MoodValue | null;
+  setSelectedMoodAfter: (mood: MoodValue) => void;
   handleFrameImDone: () => void | Promise<unknown>;
   handleDeepFirstBreathRepeat: PauseSessionDeepRitualBodyProps['onRepeatDeepFirstBreathPattern'];
   handleDeepSecondBreathRepeat: PauseSessionDeepRitualBodyProps['onRepeatDeepSecondBreathPattern'];
@@ -86,14 +94,12 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onFeelTilesSelect: p.onFeelTilesSelect,
       onBriefFeelContinueToBreath: () => p.setBriefStep('breath'),
       breathingRef: p.breathingRef,
-      mantra: p.mantra,
       severity: p.severity,
       breathingFirstCompleted: p.breathingFirstCompleted,
       onTimedBreathingChange: p.setBreathTimedActive,
       /** Brief: first segment “completed” is set after `breath_completed` RPC in `handleBriefBreathContinue`. */
       onBriefBreathPatternComplete: () => {},
       onContinueAfterBriefBreath: () => void p.handleBriefBreathContinue(),
-      onSkipBriefBreath: p.handleBriefSkipBreath,
       ritualSoundMuted: p.soundMuted,
       briefIntegrateDone: p.briefIntegrateDone,
       onBriefIntegrateComplete: p.handleBriefIntegrateComplete,
@@ -102,6 +108,9 @@ export function buildPauseSessionScaffoldRitualPayloads(
       deepPauseLocked: !p.subscribed,
       onDecide: p.handleDecide,
       onBriefDecideBack: () => p.setBriefStep('integrate'),
+      marketData: p.marketData,
+      trackedAssetId: p.trackedAssetId,
+      context: p.context,
     },
     deepRitual: {
       step: p.step,
@@ -113,7 +122,6 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onFeelTilesSelect: p.onFeelTilesSelect,
       goToStep: p.goToStep,
       breathingRef: p.breathingRef,
-      mantra: p.mantra,
       severity: p.severity,
       breathingFirstCompleted: p.breathingFirstCompleted,
       breathingSecondCompleted: p.breathingSecondCompleted,
@@ -122,7 +130,6 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onSecondBreathPatternComplete: () => p.setBreathingSecondCompleted(true),
       onContinueAfterFirstBreath: () => void p.handleContinueAfterFirstBreath(),
       onContinueAfterSecondBreath: () => void p.handleContinueAfterSecondBreath(),
-      onSkipFirstBreath: p.handleSkipFirstBreath,
       onSkipSecondBreath: p.handleSkipSecondBreath,
       ritualSoundMuted: p.soundMuted,
       prefersReducedMotion: p.prefersReducedMotion,
@@ -130,10 +137,16 @@ export function buildPauseSessionScaffoldRitualPayloads(
       companionPrefs: p.companionPrefs,
       pauseInstanceId: p.pauseInstanceId,
       context: p.context,
+      marketData: p.marketData,
+      trackedAssetId: p.trackedAssetId,
       reflectionMessage: p.message,
+      reflectionContent: p.reflectionContent,
+      currentFeel: p.currentFeel,
+      severityAbsPct: p.severityAbsPct,
       isFavorite: p.isFavorite,
       onToggleFavorite: p.toggleFavorite,
       subscribed: p.subscribed,
+      mood: p.selectedMood,
       onFrameImDone: () => void p.handleFrameImDone(),
       onDecide: p.handleDecide,
       onRepeatDeepFirstBreathPattern: p.handleDeepFirstBreathRepeat,

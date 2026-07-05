@@ -7,7 +7,6 @@ export function useSettingsLocalPrefs() {
   const [soundEnabled, setSoundEnabled] = useState(
     () => localStorage.getItem('holzen_sound_enabled') !== 'false',
   );
-  const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
 
   const setHapticEnabled = useCallback((value: boolean) => {
     setHapticEnabledState(value);
@@ -19,7 +18,5 @@ export function useSettingsLocalPrefs() {
     setHapticEnabled,
     soundEnabled,
     setSoundEnabled,
-    btcMode,
-    setBtcMode,
   };
 }

@@ -21,13 +21,20 @@ export async function fetchHolzenNumber(): Promise<HolzenNumberData | null> {
   }
 }
 
+/**
+ * Public community aggregates (`get_holzen_number` via edge / `holzen_community_stats` cache):
+ * paused today (UTC) on Home; live pausing-now fields still returned but UI is legacy-only.
+ * No polling — warm on Home prefetch (`useHomePrefetch`); refetch when invalidated (own pause, or
+ * `holzen_community_stats` Realtime when pause activity changes).
+ */
 export function getHolzenNumberQueryOptions() {
   return {
     queryKey: HOLZEN_NUMBER_QUERY_KEY,
     queryFn: fetchHolzenNumber,
-    refetchInterval: 60_000,
-    staleTime: 30_000,
+    staleTime: 5 * 60_000,
+    refetchInterval: false,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     retry: false,
   } as const;
 }

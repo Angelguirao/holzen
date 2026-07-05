@@ -8,7 +8,7 @@ export type CompanionSlotTransitionStart = (
 /** @deprecated Prefer `startCompanionSlotTransition` + `useTransition` pending flags. */
 export interface CompanionSlotLoadingSetters {
   setSignalLoading: (value: boolean) => void;
-  setNudgeLoading: (value: boolean) => void;
+  setGroundingLoading: (value: boolean) => void;
   setHistoryLoading: (value: boolean) => void;
   setZoomOutLoading: (value: boolean) => void;
 }
@@ -22,7 +22,7 @@ export interface CompanionSlotTransitionStarters {
 
 export interface CompanionSlotErrorSetters {
   setSignalError: (value: boolean) => void;
-  setNudgeError: (value: boolean) => void;
+  setGroundingError: (value: boolean) => void;
   setHistoryError: (value: boolean) => void;
   setZoomOutError: (value: boolean) => void;
 }
@@ -38,7 +38,7 @@ export function setCompanionSlotLoading(
       setters.setSignalLoading(value);
       break;
     case 'grounding':
-      setters.setNudgeLoading(value);
+      setters.setGroundingLoading(value);
       break;
     case 'history':
       setters.setHistoryLoading(value);
@@ -80,7 +80,7 @@ export function setCompanionSlotError(
       setters.setSignalError(value);
       break;
     case 'grounding':
-      setters.setNudgeError(value);
+      setters.setGroundingError(value);
       break;
     case 'history':
       setters.setHistoryError(value);

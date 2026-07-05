@@ -10,30 +10,30 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
-  supabaseReflectGenerator: { port: 'reflectGenerator' },
+  supabaseReflectGenerator: { port: 'reflectGenerator' }
 }));
 
 import {
   trackPauseReflectPostItOpen as trackPostItDirect,
   trackPauseReflectShareTap as trackShareTapDirect,
-  trackPauseReflectWallpaperTap as trackWallpaperDirect,
+  trackPauseReflectWallpaperTap as trackWallpaperDirect
 } from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-session-ui-telemetry';
 import {
   trackPauseReflectPostItOpen as trackPostItFromShareFlow,
   trackPauseReflectShareTap as trackShareTapFromShareFlow,
   trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow,
   buildReflectionShareText as buildShareTextFromShareFlow,
-  runReflectionShareImage as runShareImageFromShareFlow,
+  runReflectionShareImage as runShareImageFromShareFlow
 } from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow';
 import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryIo,
   trackPauseReflectShareTap as trackShareTapFromTelemetryIo,
-  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryIo,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryIo
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
@@ -44,42 +44,40 @@ import {
   runPauseFavoriteToggle as runFavoriteFromStepsFlow,
   runPauseReflectNoteUpdate as runNoteFromStepsFlow,
   runPauseReflectTagUpdate as runTagFromStepsFlow,
-  runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
+  runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow
 } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow';
 import {
   openManualPauseFromHome as openManualFromGenerationFlow,
-  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
-  resolvePauseSessionReflectAndDecidePreflight,
+  resolvePauseSessionReflectAndDecidePreflight
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
   pauseReflectTagUpdate,
-  pauseReflectionStepLogOnce,
+  pauseReflectionStepLogOnce
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   pauseReflectGeneration,
-  reflectGenerator,
+  reflectGenerator
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   buildReflectionShareTelegramUrl,
   buildReflectionShareText,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-  pauseReflectionShareImage,
+  pauseReflectionShareImage
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   buildFeelTilesMoodLogOptions,
@@ -88,42 +86,41 @@ import {
   pauseInitialEmotionSkip as pauseInitialEmotionSkipFromMoodIo,
   pauseInitialEmotionSkipWithRepository,
   reflectPauseRepository,
-  resolvePauseSessionChromeCloseAction,
+  resolvePauseSessionChromeCloseAction
 } from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
   resolvePauseSessionChromeCloseAction as resolveChromeCloseFromMoodFlow,
   runInitialEmotionSelect as runInitialEmotionSelectFromMoodFlow,
-  runInitialEmotionSkip as runInitialEmotionSkipFromMoodFlow,
+  runInitialEmotionSkip as runInitialEmotionSkipFromMoodFlow
 } from '@/features/pause/application/use-cases/ritual/feel/pause-feel-flow';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
-  resolveShiftFrameHubDonePresentation,
+  resolveShiftFrameHubDonePresentation
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
-  pauseDeclinePendingOffer,
+  pauseDeclinePendingOffer
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   buildShiftEmotionFrameHubLogBundle as buildLogBundleFromHubFlow,
   resolveShiftFrameHubDonePresentation as resolvePresentationFromHubFlow,
-  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
+  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow
 } from '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow';
 import {
   markPauseManualStartedHomeOnce,
-  trackHomePendingPauseBannerPauseOpened,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
-  trackPauseOpenDismissed,
+  trackPauseOpenDismissed
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
 import {
   dismissOpenPauseHome as dismissFromHomeIo,
   openManualPauseFromHome as openFromHomeIo,
   pauseDismissOpenPauseHomePreview,
-  pauseHomeManualOpenPorts,
+  pauseHomeManualOpenPorts
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 
 describe('pause-reflect-telemetry-io parity (application)', () => {
@@ -160,9 +157,7 @@ describe('pause-reflect-telemetry-io parity (application)', () => {
     expect(trackPauseReflectShareTap).not.toBe(pauseReflectOutcomeLogWithRepository);
     expect(trackPauseReflectWallpaperTap).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(trackPauseReflectPostItOpen).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
-    expect(trackPauseReflectShareTap).not.toBe(formatReinforcementQuoteFromSession);
     expect(trackPauseReflectWallpaperTap).not.toBe(resolvePauseDecideOutcomeFlow);
-    expect(trackPauseReflectPostItOpen).not.toBe(getSessionQuote);
     expect(trackPauseReflectShareTap).not.toBe(buildPauseScoreImpacts);
     // Reciprocal inline pins: `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
   });
@@ -358,7 +353,7 @@ describe('pause-reflect-telemetry-io parity (application)', () => {
    */
   it('sibling cluster: Home manual-open telemetry-io exports stay distinct from session reflect telemetry-io', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(trackPauseOpenDismissed);
-    expect(trackPauseReflectShareTap).not.toBe(trackHomePendingPauseBannerPauseOpened);
+    expect(trackPauseReflectShareTap).not.toBe(trackPauseOpenDismissed);
     expect(trackPauseReflectWallpaperTap).not.toBe(markPauseManualStartedHomeOnce);
     expect(trackPostItFromTelemetryIo).not.toBe(trackManualPauseInstanceCreated);
     expect(trackShareTapFromTelemetryIo).not.toBe(trackPauseManualCompleted);

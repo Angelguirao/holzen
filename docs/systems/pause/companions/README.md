@@ -8,6 +8,12 @@
 
 Focused notes on the **intervention** and **individual companion types** — how they fit into the overall pause pipeline described in [ai-powered-pause-system.md](../ai-powered-pause-system.md).
 
+## Metering & cost
+
+| Doc | What |
+|-----|------|
+| [companion-metering.md](companion-metering.md) | **What counts** against Companions & guidance (orchestrate/regenerate only), pregenerate vs session cost, naming map |
+
 ## Cache warmer (background)
 
 | Doc | What |
@@ -19,6 +25,12 @@ Focused notes on the **intervention** and **individual companion types** — how
 | Doc | What |
 |-----|------|
 | [intervention.md](intervention.md) | **Intervention** — selection order (mirror / trap / pattern / question), severity bucketing, session intent vs selection |
+
+## Frame companions (architecture map)
+
+| Doc | What |
+|-----|------|
+| [frame-companions.md](frame-companions.md) | **Frame companions** — product vs backend names, client orchestrate slots, Reflect vs Frame journeys |
 
 ## Companion cards
 

@@ -12,6 +12,7 @@ Human checklist for shipping pause-first to production. **Quick ticks:** [ship-c
 | Merge `staging → main` | 🚢 you |
 | Vercel production deploy | 🚢 automatic on `main` merge |
 | §3.1 no real prod users (before destructive cutover) | 🚢 you |
+| Pre-launch: `holzen.app` not public (see §5.1 — Vercel Auth/password need Advanced on custom domains) | 🚢 you |
 
 ## Preconditions
 
@@ -32,7 +33,7 @@ npm run check:edge-logging
 npm run check:edge-coverage-manifest
 npm run test:ci
 npm run build
-npm run check:bundle-shipped   # also runs inside test:ci
+npm run check:bundle-shipped   # run after build (also in the CI build step)
 npm run check:bruno-active-manifest
 npm run check:posthog-events-allowlist
 npm run check:view-migrations
@@ -77,12 +78,12 @@ After staging smoke passes, merge **`staging → main`** for production Supabase
 
 ## 4. Bruno smoke (`bruno/active/`)
 
-With `hosted.bru` env (JWT + Supabase URL/key). Full sequence: [bruno/active/README.md](../../bruno/active/README.md).
+With `staging.bru` (preferred) or `prod.bru` env (JWT + Supabase URL/key). Full sequence: [bruno/active/README.md](../../bruno/active/README.md).
 
 1. `auth/01-sign-in-password`
 2. `platform/health` — 200
 3. `billing/02-check-subscription` — `subscription_status` / tier fields
-4. `billing/04-ensure-trial-subscription` — `{ ok: true }` (disposable user; idempotent)
+4. `billing/01-create-checkout-trial` — `{ url }` (disposable user) **or** app onboarding → Stripe Checkout → `trial_checkout=success`
 5. Optional: `pause-pipeline/01-holzen-reflect`, `02-companion-orchestrate`
 
 Do not use requests under `bruno/legacy/full-shell/` for launch ship checks (undeployed edges).

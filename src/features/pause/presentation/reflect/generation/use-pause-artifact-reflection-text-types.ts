@@ -1,3 +1,5 @@
+import type { ReflectionContentV2 } from '@/features/pause/domain/reflect/generation/reflection-content-v2';
+
 /** Params for artifact-only `reflection_text` hydrate on Reflect / Frame beats. */
 export type PauseArtifactReflectionTextFetchPhase = 'idle' | 'loading' | 'error' | 'done';
 
@@ -22,5 +24,6 @@ export type UsePauseArtifactReflectionTextParams =
 
 export type UsePauseArtifactReflectionTextResult = {
   artifactReflectionText: string | null;
+  artifactReflectionContent: ReflectionContentV2 | null;
   reflectionTextFetch: PauseArtifactReflectionTextFetchPhase;
 };

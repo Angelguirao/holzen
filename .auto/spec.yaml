@@ -1,0 +1,84 @@
+# Holzen — system specification for auto cycles
+# Canonical product docs remain in docs/; this is the computable core.
+
+name: holzen
+description: >
+  React + TypeScript SPA for volatility-triggered investor pause practice.
+  Supabase backend (Postgres, auth, RLS, Edge Functions). Stripe subscriptions.
+
+user:
+  primary: Individual investor practicing pause during market volatility
+  job_to_be_done: >
+    Interrupt reactive trading impulses with structured pause rituals,
+    grounding, reflection, and lightweight progress tracking.
+
+entities:
+  - User (auth, profile, subscription)
+  - PauseInstance (lifecycle, metadata, artifacts)
+  - PauseEvent (state machine transitions)
+  - Companion (curated catalog, serves, generation limits)
+  - Subscription (Stripe via edge functions)
+  - Notification (in-app, web push, delivery channels)
+
+core_loop: |
+  1. User triggers or accepts pause during volatility signal
+  2. System guides grounding/breathing ritual
+  3. Optional AI reflection/companion (bounded by cost model)
+  4. Artifacts stored; stats/journey updated
+  5. User returns to agency — system does not trade or decide for them
+
+inputs:
+  - Market volatility signals / user-initiated pause
+  - User ritual choices and journal input
+  - Auth session, subscription status
+
+outputs:
+  - Completed pause instances and artifacts
+  - Journey/stats projection
+  - Notifications (non-coercive)
+  - Analytics events (PostHog taxonomy)
+
+invariants:
+  - Pause sessions are user-initiated or user-accepted — no autonomous trading actions
+  - No financial advice; behavioral scaffolding only
+  - Pause-first active surface — stripped legacy routes stay 404
+  - Edge HTTP handlers use withRequestLogging; x-cid preserved
+  - RLS and migration security conventions enforced
+  - invokeEdge allowlist and active-surface checks must pass in CI
+  - Responsibility for investment decisions stays with the user
+
+out_of_scope:
+  - Autonomous outreach, sales, or ads
+  - Dispute resolution between users
+  - Re-expanding stripped IA (collections tab, zen mode, tools hub) without human approval
+  - Simulating emotional outcomes or guaranteed behavioral change
+  - Production schema changes without escalation
+
+value_loop: |
+  User pays subscription → accesses pause tooling during volatility →
+  retained through ritual habit and journey visibility →
+  infra cost bounded by AI cost model and edge limits.
+
+failure_modes:
+  - Edge function timeout → logged, user sees graceful fallback
+  - AI generation limit hit → strip client context, inline notice
+  - Stripe webhook delay → subscription state eventually consistent
+  - Auth expiry → re-auth flow
+
+tech:
+  frontend: Vite + React 19 + TanStack Query
+  backend: Supabase (Postgres, Edge Functions, Deno)
+  payments: Stripe
+  deploy: Vercel (unified marketing + SPA), GitHub Actions CI
+  observability: PostHog, Sentry, BetterStack edge logging
+
+preflight_commands:
+  - npm run test:ci
+  - npm run lint
+
+canonical_docs:
+  - AGENTS.md
+  - docs/ops/active-surface.md
+  - docs/systems/pause-system.md
+  - docs/systems/pause/ai-powered-pause-system.md
+  - docs/ops/deployment-sync-guide.md

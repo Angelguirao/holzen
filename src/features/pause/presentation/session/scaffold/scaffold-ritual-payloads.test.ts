@@ -28,7 +28,6 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     onFeelTilesSelect: vi.fn(),
     setBriefStep,
     breathingRef,
-    mantra: null,
     severity: 'mild' as const,
     breathingFirstCompleted: false,
     breathingSecondCompleted: false,
@@ -36,7 +35,6 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     setBreathingFirstCompleted,
     setBreathingSecondCompleted,
     handleBriefBreathContinue,
-    handleBriefSkipBreath: vi.fn(),
     soundMuted: false,
     prefersReducedMotion: false,
     briefIntegrateDone: false,
@@ -47,16 +45,20 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     goToStep: vi.fn(),
     handleContinueAfterFirstBreath: vi.fn(),
     handleContinueAfterSecondBreath: vi.fn(),
-    handleSkipFirstBreath: vi.fn(),
     handleSkipSecondBreath: vi.fn(),
     companions: DEFAULT_COMPANIONS,
     companionPrefs: DEFAULT_PREFS,
     pauseInstanceId: 'p1',
     context: null,
+    marketData: null,
+    trackedAssetId: 'bitcoin',
     message: 'hello',
+    reflectionContent: null,
     isFavorite: false,
     toggleFavorite: vi.fn(),
     subscribed: false,
+    selectedMoodAfter: null,
+    setSelectedMoodAfter: vi.fn(),
     handleFrameImDone: vi.fn(),
     handleDeepFirstBreathRepeat: vi.fn(),
     handleDeepSecondBreathRepeat: vi.fn(),
@@ -186,18 +188,10 @@ describe('buildPauseSessionScaffoldRitualPayloads', () => {
     expect(briefRitual.deepPauseLocked).toBe(false);
   });
 
-  it('forwards brief and deep skip breath handlers', () => {
-    const handleBriefSkipBreath = vi.fn();
-    const handleSkipFirstBreath = vi.fn();
+  it('forwards deep second-breath skip handler only', () => {
     const handleSkipSecondBreath = vi.fn();
-    const { params } = setup({ handleBriefSkipBreath, handleSkipFirstBreath, handleSkipSecondBreath });
-    const { briefRitual, deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
-
-    briefRitual.onSkipBriefBreath();
-    expect(handleBriefSkipBreath).toHaveBeenCalled();
-
-    deepRitual.onSkipFirstBreath();
-    expect(handleSkipFirstBreath).toHaveBeenCalled();
+    const { params } = setup({ handleSkipSecondBreath });
+    const { deepRitual } = buildPauseSessionScaffoldRitualPayloads(params);
 
     deepRitual.onSkipSecondBreath();
     expect(handleSkipSecondBreath).toHaveBeenCalled();

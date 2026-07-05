@@ -23,13 +23,11 @@ export function PauseSessionBriefRitualBody({
   onFeelTilesSelect,
   onBriefFeelContinueToBreath,
   breathingRef,
-  mantra,
   severity,
   breathingFirstCompleted,
   onTimedBreathingChange,
   onBriefBreathPatternComplete,
   onContinueAfterBriefBreath,
-  onSkipBriefBreath,
   ritualSoundMuted,
   briefIntegrateDone,
   onBriefIntegrateComplete,
@@ -38,6 +36,9 @@ export function PauseSessionBriefRitualBody({
   deepPauseLocked,
   onDecide,
   onBriefDecideBack,
+  marketData,
+  trackedAssetId,
+  context,
 }: PauseSessionBriefRitualBodyProps) {
   "use memo";
   return (
@@ -51,6 +52,9 @@ export function PauseSessionBriefRitualBody({
             feelIntensity={feelIntensity}
             onSelect={onFeelTilesSelect}
             onContinue={onBriefFeelContinueToBreath}
+            marketData={marketData}
+            trackedAssetId={trackedAssetId}
+            contextText={context}
           />
         </motion.div>
       )}
@@ -62,13 +66,11 @@ export function PauseSessionBriefRitualBody({
             key="breath-brief"
             breathSegment="first"
             ritualVariant="brief"
-            mantra={mantra}
             severity={severity}
             completed={breathingFirstCompleted}
             onTimedBreathingChange={onTimedBreathingChange}
             onPatternComplete={onBriefBreathPatternComplete}
             onContinueAfterBreath={onContinueAfterBriefBreath}
-            onSkipBreath={onSkipBriefBreath}
             ritualSoundMuted={ritualSoundMuted}
             feelTile={selectedBriefFace}
           />

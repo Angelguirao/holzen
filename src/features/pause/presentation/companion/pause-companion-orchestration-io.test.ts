@@ -108,6 +108,7 @@ describe('pause-companion-orchestration-io', () => {
     await pauseToggleCompanionLibraryFavorite({
       pauseInstanceId: 'pi-1',
       sourceType: 'article',
+      nextBucket: { article: true },
       onBucketComputed,
     });
 
@@ -116,6 +117,7 @@ describe('pause-companion-orchestration-io', () => {
       {
         pauseInstanceId: 'pi-1',
         sourceType: 'article',
+        nextBucket: { article: true },
         onBucketComputed,
       },
     );

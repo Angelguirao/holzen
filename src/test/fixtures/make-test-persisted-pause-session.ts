@@ -11,8 +11,6 @@ export function makeTestPersistedPauseSession(overrides: Partial<PersistedSessio
     pauseInstanceId: 'p1',
     companions: {
       haiku: null,
-      groundingTitle: null,
-      groundingBody: null,
     },
     companionPrefs: {
       breathing: true,

@@ -53,7 +53,7 @@ describe('pause-session-scaffold-io re-exports', () => {
       message: 'm',
       context: null,
       pauseInstanceId: 'pi-scaffold-reexport',
-      companions: { haiku: null, groundingTitle: null, groundingBody: null },
+      companions: { haiku: null },
       companionPrefs: {
         breathing: true,
         haiku: true,

@@ -1,15 +1,12 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useAuth } from '@/features/auth/public';
-import { useProfile } from '@/features/user/public-hooks';
+import { useHolzenCommunityStatsRealtime, useProfile } from '@/features/user/public-hooks';
 import {
-  useCompletedPauseCount,
   useDismissOutletPauseReady,
-  useHomePauseActions,
+  useHomePracticeStats,
   usePauseArrivalAudio,
-  usePauseContextHomePreviews,
 } from '@/features/pause/public-home';
 import { useMarketDisplayPreferences } from '@/features/market/public-hooks';
 import { getHomeSubscriptionGate } from '@/features/subscription/public';
@@ -22,12 +19,13 @@ import { useHomeCustomizeBridge } from '@/screens/home/hooks/use-home-customize-
 import { useHomeDashboardLayoutProps } from '@/screens/home/hooks/use-home-dashboard-layout-props';
 import { useHomeDashboardTodayWiring } from '@/screens/home/hooks/use-home-dashboard-today-wiring';
 import { useHomeDocumentTitle } from '@/screens/home/hooks/use-home-document-title';
-import { useHomeHeroQuoteViewed } from '@/screens/home/hooks/use-home-hero-quote-viewed';
 import { useHomeMarketGoalHeaders } from '@/screens/home/hooks/use-home-market-goal-headers';
 import { useHomeOptionalVisibility } from '@/screens/home/hooks/use-home-optional-visibility';
 import { useHomePauseCardProjection } from '@/screens/home/hooks/use-home-pause-card-projection';
 import { useHomePullFullReload } from '@/screens/home/hooks/use-home-pull-full-reload';
 import { useHomeVisibleSections } from '@/screens/home/hooks/use-home-visible-sections';
+import { useHomePrefetch } from '@/screens/home/hooks/use-home-prefetch';
+import { useHomePauseHelpFeedback } from '@/features/pause/public-home';
 
 /**
  * Home route conductor — composes Holzen outlet, subscription gate, pause card, and dashboard layout.
@@ -52,38 +50,37 @@ export function useHomeScreen() {
   useHomeDocumentTitle(true);
 
   const {
-    btcData,
-    message,
-    context,
-    companions,
-    severity,
+    marketData,
     lastPauseInstanceId,
     openPauseState,
+    openPauseSource,
+    contextSnapshot,
     loading,
     error,
     newPauseArrival,
     clearNewPauseArrival,
-    dismissMessage,
-    manualTrigger,
-    manualCooldownRemaining,
-    autoCooldownRemaining,
-    nextCronCheckIn,
   } = usePauseHomeContext();
 
   const {
-    companionPrefs,
-    hasOnboarded,
-    completeOnboarding,
-    cooldownHours,
     firstName,
     currency,
     trackedAssetId,
+    threshold,
+    thresholdDown,
     profileLoaded,
   } = useProfile();
 
+  useHomePrefetch({
+    userId: user?.id,
+    coinIdRaw: trackedAssetId,
+    currency,
+  });
+
+  useHolzenCommunityStatsRealtime(Boolean(user?.id));
+
   const hasOpenPause = Boolean(lastPauseInstanceId);
 
-  const { subscriptionReady, hasAccess, showPauseScheduling } = getHomeSubscriptionGate({
+  const { subscriptionReady } = getHomeSubscriptionGate({
     subLoading,
     entitlement,
     hasOpenPause,
@@ -94,35 +91,27 @@ export function useHomeScreen() {
   const pauseReady = outletCtx?.pauseReady ?? false;
   const dismissPauseReady = outletCtx?.dismissPauseReady;
   useDismissOutletPauseReady(pauseReady, hasOpenPause, dismissPauseReady);
-  useHomeHeroQuoteViewed(profileLoaded, user?.id);
   usePauseArrivalAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
 
   const {
     priceHidden,
-    btcMode,
     marketChartExpanded,
     marketChartExpandBlocked,
     togglePriceHidden,
-    toggleBtcMode,
     toggleMarketChartExpanded,
   } = useMarketDisplayPreferences();
-  const unitBasisModeSupported = trackedAssetId === 'bitcoin';
-  const completedPauseCount = useCompletedPauseCount() ?? 0;
-  const pauseContextHomePreview = usePauseContextHomePreviews(context);
-
-  const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
+  const { stats: practiceStats, isLoading: practiceStatsLoading } = useHomePracticeStats();
 
   const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(
     HOME_WIDGET_DEFAULT_ORDER,
+    user?.id,
   );
   const { visible: sectionVisible, setVisible, resetVisibility: resetSectionVisibility } =
-    useHomeOptionalVisibility();
+    useHomeOptionalVisibility(user?.id);
 
   const { visibleOrderedSectionIds, todaySectionIds } = useHomeVisibleSections({
     order,
     sectionVisible,
-    subscribed,
-    hasNightReflection: false,
   });
 
   const { customizeSheet, onOpenCustomize } = useHomeCustomizeBridge({
@@ -133,58 +122,21 @@ export function useHomeScreen() {
     setVisible,
     resetLayout,
     resetSectionVisibility,
-    subscribed,
   });
 
-  const { goalWhyExpanded, goalWhyHeaderRight, marketHeaderRight } = useHomeMarketGoalHeaders({
+  const { marketHeaderRight } = useHomeMarketGoalHeaders({
     t,
     marketChartExpanded,
     marketChartExpandBlocked,
     toggleMarketChartExpanded,
   });
 
-  const pauseActions = useHomePauseActions({
-    message,
-    context,
-    lastPauseInstanceId,
-    openPauseState,
-    companions,
-    companionPrefs,
-    severity,
-    navigate,
-    dismissMessage,
-    manualTrigger,
-    manualCooldownRemaining,
-    startCheckout,
-    dismissAnalyticsSurface: 'home_your_pause_widget',
-  });
-
   const pauseProjection = useHomePauseCardProjection({
     subscriptionReady,
-    hasAccess,
-    subLoading,
-    entitlement,
-    checkoutLoading,
-    trialLoading,
-    hasOpenPause,
-    openPauseState,
-    pauseContextHomePreview,
-    loading,
-    error,
-    btcData,
-    showPauseScheduling,
-    autoCooldownRemaining,
-    cooldownHours,
-    nextCronCheckIn,
-    manualCooldownRemaining,
-    manualTrigger,
-    onNavigatePauseWithThis: pauseActions.handleNavigatePauseWithThis,
-    onNavigatePauseFromPendingBanner: pauseActions.handleNavigatePauseWithThisFromPendingBanner,
-    onDismissOpenPause: pauseActions.handleDismiss,
-    onNeedPause: pauseActions.handleNeedAPause,
-    onStartCheckoutPro: pauseActions.startProCheckout,
-    onStartTrial: () => void ensureTrial(),
-    onReactivate: () => void startReactivationCheckout(),
+    navigate,
+    startCheckout,
+    startReactivationCheckout,
+    ensureTrial,
   });
 
   const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = useHomePullFullReload();
@@ -192,27 +144,29 @@ export function useHomeScreen() {
   const { renderSection, goalWhyBlock } = useHomeDashboardTodayWiring(
     {
       t,
-      goalWhyHoldSummary,
-      setGoalWhyHoldSummary,
-      goalWhyHeaderRight,
-      goalWhyExpanded,
       error,
       marketHeaderRight,
-      btcData,
+      marketData,
+      threshold,
+      thresholdDown,
+      openPauseSource,
+      openPauseState,
+      openPauseContextSnapshot: contextSnapshot,
       priceHidden,
       togglePriceHidden,
       currency,
       trackedAssetId,
-      unitBasisModeSupported,
-      btcMode,
-      toggleBtcMode,
       marketChartExpanded,
       toggleMarketChartExpanded,
       pauseCardBody: pauseProjection.pauseCardBody,
       pauseSectionHeaderRight: pauseProjection.pauseSectionHeaderRight,
+      pauseWidgetProjection: pauseProjection.pauseWidgetProjection,
       subscribed,
       collapsed,
       toggleCollapsed,
+      presenceXp: practiceStats?.presenceXp ?? null,
+      completedPauseCount: practiceStats?.completedPauseCount ?? null,
+      practiceStatsLoading,
     },
     visibleOrderedSectionIds,
   );
@@ -228,13 +182,17 @@ export function useHomeScreen() {
     renderSection,
     onOpenCustomize,
     customize: customizeSheet,
-    completedPauseCount,
+    completedPauseCount: practiceStats?.completedPauseCount ?? null,
+  });
+
+  const pauseHelpFeedback = useHomePauseHelpFeedback({
+    blocked: customizeSheet.open,
   });
 
   return {
     profileLoaded,
-    hasOnboarded,
-    completeOnboarding,
     dashboardLayout,
+    pauseHelpFeedback,
+    pauseWelcomeBackSheet: pauseProjection.pauseWelcomeBackSheet,
   };
 }

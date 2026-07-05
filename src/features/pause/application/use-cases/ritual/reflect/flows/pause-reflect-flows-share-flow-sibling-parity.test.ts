@@ -8,16 +8,15 @@ import {
   runReflectionShareImage,
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from '../share/pause-reflect-share-flow';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   runPauseOutcomeLog,
-  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeNotCompletedToast
 } from './pause-reflect-flows-flow';
 import * as flowsFlow from './pause-reflect-flows-flow';
 import * as shareFlow from '../share/pause-reflect-share-flow';
@@ -26,7 +25,6 @@ describe('pause-reflect-flows-flow ↔ pause-reflect-share-flow sibling parity',
   it('flows-flow and share-flow are distinct sibling CI anchors', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecideAfterGeneration).toBe('function');
-    expect(typeof formatReinforcementQuoteFromSession).toBe('function');
     expect(typeof resolvePauseDecideOutcomeFlow).toBe('function');
     expect(typeof runPauseOutcomeLog).toBe('function');
     expect(typeof showPauseOutcomeNotCompletedToast).toBe('function');
@@ -54,7 +52,6 @@ describe('pause-reflect-flows-flow ↔ pause-reflect-share-flow sibling parity',
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(runReflectionShareImage);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(buildReflectionShareText);
     expect(runPauseOutcomeLog).not.toBe(buildReflectionShareTelegramUrl);
-    expect(formatReinforcementQuoteFromSession).not.toBe(buildReflectionShareTweetUrl);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(buildReflectionShareWhatsAppUrl);
     expect(buildPauseScoreImpacts).not.toBe(trackPauseReflectShareTap);
     expect(showPauseOutcomeNotCompletedToast).not.toBe(trackPauseReflectWallpaperTap);
@@ -63,7 +60,6 @@ describe('pause-reflect-flows-flow ↔ pause-reflect-share-flow sibling parity',
   it('share umbrella exports stay off reflect+decide preflight and decide outcome helpers', () => {
     expect(runReflectionShareImage).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(buildReflectionShareText).not.toBe(runPauseOutcomeLog);
-    expect(buildReflectionShareTelegramUrl).not.toBe(formatReinforcementQuoteFromSession);
     expect(trackPauseReflectShareTap).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(trackPauseReflectWallpaperTap).not.toBe(buildPauseScoreImpacts);
     expect(trackPauseReflectPostItOpen).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);

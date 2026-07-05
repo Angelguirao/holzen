@@ -101,7 +101,7 @@ serve(
     const consumeQuota = body.consumeQuota !== false;
 
     // Extract user for tracking
-    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.57.2");
+    const { createClient } = await import("npm:@supabase/supabase-js@2");
     const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
     const sbUser = createClient(sbUrl, sbAnon, { global: { headers: { Authorization: authHeader } } });

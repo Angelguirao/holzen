@@ -4,7 +4,6 @@ import {
   User,
   PauseCircle,
   SlidersHorizontal,
-  Layers,
   Bell,
   CreditCard,
   Shield,
@@ -46,16 +45,9 @@ const SECTION_ROWS: {
     icon: SlidersHorizontal,
   },
   {
-    id: 'companions',
-    titleKey: 'settings.contentData',
-    titleOpts: { defaultValue: 'Content & data' },
-    descKey: 'settings.hubDescCompanions',
-    icon: Layers,
-  },
-  {
     id: 'notifications',
-    titleKey: 'settings.notificationsQuietHours',
-    titleOpts: { defaultValue: 'Notifications & quiet hours' },
+    titleKey: 'settings.notifications',
+    titleOpts: { defaultValue: 'Notifications' },
     descKey: 'settings.hubDescNotifications',
     icon: Bell,
   },
@@ -86,7 +78,7 @@ export default function SettingsHubScreen() {
     if (isSettingsSectionId(id)) {
       navigate(settingsSectionPath(id), { replace: true });
     }
-  }, [location.hash, navigate]);
+  }, [location, navigate]);
 
   return (
     <div className="space-y-6 pb-8">
@@ -127,18 +119,11 @@ export default function SettingsHubScreen() {
               </span>
               <span className="mt-0.5 block text-sm leading-snug text-muted-foreground">
                 {m.t('settings.aboutSubpageHint', {
-                  defaultValue: "What's new, version, and feedback — in one place",
+                  defaultValue: 'Version and feedback',
                 })}
               </span>
             </div>
-            <div className="flex shrink-0 items-center gap-2 mt-0.5">
-              {m.hasUnseenChangelog ? (
-                <span className="text-[10px] font-medium bg-muted/50 text-foreground px-2 py-0.5 rounded-full">
-                  {m.t('common.new')}
-                </span>
-              ) : null}
-              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" aria-hidden />
-            </div>
+            <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50 mt-0.5" aria-hidden />
           </Link>
         </li>
       </ul>

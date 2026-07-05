@@ -8,7 +8,7 @@ describe('pause-companion-orchestrate-slot-apply-flow', () => {
   it('re-exports slot apply types and empty relaxations from orchestrate-slot-apply', () => {
     expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toBe(emptyRelaxationsDirect);
     expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toMatchObject({
-      nudge: null,
+      grounding: null,
       signal: null,
       history: null,
       zoomOut: null,

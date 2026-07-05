@@ -8,12 +8,6 @@ export type SubscriptionSnapshot = {
   companionLimit: number;
   companionUsed: number;
   companionRemaining: number;
-  wallpaperLimit: number;
-  wallpaperUsed: number;
-  wallpaperRemaining: number;
-  insightsLimit: number;
-  insightsUsed: number;
-  insightsRemaining: number;
   flexCreditsBalance: number;
   subscriptionStatus: string | null;
   subscriptionEnd: string | null;
@@ -31,12 +25,6 @@ export interface SubCache {
   companionLimit: number;
   companionUsed: number;
   companionRemaining: number;
-  wallpaperLimit: number;
-  wallpaperUsed: number;
-  wallpaperRemaining: number;
-  insightsLimit: number;
-  insightsUsed: number;
-  insightsRemaining: number;
   flexCreditsBalance: number;
   ts: number;
 }

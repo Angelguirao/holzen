@@ -1,8 +1,6 @@
-import { Link } from 'react-router-dom';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { PRICING } from '@/features/subscription/public';
 import { CreditsDashboard } from '@/screens/settings/components/CreditsDashboard';
-import { ReferralSection } from '@/screens/settings/components/ReferralSection';
 import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 
 export function SettingsSubscriptionPanel() {
@@ -79,11 +77,6 @@ export function SettingsSubscriptionPanel() {
             >
               {t('settings.manageSubscription')}
             </LoadingButton>
-            <div>
-              <Link to="/settings/billing-history" className="text-xs font-mono text-muted-foreground underline">
-                View checkout history
-              </Link>
-            </div>
           </div>
         ) : (
           <div className="space-y-2">
@@ -118,8 +111,6 @@ export function SettingsSubscriptionPanel() {
       </div>
 
       <CreditsDashboard />
-
-      <ReferralSection />
     </>
   );
 }

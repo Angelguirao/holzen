@@ -4,45 +4,23 @@ import {
   computeTodaySectionIds,
   computeVisibleOrderedSectionIds,
 } from './compute-home-visible-sections';
+import { JOURNEY_STAT_TILES_VISIBILITY_ID } from './home-section-visibility-constants';
 
 describe('computeVisibleOrderedSectionIds', () => {
   it('keeps always-visible sections regardless of sectionVisible', () => {
     const ids = computeVisibleOrderedSectionIds({
       order: ['your-pause', 'market', 'goal-why'],
       sectionVisible: { 'your-pause': false, market: false },
-      subscribed: true,
-      hasNightReflection: true,
     });
     expect(ids).toEqual(['your-pause', 'market', 'goal-why']);
   });
 
   it('drops optional widgets when toggled off', () => {
     const ids = computeVisibleOrderedSectionIds({
-      order: ['your-pause', 'quick-capture', 'market'],
-      sectionVisible: { 'quick-capture': false },
-      subscribed: true,
-      hasNightReflection: true,
+      order: ['your-pause', JOURNEY_STAT_TILES_VISIBILITY_ID, 'market'],
+      sectionVisible: { [JOURNEY_STAT_TILES_VISIBILITY_ID]: false },
     });
     expect(ids).toEqual(['your-pause', 'market']);
-  });
-
-  it('hides night when unsubscribed or no night reflection', () => {
-    expect(
-      computeVisibleOrderedSectionIds({
-        order: ['night'],
-        sectionVisible: { night: true },
-        subscribed: false,
-        hasNightReflection: true,
-      }),
-    ).toEqual([]);
-    expect(
-      computeVisibleOrderedSectionIds({
-        order: ['night'],
-        sectionVisible: { night: true },
-        subscribed: true,
-        hasNightReflection: false,
-      }),
-    ).toEqual([]);
   });
 });
 

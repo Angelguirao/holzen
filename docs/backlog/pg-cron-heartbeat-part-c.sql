@@ -207,19 +207,19 @@ SELECT cron.schedule(
 );
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 12. refresh-btc-prices   (every 15 min)
+-- 12. refresh-market-prices   (every 15 min)
 -- ─────────────────────────────────────────────────────────────────────────────
-SELECT cron.unschedule('refresh-btc-prices');
+SELECT cron.unschedule('refresh-market-prices');
 SELECT cron.schedule(
-  'refresh-btc-prices',
+  'refresh-market-prices',
   '*/15 * * * *',
   $$
     SELECT net.http_post(
-      url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/refresh-btc-prices',
+      url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/refresh-market-prices',
       headers := jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET')),
       body := '{}'::jsonb
     );
-    PERFORM public.emit_job_heartbeat('refresh_btc_prices');
+    PERFORM public.emit_job_heartbeat('refresh_market_prices');
   $$
 );
 

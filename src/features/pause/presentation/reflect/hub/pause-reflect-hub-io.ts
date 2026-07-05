@@ -30,8 +30,16 @@ import {
   resolveShiftFrameHubDonePresentation,
   type ShiftFrameHubDonePresentation,
 } from '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation';
+import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
+
+export type PauseShiftEmotionFrameHubDoneInput = {
+  pauseInstanceId: string | null;
+  lastShiftLogKey: string | null;
+  shiftMood?: MoodValue | null;
+  shiftIntensity?: number | null;
+};
 
 export {
   buildShiftEmotionFrameHubLogBundle,
@@ -44,7 +52,7 @@ export const reflectPauseRepository = supabasePauseRepository;
 
 /** Default port + use case: frame hub shift_emotion_logged (deduped). */
 export function pauseShiftEmotionFrameHubDone(
-  input: { pauseInstanceId: string | null; lastShiftLogKey: string | null },
+  input: PauseShiftEmotionFrameHubDoneInput,
 ): ReturnType<typeof runShiftEmotionFrameHubDone> {
   return runShiftEmotionFrameHubDone(reflectPauseRepository, input);
 }
@@ -52,7 +60,7 @@ export function pauseShiftEmotionFrameHubDone(
 /** Test seam: inject a custom `PauseRepository`. */
 export function pauseShiftEmotionFrameHubDoneWithRepository(
   repository: PauseRepository,
-  input: { pauseInstanceId: string | null; lastShiftLogKey: string | null },
+  input: PauseShiftEmotionFrameHubDoneInput,
 ): ReturnType<typeof runShiftEmotionFrameHubDone> {
   return runShiftEmotionFrameHubDone(repository, input);
 }

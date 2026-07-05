@@ -1,0 +1,51 @@
+---
+import PublicFooter from './PublicFooter.astro';
+
+interface Section {
+  title: string;
+  paragraphs?: string[];
+  list?: string[];
+  paragraphsAfter?: string[];
+}
+
+interface Props {
+  backHref?: string;
+  backLabel?: string;
+  title: string;
+  subtitle: string;
+  sections: Section[];
+  closing: string;
+}
+
+const { backHref = '/welcome', backLabel = '← Back', title, subtitle, sections, closing } = Astro.props;
+---
+
+<article class="marketing-page marketing-page--wide">
+  <a class="back-link" href={backHref}>{backLabel}</a>
+  <h1 class="page-title">{title}</h1>
+  <p class="page-subtitle">{subtitle}</p>
+
+  <hr class="legal-divider" />
+
+  {
+    sections.map((section) => (
+      <section class="legal-section">
+        <h2>{section.title}</h2>
+        {section.paragraphs?.map((p) => <p>{p}</p>)}
+        {section.list ? (
+          <ul>
+            {section.list.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        ) : null}
+        {section.paragraphsAfter?.map((p) => <p>{p}</p>)}
+      </section>
+    ))
+  }
+
+  <hr class="legal-divider" />
+  <p class="legal-closing">{closing}</p>
+
+  <PublicFooter />
+</article>

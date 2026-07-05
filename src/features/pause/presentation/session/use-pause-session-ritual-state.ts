@@ -1,4 +1,4 @@
-import { useOptimistic, useState } from 'react';
+import { useLayoutEffect, useOptimistic, useState } from 'react';
 import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
@@ -22,47 +22,68 @@ import { usePauseSessionEntryPresentationEffects } from './use-pause-session-ent
  * In-session ritual UI state for `/pause` (step, mood, breath progress, depth picker).
  * Initialized from `loadSession` / shell `restored` snapshot; persisted via `usePauseSessionPersistToStorage`.
  */
-export function usePauseSessionRitualState(restored: PersistedSession | null) {
-  const restoredStep = mapPersistedStep(restored?.step);
+export function usePauseSessionRitualState(
+  restored: PersistedSession | null,
+  options?: { startAtDepthPicker?: boolean; restartEngagedRitual?: boolean },
+) {
+  const startAtDepthPicker = options?.startAtDepthPicker === true;
+  const restartEngagedRitual = options?.restartEngagedRitual === true;
+  const ritualBootstrap = restartEngagedRitual ? null : restored;
+  const restoredStep = restartEngagedRitual ? 'feel' : mapPersistedStep(restored?.step);
 
   const [step, setStep] = useState<PauseStep>(restoredStep);
-  const [phase, setPhase] = useState<'session' | 'done'>(() => initialPhaseFromRestored(restored));
-  const [decision, setDecision] = useState<string | null>(() => initialDecisionFromRestored(restored));
+  const [phase, setPhase] = useState<'session' | 'done'>(() => initialPhaseFromRestored(ritualBootstrap));
+  const [decision, setDecision] = useState<string | null>(() => initialDecisionFromRestored(ritualBootstrap));
 
   const [isFavoriteCommitted, setIsFavorite] = useState(false);
   const [isFavorite, addOptimisticFavorite] = useOptimistic(
     isFavoriteCommitted,
     (_current, next: boolean) => next,
   );
-  const [moodDone, setMoodDone] = useState(restored?.moodDone ?? false);
-  const [moodAfterDone, setMoodAfterDone] = useState(restored?.moodAfterDone ?? false);
-  const [selectedMood, setSelectedMood] = useState<MoodValue | null>(restored?.selectedMood ?? null);
+  const [moodDone, setMoodDone] = useState(ritualBootstrap?.moodDone ?? false);
+  const [moodAfterDone, setMoodAfterDone] = useState(ritualBootstrap?.moodAfterDone ?? false);
+  const [selectedMood, setSelectedMood] = useState<MoodValue | null>(ritualBootstrap?.selectedMood ?? null);
   const [selectedMoodAfter, setSelectedMoodAfter] = useState<MoodValue | null>(
-    restored?.selectedMoodAfter ?? null,
+    ritualBootstrap?.selectedMoodAfter ?? null,
   );
-  const [feelIntensity, setFeelIntensity] = useState<number | null>(restored?.feelIntensity ?? null);
-  const [shiftIntensity, setShiftIntensity] = useState<number | null>(restored?.shiftIntensity ?? null);
+  const [feelIntensity, setFeelIntensity] = useState<number | null>(ritualBootstrap?.feelIntensity ?? null);
+  const [shiftIntensity, setShiftIntensity] = useState<number | null>(ritualBootstrap?.shiftIntensity ?? null);
   const [breathingFirstCompleted, setBreathingFirstCompleted] = useState(() =>
-    initialBreathingFirstCompletedFromRestored(restored),
+    initialBreathingFirstCompletedFromRestored(ritualBootstrap),
   );
   const [breathingSecondCompleted, setBreathingSecondCompleted] = useState(() =>
-    initialBreathingSecondCompletedFromRestored(restored),
+    initialBreathingSecondCompletedFromRestored(ritualBootstrap),
   );
-  const [frameDone, setFrameDone] = useState(() => initialFrameDoneFromRestored(restored));
+  const [frameDone, setFrameDone] = useState(() => initialFrameDoneFromRestored(ritualBootstrap));
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<PauseImpactData | null>(null);
+  const [ritualStartedAtMs, setRitualStartedAtMs] = useState<number | null>(() => {
+    if (restartEngagedRitual) return Date.now();
+    if (typeof ritualBootstrap?.ritualStartedAtMs === 'number') return ritualBootstrap.ritualStartedAtMs;
+    if (ritualBootstrap?.ritualDepth) return Date.now();
+    return null;
+  });
 
-  const [ritualEntry, setRitualEntry] = useState<RitualDepth | 'picker'>(() => initialRitualEntry(restored));
-  const [briefStep, setBriefStep] = useState<BriefPauseStep>(() => initialBriefPauseStepFromRestored(restored));
+  const [ritualEntry, setRitualEntry] = useState<RitualDepth | 'picker'>(() => {
+    if (startAtDepthPicker) return 'picker';
+    if (restartEngagedRitual) return 'deep';
+    return initialRitualEntry(restored);
+  });
+  const [briefStep, setBriefStep] = useState<BriefPauseStep>(() => initialBriefPauseStepFromRestored(ritualBootstrap));
   const [briefIntegrateDone, setBriefIntegrateDone] = useState(() =>
-    initialBriefIntegrateDoneFromRestored(restored),
+    initialBriefIntegrateDoneFromRestored(ritualBootstrap),
   );
-  const [selectedBriefFace, setSelectedBriefFace] = useState(() => initialSelectedBriefFaceFromRestored(restored));
+  const [selectedBriefFace, setSelectedBriefFace] = useState(() => initialSelectedBriefFaceFromRestored(ritualBootstrap));
 
   const [swipeDirection, setSwipeDirection] = useState<'forward' | 'back'>('forward');
   const [soundMuted, setSoundMuted] = useState(true);
 
   usePauseSessionEntryPresentationEffects({ setCurtainLifted });
+
+  useLayoutEffect(() => {
+    if (ritualEntry === 'picker') return;
+    setRitualStartedAtMs((prev) => prev ?? Date.now());
+  }, [ritualEntry]);
 
   return {
     step,
@@ -96,6 +117,7 @@ export function usePauseSessionRitualState(restored: PersistedSession | null) {
     curtainLifted,
     pauseImpactData,
     setPauseImpactData,
+    ritualStartedAtMs,
     ritualEntry,
     setRitualEntry,
     briefStep,

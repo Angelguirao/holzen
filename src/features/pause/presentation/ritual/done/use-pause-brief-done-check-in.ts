@@ -10,6 +10,12 @@ import {
   type PostPauseFeelSnapshot,
 } from '@/features/pause/presentation/ritual/done/pause-ritual-done-io';
 import { showPauseStepSyncFailedToast } from '@/features/pause/presentation/ritual/pause-step-sync-toast';
+import { PRACTICE_XP_POST_PAUSE_CHECK_IN_BONUS } from '@/features/pause/domain/practice/practice-xp-constants';
+
+export type BriefDoneSavedEndedFeel = {
+  mood: MoodValue;
+  intensity: number;
+};
 
 export type UsePauseBriefDoneCheckInParams = {
   doneVariant: 'default' | 'brief';
@@ -31,6 +37,8 @@ export function usePauseBriefDoneCheckIn({
   const [briefDoneIntensity, setBriefDoneIntensity] = useState(3);
   const [moodEditorOpen, setMoodEditorOpen] = useState(false);
   const [saveBusy, setSaveBusy] = useState(false);
+  const [savedEndedFeel, setSavedEndedFeel] = useState<BriefDoneSavedEndedFeel | null>(null);
+  const [postCheckInXpBonus, setPostCheckInXpBonus] = useState(0);
   const initialFeelSnapshotRef = useRef<PostPauseFeelSnapshot | null>(null);
 
   useLayoutEffect(() => {
@@ -57,6 +65,10 @@ export function usePauseBriefDoneCheckIn({
         showPauseStepSyncFailedToast(t);
         return;
       }
+      if (outcome.status === 'logged' && briefDoneMood != null) {
+        setSavedEndedFeel({ mood: briefDoneMood, intensity: briefDoneIntensity });
+        setPostCheckInXpBonus(PRACTICE_XP_POST_PAUSE_CHECK_IN_BONUS);
+      }
       onSaveToJourney();
     } finally {
       setSaveBusy(false);
@@ -72,5 +84,7 @@ export function usePauseBriefDoneCheckIn({
     setMoodEditorOpen,
     saveBusy,
     handleSaveToJourney,
+    savedEndedFeel,
+    postCheckInXpBonus,
   };
 }

@@ -16,7 +16,7 @@ vi.mock('@/features/pause/presentation/session/pause-persisted-tab-session-io', 
   savePausePersistedTabSession: (data: unknown) => saveSessionMock(data),
 }));
 
-const companions = { haiku: null, groundingTitle: null, groundingBody: null } as const;
+const companions = { haiku: null } as const;
 const companionPrefs = {
   breathing: true,
   haiku: true,

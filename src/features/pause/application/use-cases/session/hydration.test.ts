@@ -223,8 +223,6 @@ describe('computePauseSessionResolved', () => {
       reflection_message: '',
       context: 'BTC moved',
       haiku: null,
-      grounding_title: null,
-      grounding_body: null,
     };
     expect(
       computePauseSessionResolved({
@@ -240,7 +238,7 @@ describe('computePauseSessionResolved', () => {
       message: '',
       context: 'BTC moved',
       pauseInstanceId: 'p',
-      companions: { haiku: null, groundingTitle: null, groundingBody: null },
+      companions: { haiku: null },
       companionPrefs: prefsB,
       severity: 'moderate',
     });
@@ -265,8 +263,6 @@ describe('computePauseSessionResolved', () => {
       reflection_message: 'hello',
       context: 'ctx',
       haiku: 'h',
-      grounding_title: 't',
-      grounding_body: 'b',
     };
     const out = computePauseSessionResolved({
       hydration: { status: 'fetch', pauseInstanceId: 'p2' },
@@ -283,8 +279,6 @@ describe('computePauseSessionResolved', () => {
       pauseInstanceId: 'p2',
       companions: {
         haiku: 'h',
-        groundingTitle: 't',
-        groundingBody: 'b',
       },
       companionPrefs: prefsB,
       severity: 'moderate',

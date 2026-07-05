@@ -9,8 +9,6 @@ import {
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { SignalFullView } from '@/screens/pause/components/companion/SignalFullView';
-import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
-import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { PageMeta } from '@/app/components/PageMeta';
 
 /**
@@ -40,7 +38,6 @@ export default function CompanionSignalPage() {
       cacheIds,
       cacheRelaxations,
       regenerateCompanion,
-      intervention,
     },
   } = useCompanionFullViewPage({
     routeInstanceId: rid,
@@ -55,7 +52,7 @@ export default function CompanionSignalPage() {
 
   if (loadError) {
     return (
-      <CompanionFocusLayout title={t('companions.signal')} onBack={handleBack}>
+      <CompanionFocusLayout title={t('companions.signalTitle')} onBack={handleBack}>
         <PageMeta
           title={t('companions.fullview.signal.meta')}
           description={t('companions.fullview.signal.meta')}
@@ -68,22 +65,20 @@ export default function CompanionSignalPage() {
 
   if (!loadError && (snapshotPending || !snapshot)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-busy="true">
+      <div className="min-h-screen flex items-center justify-center bg-background" aria-busy="true">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-border/50 border-t-nox-text-link/70" />
       </div>
     );
   }
 
   return (
-    <CompanionFocusLayout title={t('companions.signal')} onBack={handleBack}>
+    <CompanionFocusLayout title={t('companions.signalTitle')} onBack={handleBack}>
       <PageMeta
         title={t('companions.fullview.signal.meta')}
         description={t('companions.fullview.signal.meta')}
         noindex
       />
       <div className="space-y-6">
-        <InterventionCrossRefBadge companion="signal" intervention={intervention} />
-
         <SignalFullView
           signal={signal}
           loading={signalLoading}
@@ -95,7 +90,7 @@ export default function CompanionSignalPage() {
         />
 
         {signal && cacheRelaxations.signal && (
-          <p className="text-[10px] text-muted-foreground/55 font-mono leading-snug" role="status">
+          <p className="text-[10px] text-muted-foreground/55 font-mono leading-snug">
             {t(`companions.cacheRelaxation.${cacheRelaxations.signal}`)}
           </p>
         )}
@@ -112,8 +107,6 @@ export default function CompanionSignalPage() {
             />
           </div>
         )}
-
-        <HistoryThread companion="signal" currentPauseInstanceId={pauseInstanceId} />
       </div>
     </CompanionFocusLayout>
   );

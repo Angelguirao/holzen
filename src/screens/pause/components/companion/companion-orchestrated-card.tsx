@@ -1,5 +1,10 @@
+import { useEffect } from 'react';
 import type { RegenerateCompanionSlot } from '@/features/pause/public-ritual-frame';
-import { CompanionCard, type CompanionCardProps } from '@/screens/pause/components/companion/companion-card';
+import {
+  CompanionCard,
+  type CompanionCardAppearance,
+  type CompanionCardProps,
+} from '@/screens/pause/components/companion/companion-card';
 import { CompanionOrchestratedSlotChrome } from '@/screens/pause/components/companion/companion-orchestrated-slot-chrome';
 import type { CompanionFullViewRouteSegment } from '@/screens/pause/components/companion/companion-open-full-view-button';
 
@@ -10,7 +15,7 @@ export type CompanionOrchestratedCardProps = {
   expanded: boolean;
   onToggleExpand: () => void;
   completed: boolean;
-  /** Fires once when the user expands before UI completion is recorded (e.g. RPC persist). */
+  /** Fires once when the slot is expanded and renderable content is on screen (RPC persist). */
   onFirstExpandComplete?: () => void;
   loading: boolean;
   isFavorite?: boolean;
@@ -23,6 +28,9 @@ export type CompanionOrchestratedCardProps = {
   regenerateSlot: RegenerateCompanionSlot;
   onRegenerate: () => void;
   routeSegment: CompanionFullViewRouteSegment;
+  appearance?: CompanionCardAppearance;
+  iconHelp?: string;
+  showFullViewButton?: boolean;
   children: React.ReactNode;
 };
 
@@ -46,23 +54,32 @@ export function CompanionOrchestratedCard({
   regenerateSlot,
   onRegenerate,
   routeSegment,
+  appearance = 'default',
+  iconHelp,
+  showFullViewButton = true,
   children,
 }: CompanionOrchestratedCardProps) {
   "use memo";
+
+  useEffect(() => {
+    if (expanded && hasContent && !completed) {
+      onFirstExpandComplete?.();
+    }
+  }, [expanded, hasContent, completed, onFirstExpandComplete]);
+
   return (
     <CompanionCard
       id={id}
       label={label}
       icon={icon}
       expanded={expanded}
-      onToggle={() => {
-        onToggleExpand();
-        if (!completed) onFirstExpandComplete?.();
-      }}
+      onToggle={onToggleExpand}
       completed={completed}
       loading={loading}
       isFavorite={isFavorite}
       onToggleFavorite={onToggleFavorite}
+      appearance={appearance}
+      iconHelp={iconHelp}
     >
       <CompanionOrchestratedSlotChrome
         pauseInstanceId={pauseInstanceId}
@@ -75,6 +92,7 @@ export function CompanionOrchestratedCard({
         onRegenerate={onRegenerate}
         regenerating={loading}
         routeSegment={routeSegment}
+        showFullViewButton={showFullViewButton}
       >
         {children}
       </CompanionOrchestratedSlotChrome>

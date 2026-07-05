@@ -102,20 +102,23 @@ export class ErrorBoundary extends Component<Props, State> {
             <p className="text-sm text-muted-foreground leading-relaxed">
               Something went wrong. Take a breath, then try again.
             </p>
+            {import.meta.env.DEV && this.state.errorMessage ? (
+              <p className="text-xs font-mono text-destructive/80 break-words">{this.state.errorMessage}</p>
+            ) : null}
             <div className="space-y-2">
-              <button
+              <button type="button"
                 onClick={this.handleReset}
                 className="block mx-auto text-xs font-mono text-muted-foreground underline"
               >
                 Try again
               </button>
-              <button
+              <button type="button"
                 onClick={this.handleGoHome}
                 className="block mx-auto text-xs font-mono text-muted-foreground underline"
               >
                 Go home
               </button>
-              <button
+              <button type="button"
                 onClick={this.handleReport}
                 className="block mx-auto text-xs font-mono text-muted-foreground underline"
               >

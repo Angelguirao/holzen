@@ -1,8 +1,9 @@
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import {
   buildPauseContextFromMarket,
+  isBitcoinTrackedAsset,
   normalizeTrackedAssetId,
-  severityFromBtcChangePercent,
+  severityFromMarketChangePercent,
   trackedAssetSymbol,
 } from '@/features/market/public';
 import { buildSilentReflectionStubMessage } from '@/features/pause/domain/reflect/generation/build-silent-reflection-stub-message';
@@ -17,16 +18,15 @@ export type ManualPauseMarketContext = {
 
 /** Market snapshot → pause context string, severity band, and silent reflection stub copy. */
 export function buildManualPauseMarketContext(
-  data: BtcPriceData,
-  cumulativeThreshold: number,
+  data: MarketQuote,
   profileTrackedAssetId: string,
 ): ManualPauseMarketContext {
   const assetId = normalizeTrackedAssetId(profileTrackedAssetId);
   const assetSym = trackedAssetSymbol(assetId);
-  const ctx = buildPauseContextFromMarket(data, cumulativeThreshold, assetSym);
-  const severityBand = severityFromBtcChangePercent(data.changePercent) ?? 'mild';
+  const ctx = buildPauseContextFromMarket(data, assetSym);
+  const severityBand = severityFromMarketChangePercent(data.changePercent) ?? 'mild';
   const onChainBand =
-    assetId === 'bitcoin' && data.onChain
+    isBitcoinTrackedAsset(assetId) && data.onChain
       ? ([data.onChain.mempoolSize, data.onChain.fastestFee, data.onChain.medianFee].filter(
           (x) => typeof x === 'number' && Number.isFinite(x),
         ) as number[]).join(':') || null

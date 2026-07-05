@@ -1,0 +1,19 @@
+name: holzen
+phase: operate
+layer: 5
+updated_at: "2026-06-13T00:00:00.000Z"
+
+gates:
+  computability: passed
+  sovereignty: passed
+  signal: passed
+
+phase_history:
+  - phase: probe
+    note: Lovable/platform exit path documented in docs/ops/lovable-staging-and-platform-exit.md
+  - phase: consolidate
+    note: Owned repo, CI fitness functions, pause-first strip, Vercel + Supabase
+  - phase: operate
+    note: Registered in auto meta-layer
+
+human_approvals: []

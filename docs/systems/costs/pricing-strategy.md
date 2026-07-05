@@ -4,7 +4,7 @@ Decision document for pricing and packaging after the AI cost-model audit.
 This translates cost analysis into a customer-facing pricing model that is
 simple, defensible, and resilient while cache coverage is still maturing.
 
-> **Pause-first shipped scope (2026-05):** Shipped acquisition is **7-day in-app trial** via `ensure-trial-subscription` (no card at signup). Checkout is for **reactivation** after trial/lapse. Marketing copy is trial-first — not “free forever” with unlimited Pro features. The plan table in §3.1 remains the **long-term** packaging target; align landing/Settings with [docs/ops/active-surface.md](../../ops/active-surface.md) until tiers are re-enabled in product.
+> **Pause-first shipped scope (2026-05):** Shipped acquisition is **7-day trial via Stripe Checkout** (`create-checkout` with `{ trial: true }`): card required, **$0 during trial**, subscription **cancels at trial end** (no auto-charge). Reactivation after lapse uses **`create-checkout`** with `{ reactivation: true }`. Marketing copy is trial-first — not “free forever” with unlimited Pro features. The plan table in §3.1 remains the **long-term** packaging target; align landing/Settings with [docs/ops/active-surface.md](../../ops/active-surface.md) until tiers are re-enabled in product.
 
 ---
 
@@ -195,6 +195,9 @@ Stripe wiring for this flow:
   - `checkoutKind: "flex_pack_s" | "flex_pack_m"`
 - `stripe-webhook` handles `checkout.session.completed` /
   `checkout.session.async_payment_succeeded` and grants credits idempotently.
+- **Trial fraud:** prepaid blocked on trial Checkout in webhook
+  (`trial-checkout-finalize.ts`); optional Stripe Radar rule scoped with
+  `::holzen_trial::` — see [stripe-radar-trial-rules.md](../ops/stripe-radar-trial-rules.md).
 - Required env vars:
   - `STRIPE_PRICE_ID_PRO`
   - `STRIPE_PRICE_ID_PRO_PLUS`

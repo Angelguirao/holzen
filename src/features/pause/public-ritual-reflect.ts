@@ -3,11 +3,28 @@
  * Feel-step hooks and mood constants: `public-ritual-feel.ts`.
  */
 export { resolveEffectiveReflectionCopy } from './domain/reflect/generation/resolve-effective-reflection-copy';
+export {
+  reflectionContentFromLegacyMessage,
+  type CurrentFeelForReflect,
+  type ReflectionContentV2,
+} from './domain/reflect/generation/reflection-content-v2';
+export {
+  formatReflectDisplayLetter,
+  formatReflectIntegratedProse,
+} from './domain/reflect/generation/format-reflect-integrated-prose';
+export { buildReflectFeelRecapLine } from './domain/reflect/generation/build-reflect-feel-recap-line';
 export { resolveFrameHaikuDisplayBody } from './domain/reflect/generation/resolve-frame-haiku-display-body';
 export {
   resolvePauseReflectMessageView,
   type PauseReflectMessageView,
 } from './domain/reflect/generation/resolve-pause-reflect-message-view';
+export { resolvePauseReflectDisplayContent } from './domain/reflect/generation/resolve-pause-reflect-display-content';
+export { isPauseReflectContinueDisabled } from './domain/reflect/generation/is-pause-reflect-continue-disabled';
+export {
+  trackPauseReflectBlockViewed,
+  trackPauseReflectContextStripExpanded,
+  trackPauseReflectInquiryDisplayed,
+} from './presentation/reflect/telemetry/pause-reflect-telemetry-io';
 export { buildReflectionShareText } from './domain/reflect/share/reflection-share-text';
 
 export { usePauseReflectGeneration } from './presentation/reflect/generation/use-pause-reflect-generation';
@@ -28,7 +45,6 @@ export { useReflectionShareHandlers } from './presentation/reflect/share/use-ref
 export type { UseReflectionShareHandlersParams } from './presentation/reflect/share/reflection-share-handler-types';
 export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-pause-reflection-step-log';
 export { usePauseReflectUiTelemetry } from './presentation/reflect/telemetry/use-pause-reflect-ui-telemetry';
-export { usePauseReflectTags } from './presentation/reflect/steps/use-pause-reflect-tags';
 export { usePauseReflectNote } from './presentation/reflect/steps/use-pause-reflect-note';
 export { usePauseReflectFrameFocusAmbience } from './presentation/reflect/ambience/use-pause-reflect-frame-focus-ambience';
 export { usePauseFavoriteToggle } from './presentation/reflect/steps/use-pause-favorite-toggle';

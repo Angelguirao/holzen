@@ -8,41 +8,37 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {},
+  supabase: {}
 }));
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
-  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' }
 }));
 
 import {
-  formatReinforcementQuoteFromSession as formatQuoteDirect,
-  resolvePauseDecideOutcomeFlow as resolveOutcomeDirect,
+  resolvePauseDecideOutcomeFlow as resolveOutcomeDirect
 } from '@/features/pause/domain/decide/pause-decide-outcome-flow';
 import {
   resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenDirect,
-  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightDirect,
+  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightDirect
 } from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
 import {
   buildPauseScoreImpacts as buildImpactsDirect,
-  parseScoreImpactVolatilityPct as parseVolatilityDirect,
+  parseScoreImpactVolatilityPct as parseVolatilityDirect
 } from '@/features/pause/application/use-cases/ritual/decide/score-impacts';
 import {
   resolveScoreImpactDisplayImpacts as resolveDisplayImpactsDirect,
   resolveScoreImpactViewMode as resolveViewModeDirect,
-  scoreImpactMotionDelaySec as motionDelayDirect,
+  scoreImpactMotionDelaySec as motionDelayDirect
 } from '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation';
 import {
   showPauseOutcomeNotCompletedToast as showNotCompletedDirect,
-  showPauseOutcomeSaveFailedToast as showSaveFailedDirect,
+  showPauseOutcomeSaveFailedToast as showSaveFailedDirect
 } from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 import { runPauseOutcomeLog as runOutcomeLogDirect } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
-import { getSessionQuote as getQuoteDirect } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   parseScoreImpactVolatilityPct,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
@@ -52,12 +48,10 @@ import {
   runPauseOutcomeLog,
   scoreImpactMotionDelaySec,
   showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeSaveFailedToast
 } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
 import {
   buildPauseScoreImpacts as buildImpactsFromFlowsIo,
-  formatReinforcementQuoteFromSession as formatQuoteFromFlowsIo,
-  getSessionQuote as getQuoteFromFlowsIo,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   parseScoreImpactVolatilityPct as parseVolatilityFromFlowsIo,
@@ -69,17 +63,17 @@ import {
   resolveScoreImpactViewMode as resolveViewModeFromFlowsIo,
   scoreImpactMotionDelaySec as motionDelayFromFlowsIo,
   showPauseOutcomeNotCompletedToast as showNotCompletedFromFlowsIo,
-  showPauseOutcomeSaveFailedToast as showSaveFailedFromFlowsIo,
+  showPauseOutcomeSaveFailedToast as showSaveFailedFromFlowsIo
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
-  resolveShiftFrameHubDonePresentation,
+  resolveShiftFrameHubDonePresentation
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
   buildFeelTilesMoodLogOptions,
@@ -87,7 +81,7 @@ import {
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
-  resolvePauseSessionChromeCloseAction,
+  resolvePauseSessionChromeCloseAction
 } from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   pauseReflectFavoriteToggle,
@@ -95,12 +89,12 @@ import {
   pauseReflectTagUpdate,
   pauseReflectionStepLogOnce,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   messageFromReflectGenerationResult,
@@ -109,29 +103,29 @@ import {
   reflectGenerator,
   resolveReflectGenerationPrefetch,
   runReflectGeneration,
-  shouldCommitReflectGeneration,
+  shouldCommitReflectGeneration
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
-  pauseDeclinePendingOfferWithRepository,
+  pauseDeclinePendingOfferWithRepository
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   buildReflectionShareTelegramUrl,
   buildReflectionShareText,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-  pauseReflectionShareImage,
+  pauseReflectionShareImage
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   initialDecisionFromRestored,
-  initialPhaseFromRestored,
+  initialPhaseFromRestored
 } from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
 import {
   buildPauseSessionStepRitualBundle,
-  buildPauseSessionStepShellBundle,
+  buildPauseSessionStepShellBundle
 } from '@/features/pause/presentation/session/pause-session-step-handlers-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -143,9 +137,7 @@ describe('pause-reflect-flows-io parity (application)', () => {
   it('presentation I/O reflect+decide exports match flows CI umbrella', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).toBe(resolvePreflightFromFlowsIo);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).toBe(resolveAfterGenFromFlowsIo);
-    expect(formatReinforcementQuoteFromSession).toBe(formatQuoteFromFlowsIo);
     expect(resolvePauseDecideOutcomeFlow).toBe(resolveOutcomeFromFlowsIo);
-    expect(getSessionQuote).toBe(getQuoteFromFlowsIo);
     expect(buildPauseScoreImpacts).toBe(buildImpactsFromFlowsIo);
     expect(parseScoreImpactVolatilityPct).toBe(parseVolatilityFromFlowsIo);
     expect(resolveScoreImpactDisplayImpacts).toBe(resolveDisplayImpactsFromFlowsIo);
@@ -159,9 +151,7 @@ describe('pause-reflect-flows-io parity (application)', () => {
   it('flows CI umbrella composes the same domain + ritual/decide leaf modules as presentation I/O', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).toBe(resolvePreflightDirect);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).toBe(resolveAfterGenDirect);
-    expect(formatReinforcementQuoteFromSession).toBe(formatQuoteDirect);
     expect(resolvePauseDecideOutcomeFlow).toBe(resolveOutcomeDirect);
-    expect(getSessionQuote).toBe(getQuoteDirect);
     expect(buildPauseScoreImpacts).toBe(buildImpactsDirect);
     expect(parseScoreImpactVolatilityPct).toBe(parseVolatilityDirect);
     expect(resolveScoreImpactDisplayImpacts).toBe(resolveDisplayImpactsDirect);
@@ -195,7 +185,6 @@ describe('pause-reflect-flows-io parity (application)', () => {
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseShiftEmotionFrameHubDone);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseShiftEmotionFrameHubDone);
-    expect(formatReinforcementQuoteFromSession).not.toBe(buildShiftEmotionFrameHubLogBundle);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(resolveShiftFrameHubDonePresentation);
     expect(buildPauseScoreImpacts).not.toBe(buildShiftEmotionFrameHubLogBundle);
     // Reciprocal inline pins: `presentation/reflect/hub/pause-reflect-hub-io-parity.test.ts`.
@@ -210,10 +199,8 @@ describe('pause-reflect-flows-io parity (application)', () => {
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseReflectNoteUpdate);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseReflectTagUpdate);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseReflectionStepLogOnce);
-    expect(formatReinforcementQuoteFromSession).not.toBe(pauseReflectNoteUpdate);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(pauseReflectTagUpdate);
     expect(buildPauseScoreImpacts).not.toBe(pauseReflectFavoriteToggle);
-    expect(getSessionQuote).not.toBe(pauseReflectTagUpdate);
     expect(pauseReflectOutcomeLog).not.toBe(shouldLogPauseReflectionStep);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(shouldShowFavoriteProHint);
     // Reciprocal inline pins: `application/.../steps/pause-reflect-steps-io-parity.test.ts`.
@@ -228,10 +215,8 @@ describe('pause-reflect-flows-io parity (application)', () => {
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(initialPhaseFromRestored);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(initialDecisionFromRestored);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(initialPhaseFromRestored);
-    expect(formatReinforcementQuoteFromSession).not.toBe(initialDecisionFromRestored);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(initialPhaseFromRestored);
     expect(buildPauseScoreImpacts).not.toBe(initialDecisionFromRestored);
-    expect(getSessionQuote).not.toBe(initialPhaseFromRestored);
     // Reciprocal inline pins: `presentation/session/pause-session-decide-io-parity.test.ts`.
   });
 
@@ -242,7 +227,6 @@ describe('pause-reflect-flows-io parity (application)', () => {
   it('sibling cluster: generation-io exports stay distinct from flows-io', () => {
     expect(pauseReflectOutcomeLog).not.toBe(runReflectGeneration);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseReflectGeneration);
-    expect(formatReinforcementQuoteFromSession).not.toBe(reflectGenerationPrerequisite);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(resolveReflectGenerationPrefetch);
     expect(buildPauseScoreImpacts).not.toBe(shouldCommitReflectGeneration);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseReflectGeneration);
@@ -258,7 +242,6 @@ describe('pause-reflect-flows-io parity (application)', () => {
   it('sibling cluster: ambience-io exports stay distinct from flows-io', () => {
     expect(pauseReflectOutcomeLog).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(stopPauseReflectFrameFocusAmbience);
-    expect(formatReinforcementQuoteFromSession).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(buildPauseScoreImpacts).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
@@ -274,10 +257,8 @@ describe('pause-reflect-flows-io parity (application)', () => {
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseInitialEmotionSkip);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseInitialEmotionSelectWithRepository);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseInitialEmotionSkipWithRepository);
-    expect(formatReinforcementQuoteFromSession).not.toBe(buildFeelTilesMoodLogOptions);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(resolvePauseSessionChromeCloseAction);
     expect(buildPauseScoreImpacts).not.toBe(pauseInitialEmotionSelect);
-    expect(getSessionQuote).not.toBe(pauseInitialEmotionSkip);
     // Reciprocal inline pins: `presentation/feel/pause-feel-io-parity.test.ts`.
   });
 
@@ -290,9 +271,7 @@ describe('pause-reflect-flows-io parity (application)', () => {
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(trackPauseReflectShareTap);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(trackPauseReflectWallpaperTap);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(trackPauseReflectPostItOpen);
-    expect(formatReinforcementQuoteFromSession).not.toBe(trackPauseReflectShareTap);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(trackPauseReflectWallpaperTap);
-    expect(getSessionQuote).not.toBe(trackPauseReflectPostItOpen);
     expect(buildPauseScoreImpacts).not.toBe(trackPauseReflectShareTap);
     // Reciprocal inline pins: `telemetry/pause-reflect-telemetry-io-parity.test.ts`.
   });
@@ -307,8 +286,6 @@ describe('pause-reflect-flows-io parity (application)', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(getPendingPauseOfferDisplay);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseAdoptPendingOfferWithRepository);
     expect(buildPauseScoreImpacts).not.toBe(pauseDeclinePendingOfferWithRepository);
-    expect(formatReinforcementQuoteFromSession).not.toBe(pauseAdoptPendingOffer);
-    expect(getSessionQuote).not.toBe(pauseDeclinePendingOffer);
     // Reciprocal inline pins: `pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
   });
 
@@ -320,10 +297,8 @@ describe('pause-reflect-flows-io parity (application)', () => {
     expect(pauseReflectOutcomeLog).not.toBe(pauseReflectionShareImage);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(buildReflectionShareText);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(buildReflectionShareTelegramUrl);
-    expect(formatReinforcementQuoteFromSession).not.toBe(buildReflectionShareTweetUrl);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(buildReflectionShareWhatsAppUrl);
     expect(buildPauseScoreImpacts).not.toBe(pauseReflectionShareImage);
-    expect(getSessionQuote).not.toBe(buildReflectionShareText);
     // Reciprocal inline pins: `pause-reflect-share-io-parity.test.ts`.
   });
 
@@ -337,8 +312,6 @@ describe('pause-reflect-flows-io parity (application)', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(buildPauseSessionStepShellBundle);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(buildPauseSessionStepRitualBundle);
     expect(buildPauseScoreImpacts).not.toBe(buildPauseSessionStepShellBundle);
-    expect(formatReinforcementQuoteFromSession).not.toBe(buildPauseSessionStepRitualBundle);
-    expect(getSessionQuote).not.toBe(buildPauseSessionStepShellBundle);
     expect(reflectPauseRepository).not.toBe(buildPauseSessionStepRitualBundle);
     // Reciprocal inline pins: `presentation/session/pause-session-step-handlers-io-parity.test.ts`.
   });

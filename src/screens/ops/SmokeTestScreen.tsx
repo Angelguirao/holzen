@@ -28,18 +28,19 @@ type Scenario = {
 const SCENARIOS: Scenario[] = [
   {
     id: 'A',
-    title: 'Onboarding trial — ensure-trial-subscription',
-    goal: 'Confirm the 7-day Pro trial starts in-app (no Checkout redirect, no card at signup).',
+    title: 'Onboarding trial — Stripe Checkout',
+    goal: 'Confirm the 7-day Pro trial starts via Stripe Checkout (card on file; $0 today).',
     steps: [
       'Sign in with a disposable test user who has no Stripe subscription yet.',
-      'Complete onboarding step 2 and tap "Start your free trial" (or call Bruno `ensure-trial-subscription`).',
+      'Complete onboarding (Why → asset → threshold) and tap "Start 7-day free trial".',
+      'Pay with 4242 4242 4242 4242 on Stripe Checkout; return to `/onboarding?trial_checkout=success`.',
       'Land on Home with trial entitlement; primary pause CTA should be available.',
     ],
     verify: [
-      { label: 'ensure-trial-subscription returns { ok: true, subscription_status: trialing }', where: 'Edge logs / Bruno active/03' },
-      { label: 'check-subscription returns subscribed=true, tier=pro', where: 'Edge logs: check-subscription' },
-      { label: 'profiles.subscription_tier = pro, subscription_status = trialing', where: 'DB: profiles row' },
-      { label: 'PostHog trial.started with source ensure_trial (when created: true)', where: 'PostHog live events' },
+      { label: 'create-checkout (trial) returns { url }', where: 'Edge logs / Bruno `01-create-checkout-trial`' },
+      { label: 'stripe-webhook + check-subscription after return', where: 'Edge logs' },
+      { label: 'profiles.has_onboarded = true, subscription_status = trialing', where: 'DB: profiles row' },
+      { label: 'PostHog trial.started with source trial_checkout', where: 'PostHog live events' },
     ],
   },
   {

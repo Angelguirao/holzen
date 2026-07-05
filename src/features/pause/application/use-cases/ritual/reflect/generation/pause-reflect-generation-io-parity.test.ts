@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
-  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' }
 }));
 
 vi.mock(
@@ -10,7 +10,7 @@ vi.mock(
   () => ({
     runReflectGeneration: vi.fn(() =>
       Promise.resolve({ status: 'generated' as const, message: 'ok' }),
-    ),
+    )
   }),
 );
 
@@ -21,7 +21,7 @@ import { resolveEffectiveReflectionCopy as resolveCopyDirect } from '@/features/
 import {
   resolveReflectGenerationPrefetch as resolvePrefetchDirect,
   shouldClearReflectGenerationLoading as shouldClearLoadingDirect,
-  shouldCommitReflectGeneration as shouldCommitDirect,
+  shouldCommitReflectGeneration as shouldCommitDirect
 } from '@/features/pause/domain/reflect/generation/reflect-generation-hook-flow';
 import { runReflectGeneration as runReflectGenerationDirect } from '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation';
 import {
@@ -32,7 +32,7 @@ import {
   resolveReflectGenerationPrefetch,
   runReflectGeneration,
   shouldClearReflectGenerationLoading,
-  shouldCommitReflectGeneration,
+  shouldCommitReflectGeneration
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow';
 import {
   messageFromReflectGenerationResult as messageFromGenerationIo,
@@ -44,34 +44,33 @@ import {
   resolveReflectGenerationPrefetch as resolvePrefetchFromGenerationIo,
   runReflectGeneration as runReflectGenerationFromGenerationIo,
   shouldClearReflectGenerationLoading as shouldClearLoadingFromGenerationIo,
-  shouldCommitReflectGeneration as shouldCommitFromGenerationIo,
+  shouldCommitReflectGeneration as shouldCommitFromGenerationIo
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
-  pauseInitialEmotionSkip,
+  pauseInitialEmotionSkip
 } from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
-  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDone
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
-  formatReinforcementQuoteFromSession,
   pauseReflectOutcomeLog,
-  resolvePauseSessionReflectAndDecidePreflight,
+  resolvePauseSessionReflectAndDecidePreflight
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   buildReflectionShareText,
-  pauseReflectionShareImage,
+  pauseReflectionShareImage
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   pauseReflectFavoriteToggle,
@@ -79,7 +78,7 @@ import {
   pauseReflectTagUpdate,
   pauseReflectionStepLogOnce,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   getPendingPauseOfferDisplay,
@@ -87,7 +86,7 @@ import {
   pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
   pauseDeclinePendingOfferWithRepository,
-  reflectPauseRepository,
+  reflectPauseRepository
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   buildManualPauseCreateOrReuseParams,
@@ -99,7 +98,7 @@ import {
   pauseDismissOpenPauseHomePreviewWithRepository,
   pauseHomeManualOpenPorts,
   runOpenManualPauseSilentModeAfterCreate,
-  runPersistSilentReflectionStub,
+  runPersistSilentReflectionStub
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 import * as generationIo from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
@@ -163,11 +162,10 @@ describe('pause-reflect-generation-io parity (application)', () => {
         customPrompt: '',
         motivations: [],
         mantra: '',
-        groundingActivities: [],
         currency: 'USD',
-        language: 'en',
+        language: 'en'
       },
-      signal: new AbortController().signal,
+      signal: new AbortController().signal
     };
 
     await pauseReflectGeneration(input);
@@ -228,7 +226,6 @@ describe('pause-reflect-generation-io parity (application)', () => {
   it('sibling cluster: flows-io exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(runReflectGeneration).not.toBe(pauseReflectOutcomeLog);
-    expect(reflectGenerationPrerequisite).not.toBe(formatReinforcementQuoteFromSession);
   });
 
   /**

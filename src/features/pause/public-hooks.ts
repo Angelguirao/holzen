@@ -105,14 +105,6 @@ export {
   applyBreathSegmentLogOutcome,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
 } from './public-ritual-breathe';
-export {
-  PAUSE_SCIENCE_STEPS,
-  type PauseScienceSource,
-  type PauseScienceStepConfig,
-  type PauseScienceStepKey,
-  stepHighlightsScienceRow,
-  briefStepToPauseScienceStep,
-} from './public-ritual-progress';
 export type { FeelStepTile } from './public-ritual-feel';
 export { PAUSE_FEEL_STEP_TILE_ROWS, PAUSE_FEEL_INTENSITY_KEYS, type PauseFeelIntensityKey } from './public-ritual-feel';
 export {
@@ -143,29 +135,26 @@ export { usePauseBriefIntegrateCountdown } from './public-session-ritual';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/session/breath/use-pause-breath-segment-rpc-loggers';
 export {
   usePauseArchiveList,
-  type PauseArchiveListSort,
   type PauseArchiveRow,
   type PauseArchiveSegment,
   type UsePauseArchiveListOptions,
 } from './presentation/archive/use-pause-archive-list';
-export { getArchivePausesTabHasRowsQueryOptions } from './public-queries';
 export {
   useJourneyPauseInstances,
   type JourneyPauseRow,
 } from './presentation/archive/use-journey-pause-instances';
+export { usePracticeSummary } from './presentation/practice/use-practice-summary';
+export {
+  buildPracticeXpSignalRows,
+  EMPTY_PRACTICE_XP_BY_SIGNAL,
+  type PracticeXpBySignal,
+  type PracticeXpSignalKey,
+} from './domain/practice/practice-xp-by-signal';
 export {
   trackJourneyOverviewViewed,
   type JourneyOverviewViewedPayload,
 } from './presentation/journey/journey-overview-telemetry-io';
 export { logPwaInstallAnalyticsEvent } from './public-queries';
-export {
-  fetchSettingsDataExportBundle,
-  type SettingsDataExportBundle,
-  type SettingsExportAiArtifact,
-  type SettingsExportCompanionEvent,
-  type SettingsExportPauseRow,
-  type SettingsExportStepEvent,
-} from './presentation/settings/load-settings-data-export-bundle';
 export {
   useCurrentPause,
   currentPauseQueryKey,
@@ -179,21 +168,19 @@ export {
   type UseHolzenManualTriggerOrchestrationParams,
   useHomePauseActions,
   type PauseDismissAnalyticsSurface,
+  useHomePendingPauseOfferActions,
   usePauseContextHomePreviews,
   useHolzenHomeContextState,
 } from './public-home';
 export {
-  millisecondsUntilNextQuarterHour,
-  PAUSE_CRON_QUARTER_INTERVAL_MS,
+  millisecondsUntilNextVolatilityCheck,
+  PAUSE_CRON_CHECK_VOLATILITY_INTERVAL_MS,
 } from './public-scheduling';
 export {
-  buildHomePauseCardBodyProps,
   pauseHomeErrorKind,
   pauseHomeErrorStrings,
   shouldShowHomePauseSectionSnooze,
   shouldSurfacePauseWidgetError,
-  type BuildHomePauseCardBodyPropsInput,
-  type HomePauseCardBodyPropsProjection,
   type PauseContextHomePreview,
   type PauseHomeErrorKind,
 } from './public-home';
@@ -222,7 +209,6 @@ export {
   usePauseReflectFrameFocusAmbience,
   usePauseReflectNote,
   usePauseReflectionStepLog,
-  usePauseReflectTags,
   usePauseReflectUiTelemetry,
   usePauseSessionReflectAndDecide,
   type UsePauseSessionReflectAndDecideParams,
@@ -262,14 +248,9 @@ export type {
   CompanionSlotRelaxations,
   EchoUserWord,
   FullviewCompanion,
-  GroundingEnrichment,
-  HistoryThreadRow,
-  InterventionState,
   RegenerateCompanionSlot,
   UseCompanionDataParams,
   UseCompanionFullViewPageParams,
-  UseCompanionInterventionBootstrapParams,
-  UseCompanionInterventionFetchParams,
   UseCompanionOrchestrateRetryParams,
   UseCompanionOrchestrateSessionParams,
   UseCompanionOrchestrationParams,
@@ -285,16 +266,12 @@ export type {
 export {
   companionSectionProFavoriteProps,
   estimateReadTime,
-  formatCompanionHistoryRelativeDay,
   isCompanionRegenerateUiEnabled,
   resolveCompanionRegenerateClick,
   useCompanionAccess,
   useCompanionData,
   useCompanionFeedbackVote,
   useCompanionFullViewPage,
-  useCompanionHistoryThread,
-  useCompanionInterventionBootstrap,
-  useCompanionInterventionFetch,
   useCompanionLibraryFavorites,
   useCompanionOrchestrateRetry,
   useCompanionOrchestrateSession,
@@ -307,7 +284,6 @@ export {
   useCompanionSlotUiState,
   useCompanionUiCompletion,
   useFullviewTelemetry,
-  useGroundingEnrichment,
   usePauseSessionCompanionSnapshot,
   useRelatedBiasesThisMonth,
   useSignalSourceTrustedHost,

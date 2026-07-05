@@ -12,7 +12,7 @@
 // Intentionally minimal type surface — edge functions construct their own
 // Supabase service-role clients via `_shared/cid-clients.ts`.
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { encodeHex } from "https://deno.land/std@0.224.0/encoding/hex.ts";
 
 export type PauseState =
@@ -31,6 +31,7 @@ export interface PauseCreateOrReuseResult {
   reused_reason: "fingerprint_match" | "recent_dismissal" | null;
   pending_offer?: boolean;
   prior_open_instance_id?: string | null;
+  context_refreshed?: boolean;
 }
 
 export interface PauseLogCompanionResult {
@@ -61,7 +62,6 @@ export async function computeContextFingerprint(parts: {
   directionBucket: string;     // 'up' | 'down' | 'flat'
   severityBand: string;         // 'mild' | 'moderate' | 'high'
   dailyBucketPct: number;       // truncated to whole percentage points
-  cumulativeBucketPct: number;  // truncated to whole percentage points
   /** CoinGecko coin id — keeps fingerprints distinct across assets. */
   trackedAssetId?: string;
   fearGreedBand?: string | null;
@@ -72,7 +72,6 @@ export async function computeContextFingerprint(parts: {
     d: parts.directionBucket,
     s: parts.severityBand,
     db: parts.dailyBucketPct,
-    cb: parts.cumulativeBucketPct,
     a: parts.trackedAssetId ?? "bitcoin",
     fg: parts.fearGreedBand ?? null,
     oc: parts.onChainBand ?? null,
