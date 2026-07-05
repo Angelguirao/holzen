@@ -44,7 +44,7 @@ export function FeedbackWidget() {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetContent side="right" className="w-full sm:max-w-md flex flex-col gap-4">
         <SheetHeader className="relative pr-8">
-          <SheetTitle className="font-semibold tracking-wider uppercase text-base font-sans text-[#dbb266]">
+          <SheetTitle className="font-semibold tracking-wider uppercase text-base font-sans text-nox-text-highlight">
             {t('feedback.getInTouch')}
           </SheetTitle>
           <SheetDescription className="text-base font-sans text-secondary-foreground">

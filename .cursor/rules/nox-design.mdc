@@ -1,0 +1,18 @@
+---
+description: Read Holzen Nox design contract before UI or marketing work
+globs:
+  - "**/*.{tsx,ts,css,astro}"
+  - "apps/site/**"
+  - "packages/design-tokens/**"
+alwaysApply: false
+---
+
+# Holzen Nox design
+
+Before changing UI, marketing pages, or CSS:
+
+1. Read [`DESIGN.md`](../../DESIGN.md) and [`docs/design/nox/patterns/marketing.md`](../../docs/design/nox/patterns/marketing.md) for marketing.
+2. Use tokens from `packages/design-tokens/tokens.css` — never duplicate `--nox-*` in `src/index.css`.
+3. Links: `text-nox-text-link`, not `text-primary` or cyan utilities.
+4. Highlight / wordmark: `text-nox-text-highlight`, not `#DBB366`.
+5. Run `npm run check:design-tokens` and `npm run check:nox-hex` after token or color changes.

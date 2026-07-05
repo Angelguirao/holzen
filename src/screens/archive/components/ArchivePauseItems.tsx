@@ -89,7 +89,7 @@ export function ArchivePauseItems({
           <div className="space-y-4">
             {groups.map((group) => (
               <div key={group.key} className="space-y-0.5">
-                <p className="px-3 pb-1 text-sm font-sans font-normal uppercase tracking-wider text-[#dbb266]">
+                <p className="px-3 pb-1 text-sm font-sans font-normal uppercase tracking-wider text-nox-text-highlight">
                   {group.label}
                 </p>
                 <div className="space-y-3">

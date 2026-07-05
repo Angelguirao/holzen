@@ -1,16 +1,17 @@
 ---
 import MarketingLayout from '../layouts/MarketingLayout.astro';
+import LandingBenefits from '../components/LandingBenefits.astro';
 import LandingComparison from '../components/LandingComparison.astro';
 import LandingFaq from '../components/LandingFaq.astro';
+import LandingHeroPreview from '../components/LandingHeroPreview.astro';
+import LandingHowItWorks from '../components/LandingHowItWorks.astro';
+import LandingTrustRow from '../components/LandingTrustRow.astro';
 import PublicFooter from '../components/PublicFooter.astro';
 import WaitlistForm from '../components/WaitlistForm.astro';
-import { appAuthUrl } from '../lib/app-url';
-import { landingCopy, landingFaqJsonLd } from '../lib/landing-content';
+import { landingCopy, landingFaqJsonLd, landingWebPageJsonLd } from '../lib/landing-content';
 import '../styles/welcome.css';
 
 const ref = Astro.url.searchParams.get('ref');
-const signUpUrl = appAuthUrl('sign-up', ref);
-const signInUrl = appAuthUrl('sign-in');
 const copy = landingCopy;
 ---
 
@@ -18,115 +19,98 @@ const copy = landingCopy;
   title={copy.meta.title}
   description={copy.meta.description}
   canonicalPath={copy.meta.path}
-  jsonLd={landingFaqJsonLd()}
+  jsonLd={[landingWebPageJsonLd(), landingFaqJsonLd()]}
 >
   <header class="nav">
     <span class="brand">Holzen</span>
-    <a href={signInUrl}>{copy.signIn}</a>
   </header>
 
-  <div class="hero-wrap">
-    <main class="hero">
-      <h1>{copy.hero}</h1>
-      <p>{copy.heroDesc}</p>
-      <WaitlistForm ref={ref} />
-      <p class="muted waitlist-secondary">
-        Already have an account? <a href={signInUrl}>{copy.signIn}</a>
-        · <a href={signUpUrl}>{copy.getStartedForFree}</a>
-      </p>
-    </main>
-    <a class="scroll-hint" href="#reflection-loop" aria-label="Scroll to content">↓</a>
-  </div>
+  <section class="hero-wrap">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-glow"></div>
+      <div class="hero-grid-lines"></div>
+    </div>
 
-  <section id="reflection-loop" class="section">
-    <p class="section-label">{copy.reflectionLoop}</p>
-    <LandingComparison />
-  </section>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="hero-eyebrow">{copy.heroEyebrow}</p>
+        <h1>{copy.hero}</h1>
+        <p class="hero-lead">{copy.heroDesc}</p>
 
-  <section class="section section--muted">
-    <p class="section-label">{copy.companionsTitle}</p>
-    <p class="section-intro">{copy.companionsDesc}</p>
-    <div class="card-list">
-      {
-        copy.companions.map((companion) => (
-          <article class="card">
-            <h2 class="card-title">{companion.label}</h2>
-            <p class="card-body">{companion.desc}</p>
-          </article>
-        ))
-      }
+        <div class="form-shell">
+          <WaitlistForm ref={ref} formId="waitlist-email-hero" />
+          <LandingTrustRow />
+        </div>
+
+        <p class="hero-note">{copy.heroNote}</p>
+      </div>
+
+      <div class="hero-visual">
+        <LandingHeroPreview />
+      </div>
     </div>
   </section>
 
-  <section class="section">
-    <blockquote class="science-quote">{copy.scienceQuote}</blockquote>
-    <p class="science-quote-desc">{copy.scienceDesc}</p>
-    <a
-      class="science-citation"
-      href={copy.scienceCitationUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {copy.scienceCitationLabel}
-    </a>
-  </section>
+  <main class="landing-main">
+    <section id="why" class="section">
+      <header class="section-head">
+        <p class="section-label">{copy.reflectionLoop}</p>
+        <h2 class="section-title">{copy.reflectionLoopIntro}</h2>
+      </header>
+      <LandingComparison />
+    </section>
 
-  <section id="science" class="section section--muted">
-    <p class="section-label">{copy.scienceStepsTitle}</p>
-    <p class="section-intro">{copy.scienceStepsIntro}</p>
-    <div class="card-list">
-      {
-        copy.scienceSteps.map((step) => (
-          <article class="science-step">
-            <div class="science-step-header">
-              <span class="science-step-num">{step.step}</span>
-              <h2 class="science-step-name">{step.key}</h2>
-            </div>
-            <p class="science-step-body">{step.body}</p>
-            <div class="science-step-sources">
-              {
-                step.sources.map((source) => (
-                  <a href={source.url} target="_blank" rel="noopener noreferrer">
-                    {source.label} ↗
-                  </a>
-                ))
-              }
-            </div>
-          </article>
-        ))
-      }
-    </div>
-  </section>
+    <section id="how-it-works" class="section section--band">
+      <header class="section-head">
+        <p class="section-label">{copy.howItWorksTitle}</p>
+        <h2 class="section-title">{copy.howItWorksIntro}</h2>
+      </header>
+      <LandingHowItWorks />
+    </section>
 
-  <section class="section section--muted">
-    <p class="section-label">{copy.whatYouGet}</p>
-    <div class="features-grid">
-      {
-        copy.features.map((feature) => (
-          <article class="feature-card">
-            <h2 class="card-title">{feature.label}</h2>
-            <p class="card-body">{feature.desc}</p>
-          </article>
-        ))
-      }
-    </div>
-  </section>
+    <section class="section">
+      <header class="section-head">
+        <p class="section-label">{copy.benefitsTitle}</p>
+        <h2 class="section-title">{copy.benefitsIntro}</h2>
+      </header>
+      <LandingBenefits />
+    </section>
 
-  <section class="section">
-    <div class="pricing-card">
-      <p class="pricing-title">{copy.freeToStart}</p>
-      <p class="pricing-desc">{copy.pricingDesc}</p>
-      <WaitlistForm ref={ref} compact />
-    </div>
-  </section>
+    <section class="section section--band">
+      <div class="science-strip">
+        <blockquote class="science-quote">{copy.scienceQuote}</blockquote>
+        <p class="science-quote-desc">{copy.scienceDesc}</p>
+        <a
+          class="science-citation"
+          href={copy.scienceCitationUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {copy.scienceCitationLabel}
+        </a>
+      </div>
+    </section>
 
-  <section class="section section--muted">
-    <p class="section-label">{copy.questions}</p>
-    <LandingFaq />
-  </section>
+    <section id="early-access" class="section">
+      <div class="cta-band">
+        <h2 class="cta-band-title">{copy.waitlistTitle}</h2>
+        <p class="cta-band-desc">{copy.waitlistDesc}</p>
+        <div class="form-shell form-shell--compact">
+          <WaitlistForm ref={ref} compact formId="waitlist-email-footer" />
+        </div>
+      </div>
+    </section>
 
-  <div class="landing-footer">
-    <p>{copy.footer}</p>
+    <section class="section section--faq">
+      <header class="section-head section-head--tight">
+        <p class="section-label">{copy.questions}</p>
+      </header>
+      <LandingFaq />
+    </section>
+  </main>
+
+  <footer class="landing-footer">
+    <p class="landing-disclaimer">{copy.footer}</p>
     <PublicFooter />
-  </div>
+  </footer>
 </MarketingLayout>

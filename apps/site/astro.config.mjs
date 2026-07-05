@@ -1,4 +1,9 @@
 import { defineConfig } from 'astro/config';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const holzenRoot = fileURLToPath(new URL('../..', import.meta.url));
+const designTokensRoot = path.resolve(holzenRoot, 'packages/design-tokens');
 
 /** Dev-only: Astro site has no `/` page or SPA routes — send to `/welcome`. */
 function devMarketingRedirects() {
@@ -29,6 +34,11 @@ export default defineConfig({
   vite: {
     envDir: '../../',
     envPrefix: ['PUBLIC_', 'VITE_'],
+    resolve: {
+      alias: {
+        '@holzen/design-tokens': designTokensRoot,
+      },
+    },
     plugins: [devMarketingRedirects()],
   },
 });

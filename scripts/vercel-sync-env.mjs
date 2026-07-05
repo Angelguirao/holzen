@@ -67,6 +67,8 @@ console.log("Production…");
 add("VITE_SUPABASE_URL", "https://geqkxsnyqvhtascjghuu.supabase.co", "production");
 add("VITE_SUPABASE_PROJECT_ID", "geqkxsnyqvhtascjghuu", "production");
 add("VITE_SUPABASE_PUBLISHABLE_KEY", prod.VITE_SUPABASE_PUBLISHABLE_KEY, "production");
+add("PUBLIC_SUPABASE_URL", "https://geqkxsnyqvhtascjghuu.supabase.co", "production");
+add("PUBLIC_SUPABASE_PUBLISHABLE_KEY", prod.VITE_SUPABASE_PUBLISHABLE_KEY, "production");
 add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "production");
 add("VITE_SITE_ORIGIN", "https://holzen.app", "production");
 add("VITE_POSTHOG_KEY", prod.VITE_POSTHOG_KEY, "production");

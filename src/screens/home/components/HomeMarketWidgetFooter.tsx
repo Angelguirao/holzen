@@ -34,7 +34,7 @@ function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
         ▲
       </span>
     ) : (
-      <span className="text-[#dbb266]" aria-hidden>
+      <span className="text-nox-text-highlight" aria-hidden>
         ▼
       </span>
     );
