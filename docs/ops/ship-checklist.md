@@ -9,7 +9,9 @@ Tick before calling launch **done**. Canonical detail: [launch-runbook.md](./lau
 - [ ] **Production not public** until launch-ready ([vercel-frontend-setup.md](./vercel-frontend-setup.md) §5.1 — e.g. `VITE_COMING_SOON=true` on Vercel Production only) — remove env and redeploy when launching
 - [ ] Confirm **no real production users** on prod project (test/founder accounts disposable)
 - [ ] Stripe webhook + price secrets set in **Supabase Edge secrets**
-- [ ] Observability secrets per [observability-setup.md](./observability-setup.md) (Vercel + Supabase + CI)
+- [ ] **BetterStack log drain** (staging + prod Supabase Edge): `LOG_DRAIN_URL`, `LOG_DRAIN_TOKEN` — [observability-edge-secrets-setup.md](../backlog/observability-edge-secrets-setup.md)
+- [ ] **Slack `#holzen-alerts` webhook** (staging + prod): `SLACK_WEBHOOK_URL` — same backlog ticket
+- [ ] (Optional) Vercel Production Sentry vars for source maps: `VITE_SENTRY_DSN`, `SENTRY_*` — [observability-setup.md](./observability-setup.md)
 
 ---
 

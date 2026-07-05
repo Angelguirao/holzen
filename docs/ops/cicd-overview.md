@@ -199,13 +199,13 @@ npm run prod:secrets-set
 | `CRON_SECRET` | pg_cron → edge HTTP auth |
 | `SENTRY_DSN_EDGES` | Edge error reporting |
 | `SENTRY_ENVIRONMENT` | `staging` or `production` |
-| `LOG_DRAIN_URL` / `LOG_DRAIN_TOKEN` | BetterStack structured logs |
-| `SLACK_WEBHOOK_URL` | `#holzen-alerts` |
 
 ### Recommended
 
 | Secret | Purpose |
 |--------|---------|
+| `LOG_DRAIN_URL` / `LOG_DRAIN_TOKEN` | BetterStack structured logs (no-op when unset) |
+| `SLACK_WEBHOOK_URL` | `#holzen-alerts` (no-op when unset) |
 | `RESEND_WEBHOOK_SECRET` | Bounce/complaint suppression |
 | `STRIPE_PRICE_ID_FLEX_PACK_S` / `_M` | Flex packs |
 | `OPENROUTER_API_KEY` | LLM failover |
