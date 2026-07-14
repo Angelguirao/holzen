@@ -58,3 +58,4 @@ bruno/environments/prod.bru
 bruno/environments/hosted.bru
 .env.prod
 .vercel
+.env*
