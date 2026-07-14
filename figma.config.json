@@ -1,0 +1,22 @@
+{
+  "codeConnect": {
+    "parser": "react",
+    "label": "React",
+    "language": "tsx",
+    "include": ["src/**/*.tsx"],
+    "exclude": [
+      "src/test/**",
+      "src/legacy/**",
+      "apps/**",
+      "supabase/**",
+      "**/*.test.tsx",
+      "**/*.spec.tsx"
+    ],
+    "importPaths": {
+      "src/components/ui/*": "@/components/ui/*"
+    },
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
+}
