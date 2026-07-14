@@ -9,6 +9,7 @@ Contract for the **Nox** visual system: dark-first, calm blues, mustard highligh
 | [`DESIGN.md`](../../DESIGN.md) | Agent-facing design contract (colors, type, layout, motion, voice) |
 | [`patterns/marketing.md`](patterns/marketing.md) | Marketing-only elevation and glass rules |
 | [`parity-board.md`](parity-board.md) | Route-level design migration status |
+| [`../code-connect.md`](../code-connect.md) | Figma Code Connect — Nox ↔ `src/components/ui` |
 
 ## Token source of truth
 
