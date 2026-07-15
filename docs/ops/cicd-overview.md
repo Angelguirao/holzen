@@ -76,9 +76,11 @@ Catalog source of truth: [`scripts/lib/cicd-env-catalog.mjs`](../../scripts/lib/
 
 **preflight** — **Manual dispatch only.** Re-runs `test:ci`, builds, and uploads the prebuilt artifact when CI did not run first.
 
-**deploy-backend** — Runs when `supabase/**` or edge deploy scripts changed. `npm run stamp:release` → `supabase link` → `supabase db push` → [`scripts/deploy-active-edge-functions.mjs`](../../scripts/deploy-active-edge-functions.mjs).
+**deploy-backend** — Runs when `supabase/**` or edge deploy scripts changed. `npm run stamp:release` → `supabase link` → `supabase db push` → [`scripts/deploy-active-edge-functions.mjs --base=<parent>`](../../scripts/deploy-active-edge-functions.mjs) (only changed functions; all if `_shared`/config changed; skip if migrations-only). Manual dispatch uses `--force-all`.
 
-**deploy-frontend** — Downloads the CI (or preflight) **`vercel-prebuilt`** artifact, then [`vercel-ci-deploy.mjs --mode=deploy --skip-build`](../../scripts/vercel-ci-deploy.mjs): `vercel pull` → `vercel deploy --prebuilt` (~30s). Runs after backend when backend ran; runs alone on frontend-only changes. **One Vercel project** — see [marketing-site-split.md](marketing-site-split.md).
+**deploy-frontend** — Downloads the CI (or preflight) **`vercel-prebuilt`** artifact into **`.vercel/output`**, then [`vercel-ci-deploy.mjs --mode=deploy --skip-build`](../../scripts/vercel-ci-deploy.mjs): `vercel pull` → `vercel deploy --prebuilt` (~30s). Runs after backend when backend ran; runs alone on frontend-only changes. **One Vercel project** — see [marketing-site-split.md](marketing-site-split.md).
+
+**Recommended secrets** — Missing recommended vars (BetterStack, Slack, Perplexity, `VITE_SENTRY_DSN`, …) emit GitHub **warnings**, not errors, and do not block deploy. Fill via Dashboard / `npm run staging:secrets-set` / `prod:secrets-set` when ready.
 
 ---
 
