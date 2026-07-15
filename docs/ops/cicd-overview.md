@@ -10,12 +10,14 @@ Canonical map of how Holzen validates, deploys, and correlates releases across *
 
 | Stage | Trigger | What runs | Goes live |
 |-------|---------|-----------|-----------|
-| **CI** | Pull request (and pushes to `main` / `staging` / `dev`) | `test:ci` + staging-style frontend build | Nothing deploys |
-| **Staging deploy** | Push to `staging` | Backend → frontend (ordered) | Staging Supabase + Vercel **Preview** for `staging` branch |
-| **Production deploy** | Push to `main` (+ optional approval) | Backend → frontend (ordered) | Prod Supabase + Vercel **Production** |
+| **CI** | Pull request (and pushes to `main` / `staging` / `dev`) | `test:ci` + unified build; on `main`/`staging` also uploads **Vercel prebuilt** artifact | Nothing deploys |
+| **Staging deploy** | **After CI succeeds** on `staging`; manual dispatch | Change detection → backend (if needed) → frontend deploy from CI artifact | Staging Supabase + Vercel **Preview** for `staging` branch |
+| **Production deploy** | **After CI succeeds** on `main`; manual dispatch (+ optional approval) | Same chain; production build secrets | Prod Supabase + Vercel **Production** |
 | **PR previews** | Pull request to any branch | Vercel Git integration (automatic) | Ephemeral preview URL (staging Supabase keys) |
 
 **Design choice:** `main` and `staging` frontend deploys run **only from GitHub Actions** after backend succeeds. Vercel Git auto-deploy is **disabled** for those branches ([vercel.json](../../vercel.json) `git.deploymentEnabled`) so the SPA never races ahead of migrations/edges. Feature-branch **PR previews** still auto-deploy via Vercel.
+
+**Speed:** Deploy workflows **do not re-run `test:ci`** — they trigger via `workflow_run` after the **CI** workflow passes on the same commit. CI uploads `.vercel/output`; deploy downloads it and runs `vercel deploy --prebuilt` only (~30s). **Path filters** skip `deploy-backend` on frontend-only changes and skip `deploy-frontend` on backend-only changes. Docs-only pushes may skip deploy entirely.
 
 ---
 
@@ -24,26 +26,31 @@ Canonical map of how Holzen validates, deploys, and correlates releases across *
 ```mermaid
 flowchart TB
   subgraph stg [Push to staging]
+    CIstg[CI: test:ci + build + vercel prebuilt artifact]
+    DCstg[detect-changes]
     SV[validate-secrets]
-    SP[preflight: test:ci + build]
-    SB[deploy-backend: db push + edges]
-    SF[deploy-frontend: vercel preview]
-    SV --> SP --> SB --> SF
+    SB[deploy-backend if supabase changed]
+    SF[deploy-frontend: prebuilt deploy]
+    CIstg -->|workflow_run success| DCstg --> SV
+    SV --> SB --> SF
+    SV --> SF
   end
 
   subgraph prod [Push to main]
+    CIprod[CI: test:ci + build + vercel prebuilt artifact]
+    DCprod[detect-changes]
     PV[validate-secrets]
-    PP[preflight: test:ci + build]
-    PB[deploy-backend: db push + edges]
-    PF[deploy-frontend: vercel production]
-    PV --> PP --> PB --> PF
+    PB[deploy-backend if supabase changed]
+    PF[deploy-frontend: prebuilt deploy]
+    CIprod -->|workflow_run success| DCprod --> PV
+    PV --> PB --> PF
+    PV --> PF
   end
 
   subgraph pr [Pull request]
-    VS[validate-secrets]
-    CI[ci.yml test + build]
+    CIpr[ci.yml test + build]
     VP[Vercel PR preview auto]
-    VS --> CI
+    CIpr
   end
 ```
 
@@ -53,9 +60,9 @@ flowchart TB
 
 | File | Name | Trigger | Jobs |
 |------|------|---------|------|
-| [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | CI | PR; push `main` / `staging` / `dev` | `validate-secrets` → `test:ci` + `build` |
-| [`.github/workflows/staging-deploy.yml`](../../.github/workflows/staging-deploy.yml) | Staging deploy | Push `staging`; manual | `validate-secrets` → `preflight` → `deploy-backend` → `deploy-frontend` |
-| [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) | Production deploy | Push `main`; manual | Same chain; `production` environment approval recommended |
+| [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | CI | PR; push `main` / `staging` / `dev` | `test:ci` + `build:unified`; uploads `vercel-prebuilt` on `main`/`staging` |
+| [`.github/workflows/staging-deploy.yml`](../../.github/workflows/staging-deploy.yml) | Staging deploy | After **CI** on `staging`; manual | `detect-changes` → `validate-secrets` → `deploy-backend?` → `deploy-frontend` |
+| [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) | Production deploy | After **CI** on `main`; manual | Same chain; `production` environment approval recommended |
 
 ### Job details
 
@@ -63,11 +70,15 @@ flowchart TB
 
 Catalog source of truth: [`scripts/lib/cicd-env-catalog.mjs`](../../scripts/lib/cicd-env-catalog.mjs).
 
-**preflight** — Same gate as merge quality: `npm run test:ci` (fitness checks + Vitest coverage) and `npm run build:unified` (React SPA + Astro marketing merged into `dist/`). PR CI and staging preflight use **staging** Supabase build secrets; production uses **prod** secrets.
+**CI (release branches)** — After `test:ci` + `build:unified`, runs [`vercel-ci-deploy.mjs --mode=build`](../../scripts/vercel-ci-deploy.mjs) and uploads `.vercel/output` as the **`vercel-prebuilt`** artifact. Staging pushes use staging `VITE_*` secrets; `main` uses production secrets.
 
-**deploy-backend** — `npm run stamp:release` → `supabase link` → `supabase db push` → [`scripts/deploy-active-edge-functions.mjs`](../../scripts/deploy-active-edge-functions.mjs).
+**detect-changes** — Compares `HEAD^..HEAD` via [`dorny/paths-filter`](https://github.com/dorny/paths-filter). Skips backend on frontend-only diffs and frontend on backend-only diffs. Manual `workflow_dispatch` always ships both surfaces.
 
-**deploy-frontend** — [`scripts/vercel-ci-deploy.mjs`](../../scripts/vercel-ci-deploy.mjs): `vercel pull` → `vercel build` → `vercel deploy --prebuilt`. `vercel build` reads root [`vercel.json`](../../vercel.json) (`buildCommand: npm run build:unified`, `spa.html` rewrites). Runs **only after** backend succeeds. **One Vercel project** — no separate marketing deploy. See [marketing-site-split.md](marketing-site-split.md).
+**preflight** — **Manual dispatch only.** Re-runs `test:ci`, builds, and uploads the prebuilt artifact when CI did not run first.
+
+**deploy-backend** — Runs when `supabase/**` or edge deploy scripts changed. `npm run stamp:release` → `supabase link` → `supabase db push` → [`scripts/deploy-active-edge-functions.mjs`](../../scripts/deploy-active-edge-functions.mjs).
+
+**deploy-frontend** — Downloads the CI (or preflight) **`vercel-prebuilt`** artifact, then [`vercel-ci-deploy.mjs --mode=deploy --skip-build`](../../scripts/vercel-ci-deploy.mjs): `vercel pull` → `vercel deploy --prebuilt` (~30s). Runs after backend when backend ran; runs alone on frontend-only changes. **One Vercel project** — see [marketing-site-split.md](marketing-site-split.md).
 
 ---
 
@@ -257,9 +268,9 @@ Verify in workflow logs or Vercel deployment metadata.
 ## Branch promotion checklist
 
 1. Open PR → **CI** green.
-2. Merge to **`staging`** → **Staging deploy** workflow green (backend + frontend).
+2. Merge to **`staging`** → **CI** green → **Staging deploy** auto-starts (~3–5 min for typical frontend changes).
 3. Smoke staging (Bruno / app) — [ship-checklist.md](ship-checklist.md).
-4. PR **`staging` → `main`** → merge → approve **Production deploy** if required.
+4. PR **`staging` → `main`** → merge → **CI** green → approve **Production deploy** if required.
 5. Confirm prod URL + `VITE_APP_VERSION` / edge release SHA match.
 
 ---
