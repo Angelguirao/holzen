@@ -3,6 +3,9 @@
  * CI-only Vercel deploy (prebuilt). Runs after backend deploy so migrations/edges
  * exist before the SPA ships.
  *
+ * Artifact contract: CI uploads `.vercel/output`; deploy downloads into the same
+ * path (`actions/download-artifact` `path: .vercel/output`) before `--skip-build`.
+ *
  * Requires: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID
  *
  * Usage:
