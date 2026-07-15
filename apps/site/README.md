@@ -21,6 +21,8 @@ Static marketing HTML. **Not a separate website** — it merges into the same `h
 | File | Purpose |
 | --- | --- |
 | `src/pages/welcome.astro` | Landing → `/welcome` (waitlist form + sign-in link) |
+
+**Venture experiment:** [landing-waitlist runbook](../../docs/ops/landing-waitlist-runbook.md) — staging → prod ship + weekly observe.
 | `src/pages/index.astro` | Redirect `/` → `/welcome` (cold traffic after unified build) |
 | `src/pages/about.astro` | About → `/about` |
 | `src/pages/terms.astro`, `privacy.astro` | Legal |
