@@ -8,24 +8,41 @@
  * Usage:
  *   node scripts/vercel-ci-deploy.mjs --environment=preview
  *   node scripts/vercel-ci-deploy.mjs --environment=production
+ *   node scripts/vercel-ci-deploy.mjs --environment=preview --mode=build
+ *   node scripts/vercel-ci-deploy.mjs --environment=production --mode=deploy --skip-build
  */
-import { appendFileSync } from "node:fs";
+import { appendFileSync, existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const prebuiltOutput = join(root, ".vercel", "output");
 
 function parseArgs() {
-  const arg = process.argv.find((a) => a.startsWith("--environment="));
-  const environment = arg?.split("=")[1] ?? "preview";
+  const environmentArg = process.argv.find((a) => a.startsWith("--environment="));
+  const environment = environmentArg?.split("=")[1] ?? "preview";
   if (environment !== "preview" && environment !== "production") {
     console.error(
       `[vercel-ci-deploy] --environment must be preview or production (got ${environment})`,
     );
     process.exit(1);
   }
-  return { environment, prod: environment === "production" };
+
+  const modeArg = process.argv.find((a) => a.startsWith("--mode="));
+  const mode = modeArg?.split("=")[1] ?? "build-and-deploy";
+  if (!["build", "deploy", "build-and-deploy"].includes(mode)) {
+    console.error(
+      `[vercel-ci-deploy] --mode must be build, deploy, or build-and-deploy (got ${mode})`,
+    );
+    process.exit(1);
+  }
+
+  const skipBuild =
+    process.argv.includes("--skip-build") ||
+    (mode === "deploy" && existsSync(prebuiltOutput));
+
+  return { environment, prod: environment === "production", mode, skipBuild };
 }
 
 function requireEnv(name) {
@@ -57,51 +74,66 @@ const orgId = requireEnv("VERCEL_ORG_ID");
 const projectId = requireEnv("VERCEL_PROJECT_ID");
 const cliEnv = { VERCEL_ORG_ID: orgId, VERCEL_PROJECT_ID: projectId };
 
-const { environment, prod } = parseArgs();
+const { environment, prod, mode, skipBuild } = parseArgs();
 const vercelPullEnv = prod ? "production" : "preview";
+const shouldBuild = mode !== "deploy" && !skipBuild;
+const shouldDeploy = mode !== "build";
 
 console.log(
-  `[vercel-ci-deploy] Deploying ${environment} (prebuilt) for ${process.env.GITHUB_SHA?.slice(0, 12) ?? "local"}`,
+  `[vercel-ci-deploy] ${mode} ${environment}${skipBuild ? " (prebuilt artifact)" : ""} for ${process.env.GITHUB_SHA?.slice(0, 12) ?? "local"}`,
 );
 
-run(
-  "vercel pull",
-  "npx",
-  [
-    "vercel@latest",
-    "pull",
-    "--yes",
-    `--environment=${vercelPullEnv}`,
-    `--token=${token}`,
-  ],
-  cliEnv,
-);
-
-const buildArgs = ["vercel@latest", "build", `--token=${token}`];
-if (prod) buildArgs.push("--prod");
-run("vercel build", "npx", buildArgs, cliEnv);
-
-const deployArgs = ["vercel@latest", "deploy", "--prebuilt", `--token=${token}`];
-if (prod) deployArgs.push("--prod");
-
-console.log("\n▶ vercel deploy");
-const deployResult = spawnSync("npx", deployArgs, {
-  cwd: root,
-  encoding: "utf8",
-  shell: process.platform === "win32",
-  env: { ...process.env, ...cliEnv },
-});
-
-if (deployResult.status !== 0) {
-  console.error(`\n✗ vercel deploy failed (exit ${deployResult.status ?? 1})`);
-  if (deployResult.stderr) process.stderr.write(deployResult.stderr);
-  process.exit(deployResult.status ?? 1);
+if (shouldBuild || shouldDeploy) {
+  run(
+    "vercel pull",
+    "npx",
+    [
+      "vercel@latest",
+      "pull",
+      "--yes",
+      `--environment=${vercelPullEnv}`,
+      `--token=${token}`,
+    ],
+    cliEnv,
+  );
 }
 
-const output = `${deployResult.stdout ?? ""}${deployResult.stderr ?? ""}`.trim();
-const url = output.split(/\r?\n/).filter(Boolean).at(-1) ?? "";
-console.log(`✓ vercel deploy${url ? `: ${url}` : ""}`);
+if (shouldBuild) {
+  const buildArgs = ["vercel@latest", "build", `--token=${token}`];
+  if (prod) buildArgs.push("--prod");
+  run("vercel build", "npx", buildArgs, cliEnv);
+}
 
-if (process.env.GITHUB_OUTPUT && url) {
-  appendFileSync(process.env.GITHUB_OUTPUT, `url=${url}\n`);
+if (shouldDeploy) {
+  if (!existsSync(prebuiltOutput)) {
+    console.error(
+      `[vercel-ci-deploy] Missing ${prebuiltOutput}. Run build first or download the vercel-prebuilt artifact.`,
+    );
+    process.exit(1);
+  }
+
+  const deployArgs = ["vercel@latest", "deploy", "--prebuilt", `--token=${token}`];
+  if (prod) deployArgs.push("--prod");
+
+  console.log("\n▶ vercel deploy");
+  const deployResult = spawnSync("npx", deployArgs, {
+    cwd: root,
+    encoding: "utf8",
+    shell: process.platform === "win32",
+    env: { ...process.env, ...cliEnv },
+  });
+
+  if (deployResult.status !== 0) {
+    console.error(`\n✗ vercel deploy failed (exit ${deployResult.status ?? 1})`);
+    if (deployResult.stderr) process.stderr.write(deployResult.stderr);
+    process.exit(deployResult.status ?? 1);
+  }
+
+  const output = `${deployResult.stdout ?? ""}${deployResult.stderr ?? ""}`.trim();
+  const url = output.split(/\r?\n/).filter(Boolean).at(-1) ?? "";
+  console.log(`✓ vercel deploy${url ? `: ${url}` : ""}`);
+
+  if (process.env.GITHUB_OUTPUT && url) {
+    appendFileSync(process.env.GITHUB_OUTPUT, `url=${url}\n`);
+  }
 }

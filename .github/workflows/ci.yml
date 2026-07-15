@@ -9,6 +9,9 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -36,8 +39,26 @@ jobs:
       - name: test:ci
         run: npm run test:ci
 
-      - name: CI build (staging env, unified marketing + SPA)
+      - name: CI build (unified marketing + SPA)
         run: npm run build:unified && npm run check:bundle-shipped
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_STAGING_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_STAGING_PUBLISHABLE_KEY }}
+          VITE_APP_VERSION: ${{ github.sha }}
+          VITE_SUPABASE_URL: ${{ github.ref == 'refs/heads/main' && secrets.VITE_SUPABASE_URL || secrets.VITE_SUPABASE_STAGING_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ github.ref == 'refs/heads/main' && secrets.VITE_SUPABASE_PUBLISHABLE_KEY || secrets.VITE_SUPABASE_STAGING_PUBLISHABLE_KEY }}
+
+      - name: Vercel prebuilt bundle (release branches)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main')
+        run: node scripts/vercel-ci-deploy.mjs --mode=build --environment=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Upload Vercel prebuilt artifact
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main')
+        uses: actions/upload-artifact@v4
+        with:
+          name: vercel-prebuilt
+          path: .vercel/output
+          retention-days: 1
+          if-no-files-found: error

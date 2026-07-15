@@ -13,7 +13,9 @@ How GitHub merges deploy Holzen to **owned Supabase** + **Vercel**, and how to a
 | `supabase/migrations/*.sql` | GitHub Actions `deploy-backend` job → `supabase db push` | After migration apply succeeds on target project |
 | `supabase/functions/*/index.ts` | Same job → [`deploy-active-edge-functions.mjs`](../../scripts/deploy-active-edge-functions.mjs) | After edge deploy completes |
 | `supabase/config.toml` | Merged into project config on edge deploy | With edge deploy |
-| Frontend (`src/`, `index.html`, etc.) | GitHub Actions `deploy-frontend` → [`vercel-ci-deploy.mjs`](../../scripts/vercel-ci-deploy.mjs) **after** backend | After Vercel build succeeds |
+| Frontend (`src/`, `index.html`, etc.) | GitHub Actions `deploy-frontend` → [`vercel-ci-deploy.mjs`](../../scripts/vercel-ci-deploy.mjs) **after** backend (or alone on frontend-only diffs) | After Vercel prebuilt deploy succeeds |
+
+**Trigger:** Push to `staging` or `main` runs **CI** first (`test:ci` + build + Vercel prebuilt artifact). **Staging deploy** / **Production deploy** start automatically when CI succeeds on that commit (`workflow_run`) — they do **not** re-run `test:ci`. See [cicd-overview.md](cicd-overview.md).
 | PR previews | Vercel Git integration (automatic; not Actions) | On PR open/sync |
 
 **Key insight:** `main` and `staging` **do not** auto-deploy from Vercel Git ([vercel.json](../../vercel.json) `git.deploymentEnabled`) — Actions runs **backend first, then frontend** so the SPA never races migrations/edges. PR previews on feature branches still auto-deploy via Vercel.
