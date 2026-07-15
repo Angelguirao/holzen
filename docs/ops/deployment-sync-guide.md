@@ -77,6 +77,11 @@ supabase/migrations/20260407120000_add_foo_column.sql
 **Migration conflicts:**
 - If two branches both add migrations with similar timestamps, Supabase may reject the second. Rebase or rename the timestamp before merging.
 
+**Remote-only migrations (`Remote migration versions not found in local migrations directory`):**
+- Caused by applying SQL on Supabase outside git (dashboard, MCP) without committing matching files under `supabase/migrations/`.
+- **Fix:** add migration files with the **exact** remote version timestamps (e.g. `20260713185413_lifeos_control_plane_core.sql`), idempotent `IF NOT EXISTS` SQL, merge to `staging`, re-run deploy.
+- **LifeOS venture ledger** (`lifeos_*` tables) lives in **holzen** migrations — PersonalOS reads/writes via service role on holzen-staging/prod. Do not apply LifeOS schema only via personal-ai-os without checking in here.
+
 ### 2. Edge functions
 
 **Rule:** Every edge function must have a `[functions.<name>]` block in `supabase/config.toml`. Missing entries cause silent 401s or deployment skips.
