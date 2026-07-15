@@ -2,18 +2,93 @@ name: Staging deploy
 
 on:
   workflow_dispatch:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [staging]
 
 concurrency:
   group: staging-deploy
   cancel-in-progress: true
 
+permissions:
+  actions: read
+  contents: read
+
+env:
+  DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'staging')
+    steps:
+      - run: echo "Deploying staging @ ${{ env.DEPLOY_SHA }}"
+
+  detect-changes:
+    needs: gate
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.set.outputs.backend }}
+      frontend: ${{ steps.set.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+          fetch-depth: 0
+
+      - name: Resolve diff base
+        if: github.event_name != 'workflow_dispatch'
+        id: diff
+        run: echo "base=$(git rev-parse HEAD^)" >> "$GITHUB_OUTPUT"
+
+      - uses: dorny/paths-filter@v3
+        if: github.event_name != 'workflow_dispatch'
+        id: filter
+        with:
+          base: ${{ steps.diff.outputs.base }}
+          ref: ${{ env.DEPLOY_SHA }}
+          filters: |
+            backend:
+              - 'supabase/**'
+              - 'scripts/stamp-edge-release.mjs'
+              - 'scripts/deploy-active-edge-functions.mjs'
+              - 'scripts/lib/read-config-toml-functions.mjs'
+            frontend:
+              - 'src/**'
+              - 'apps/**'
+              - 'packages/**'
+              - 'public/**'
+              - 'index.html'
+              - 'vite.config.ts'
+              - 'vercel.json'
+              - 'tailwind.config.ts'
+              - 'postcss.config.ts'
+              - 'package.json'
+              - 'package-lock.json'
+
+      - name: Set change outputs
+        id: set
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "backend=true" >> "$GITHUB_OUTPUT"
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "backend=${{ steps.filter.outputs.backend }}" >> "$GITHUB_OUTPUT"
+            echo "frontend=${{ steps.filter.outputs.frontend }}" >> "$GITHUB_OUTPUT"
+          fi
+
   validate-secrets:
+    needs: [gate, detect-changes]
+    if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
 
       - uses: actions/setup-node@v4
         with:
@@ -35,10 +110,13 @@ jobs:
         run: node scripts/check-cicd-env.mjs --profile=staging --platform=all
 
   preflight:
-    needs: validate-secrets
+    if: github.event_name == 'workflow_dispatch'
+    needs: [gate, detect-changes, validate-secrets]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
 
       - uses: actions/setup-node@v4
         with:
@@ -54,16 +132,35 @@ jobs:
       - name: Staging build (unified marketing + SPA)
         run: npm run build:unified
         env:
-          VITE_APP_VERSION: ${{ github.sha }}
+          VITE_APP_VERSION: ${{ env.DEPLOY_SHA }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_STAGING_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_STAGING_PUBLISHABLE_KEY }}
 
+      - name: Vercel prebuilt bundle
+        run: node scripts/vercel-ci-deploy.mjs --mode=build --environment=preview
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          GITHUB_SHA: ${{ env.DEPLOY_SHA }}
+
+      - name: Upload Vercel prebuilt artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vercel-prebuilt
+          path: .vercel/output
+          retention-days: 1
+          if-no-files-found: error
+
   deploy-backend:
-    needs: preflight
+    needs: [gate, detect-changes, validate-secrets]
+    if: needs.detect-changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
     environment: staging
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
 
       - uses: actions/setup-node@v4
         with:
@@ -96,27 +193,42 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
   deploy-frontend:
-    needs: deploy-backend
+    needs: [gate, detect-changes, validate-secrets, deploy-backend, preflight]
+    if: |
+      always() &&
+      needs.detect-changes.outputs.frontend == 'true' &&
+      needs.validate-secrets.result == 'success' &&
+      (needs.deploy-backend.result == 'success' || needs.deploy-backend.result == 'skipped') &&
+      (needs.preflight.result == 'success' || needs.preflight.result == 'skipped')
     runs-on: ubuntu-latest
     environment: staging
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: npm
+          ref: ${{ env.DEPLOY_SHA }}
 
-      - name: Install
-        run: npm ci
+      - name: Download Vercel prebuilt artifact (from CI)
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4
+        with:
+          name: vercel-prebuilt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Download Vercel prebuilt artifact (manual dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/download-artifact@v4
+        with:
+          name: vercel-prebuilt
 
       - name: Deploy Vercel preview (staging branch)
         id: vercel
-        run: node scripts/vercel-ci-deploy.mjs --environment=preview
+        run: node scripts/vercel-ci-deploy.mjs --mode=deploy --environment=preview --skip-build
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          GITHUB_SHA: ${{ env.DEPLOY_SHA }}
 
       - name: Deployment URL
         if: steps.vercel.outputs.url != ''
