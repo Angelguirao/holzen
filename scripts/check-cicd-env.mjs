@@ -50,10 +50,14 @@ function parseArgs() {
   return { profile, platform, strictRecommended };
 }
 
-function githubAnnotation(platformLabel, spec) {
+function githubAnnotation(platformLabel, spec, tierLabel) {
   const short = `[${platformLabel}] Missing ${spec.name}. Where: ${spec.where}. ${spec.how}`;
   const escaped = short.replace(/\n/g, " ").replace(/%/g, "%25");
-  console.log(`::error title=Missing ${spec.name} (${platformLabel})::${escaped}`);
+  // Required → error annotation; recommended → warning (non-blocking, quieter UI).
+  const level = tierLabel === "REQUIRED" ? "error" : "warning";
+  console.log(
+    `::${level} title=Missing ${spec.name} (${platformLabel})::${escaped}`,
+  );
 }
 
 function printEntry(index, platformLabel, spec, tierLabel, profile) {
@@ -70,7 +74,7 @@ function printEntry(index, platformLabel, spec, tierLabel, profile) {
   if (spec.docs) console.error(`   Docs:     ${spec.docs}`);
   console.error("");
   if (process.env.GITHUB_ACTIONS === "true") {
-    githubAnnotation(platformLabel, spec);
+    githubAnnotation(platformLabel, spec, tierLabel);
   }
 }
 
