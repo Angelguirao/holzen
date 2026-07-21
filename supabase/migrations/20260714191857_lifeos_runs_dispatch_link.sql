@@ -1,3 +1,7 @@
+-- LEGACY MIRROR — do not add new LifeOS migrations in holzen/.
+-- Canonical: personal-agent/deploy/supabase/migrations/
+-- See holzen/supabase/LIFEOS-LEGACY.md and personal-agent/deploy/LIFEOS-SUPABASE.md
+--
 -- Link PersonalOS runs to dispatch execution (action + job ids).
 
 alter table public.lifeos_runs
