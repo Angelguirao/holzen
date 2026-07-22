@@ -1,0 +1,22 @@
+name: Product signal
+description: Hypothesis / bet / discovery — what to work on (not a coding task)
+title: "[hypothesis] "
+labels: ["lane:product", "shape"]
+body: |
+  ### Question / Hypothesis
+  <!-- What do we believe, and for whom? -->
+
+  ### Evidence
+  <!-- What we already know (interviews, metrics, anecdotes). -->
+
+  ### Success signal
+  <!-- Observable signal that would confirm the bet. -->
+
+  ### Failure signal / Falsifier
+  <!-- What would make us kill or reshape the bet. -->
+
+  ### Next action
+  <!-- Shape · Validate · Measure — not “build feature X” by default. -->
+
+  ---
+  _Symphony product signal. Promote to an agent-task only after the bet is worth building._
