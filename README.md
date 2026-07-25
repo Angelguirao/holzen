@@ -12,6 +12,8 @@ The active app is a **pause-first MVP**: four primary tabs (Home, Archive, Journ
 
 ## Stack
 
+- LifeOS PE prove: capability host returns results; PersonalOS owns phases.
+
 
 | Layer              | Technology                                                             |
 | ------------------ | ---------------------------------------------------------------------- |
