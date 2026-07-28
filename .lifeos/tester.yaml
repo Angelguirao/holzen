@@ -1,0 +1,4 @@
+﻿# Independent Tester commands (LifeOS)
+# Run sequentially after pe.execute. First non-zero exit fails the capability.
+commands:
+  - npm test
