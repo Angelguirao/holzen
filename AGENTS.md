@@ -39,6 +39,18 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 
 **Default habit:** skim the **one** row that matches your change, open the linked doc section, then edit code. If the row’s “Also update” column applies, treat it as part of the same task—not a follow-up doc ticket.
 
+## LifeOS Software factory (PE)
+
+LifeOS (`pe.plan` / `pe.execute` / `pe.review`) mounts this repo and loads this file plus `.lifeos/expertise/**`.
+
+| Path | Role |
+|------|------|
+| `.lifeos/tester.yaml` | Independent Tester commands after `pe.execute` (authoritative suite — not the Writer’s self-report) |
+| `.lifeos/expertise/` | Durable conventions / learnings for future PE slices |
+| `.lifeos/expertise/learnings/` | Short lessons landed with the PR that taught them |
+
+Complete agent-ready specs need **Behavior Specifications** (EARS + `Test:` / `Untestable:`) and **Implementation Steps**. Prefer small, reviewable `symphony/*` diffs. Do not push to `main` / `staging` from the harness.
+
 ## Commands
 
 **Fitness function catalog** (capability map, automated vs manual guards, gaps): [docs/fundamentals/architectural-fitness-functions.md](docs/fundamentals/architectural-fitness-functions.md).
