@@ -2,34 +2,35 @@
 
 **Venture:** holzen  
 **Phase:** operate  
-**Last updated:** 2026-07-30 (cycle 5)
+**Last updated:** 2026-07-30 (cycle 6)
 
 ---
 
 ## Last cycle
 
+**Cycle 6 — operate (deps_hygiene · read-only)**
+
+1. Ran `npm outdated` (first ~40 rows). Many **Wanted** within-range updates (Radix minors, Sentry 10.49→10.69, supabase-js 2.98→2.111, etc.).
+2. **No bumps applied** — operate rule: dep patches need human approval / security urgency.
+3. No single critical security pin spotted in the skim; escalate later if `npm audit` is desired as a separate Backlog item.
+
 **Cycle 5 — operate (ci_green)**
 
-1. `npm run check:active-surface` → **OK**
-2. `npm run check:edge-logging` → **OK** (31 functions, 0 violations)
+1. `check:active-surface` OK; `check:edge-logging` 31/31 OK.
 
-**Cycle 4 — operate (measure_loop · PostHog taxonomy)**
+**Cycle 4 — operate (measure_loop)**
 
-1. `npm run check:posthog-events-allowlist` → **OK** (41 events / 49 taxonomy Active)
+1. `check:posthog-events-allowlist` OK.
 
-**Cycle 3 — operate (docs_drift · active-surface admin routes)**
+**Cycles 2–3 — docs_drift**
 
-1. Admin (internal) documented; `APP_ADMIN_ROUTES` added.
-
-**Cycle 2 — operate (docs_drift · check:prepush Windows reality)**
-
-1. Git Bash path documented for Windows `check:prepush`.
+1. Prepush Windows/Git Bash docs; Admin routes on active-surface + `APP_ADMIN_ROUTES`.
 
 ---
 
 ## Next action
 
-Deps hygiene (read-only): run `npm outdated` in holzen; if anything security/major is urgent, note it under Blockers — do not bump without human approval (operate · deps_hygiene).
+Human: add one Backlog item on this consensus (or set Next Action on `/os/venture?view=status`) before the next operate cycle — baton idle, no invent.
 
 ---
 
@@ -40,6 +41,8 @@ Deps hygiene (read-only): run `npm outdated` in holzen; if anything security/maj
 - [x] Confirm `docs/ops/active-surface.md` matches `app-routes.ts` (admin ops)
 - [x] Confirm PostHog event taxonomy allowlist
 - [x] CI entropy: `check:active-surface` + `check:edge-logging`
+- [x] Deps hygiene read-only (`npm outdated`) — no bumps without approval
+- [ ] Optional: `npm audit` / approve a bounded within-range bump set (Sentry + supabase-js?)
 
 _Add items here before agents implement new work._
 
@@ -47,17 +50,18 @@ _Add items here before agents implement new work._
 
 ## Blockers / escalations
 
-_None._
+- Deps: many outdated packages; **do not auto-bump**. Optional follow-up Backlog: audit + approve patch set.
 
 ---
 
 ## Out of scope declined
 
-- No product features; no dependency bumps without approval.
+- No dependency version bumps this cycle.
+- No product features.
 
 ---
 
 ## Notes
 
-- LifeOS Next Action baton should mirror **Next action** above.
 - Holzen operate PR: https://github.com/Angelguirao/holzen/pull/132
+- LifeOS baton: clear or set from Status when you pick the next Backlog item.
