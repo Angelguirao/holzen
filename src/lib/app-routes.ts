@@ -23,6 +23,23 @@ export function isAppShellPath(pathname: string): boolean {
 /** Registered authenticated shell paths (404 for anything else). */
 export const APP_SHELL_ROUTES = ['/', '/archive', JOURNEY_PREFIX, '/settings'] as const;
 
+/**
+ * Admin / ops routes (`App.tsx` PrivateExperienceLayout).
+ * Shipped for operators — not bottom-nav shell tabs. See docs/ops/active-surface.md.
+ */
+export const APP_ADMIN_ROUTES = [
+  '/admin',
+  '/admin/smoke-test',
+  '/admin/sentry-alerts',
+  '/admin/edge-coverage',
+] as const;
+
+/** True for admin ops paths (exact or nested under `/admin/`). */
+export function isAppAdminPath(pathname: string): boolean {
+  if (pathname === '/admin') return true;
+  return pathname.startsWith('/admin/');
+}
+
 /** Shipped full-view companion routes (`App.tsx`). */
 export function companionHistoryPath(pauseInstanceId: string): string {
   return `/companion/history/${encodeURIComponent(pauseInstanceId)}`;
