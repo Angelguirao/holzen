@@ -2,29 +2,32 @@
 
 **Venture:** holzen  
 **Phase:** operate  
-**Last updated:** 2026-07-30 (cycle 3)
+**Last updated:** 2026-07-30 (cycle 4)
 
 ---
 
 ## Last cycle
 
+**Cycle 4 — operate (measure_loop · PostHog taxonomy)**
+
+1. Ran `npm run check:posthog-events-allowlist` → **OK** (41 distinct events, 49 taxonomy Active entries).
+2. No code or `docs/ops/event-taxonomy.md` changes required.
+
 **Cycle 3 — operate (docs_drift · active-surface admin routes)**
 
-1. Documented Admin (internal) routes in `docs/ops/active-surface.md`: `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage`.
-2. Added `APP_ADMIN_ROUTES` + `isAppAdminPath` in `src/lib/app-routes.ts` so the route table matches `App.tsx`.
-3. Closed cycle-1 audit gap (admin ops not listed in shipped routes).
+1. Documented Admin (internal) routes in `docs/ops/active-surface.md`.
+2. Added `APP_ADMIN_ROUTES` + `isAppAdminPath` in `src/lib/app-routes.ts`.
 
 **Cycle 2 — operate (docs_drift · check:prepush Windows reality)**
 
-1. Verified: `npm run check:prepush` needs real bash; bare Windows `bash` often is a broken WSL stub.
-2. Documented Git Bash path in `AGENTS.md` + `docs/ops/deployment-sync-guide.md`.
-3. Closed redundant edge-logging backlog (covered by `check:edge-logging`).
+1. Documented Git Bash path for `check:prepush` on Windows.
+2. Closed redundant edge-logging backlog item.
 
 ---
 
 ## Next action
 
-Confirm PostHog event taxonomy still matches active `trackEvent` names: `npm run check:posthog-events-allowlist` (operate · measure_loop). Fix or update `docs/ops/event-taxonomy.md` if red.
+CI entropy: `npm run check:active-surface` and `npm run check:edge-logging` (operate · ci_green). Fix only if red.
 
 ---
 
@@ -33,6 +36,7 @@ Confirm PostHog event taxonomy still matches active `trackEvent` names: `npm run
 - [x] Verify `npm run check:prepush` docs match Windows/Git Bash reality in AGENTS.md
 - [x] Audit edge functions for any missing `withRequestLogging` wrapper *(covered by check:edge-logging)*
 - [x] Confirm `docs/ops/active-surface.md` matches current route table in `src/lib/app-routes.ts` (incl. admin ops routes)
+- [x] Confirm PostHog event taxonomy allowlist (`check:posthog-events-allowlist`)
 
 _Add items here before agents implement new work._
 
@@ -46,8 +50,7 @@ _None._
 
 ## Out of scope declined
 
-- No product features; docs_drift / measure only.
-- Did not add admin routes to BottomNav / `APP_SHELL_TABS`.
+- No product features; measure/docs/CI entropy only.
 
 ---
 
