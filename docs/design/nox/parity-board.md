@@ -4,7 +4,7 @@ Track design-system adoption per route. Update when a screen uses tokens only (n
 
 | Route / surface | Status | Notes |
 |-----------------|--------|-------|
-| `/welcome` (Astro) | ✅ tokens | Uses `@holzen/design-tokens`, marketing elevation |
+| `/welcome` (SPA Make) | ✅ tokens | Port of Figma Make; Nox-aligned palette |
 | Auth / sign-in | 🟡 partial | Highlight hex removed; shadcn forms |
 | Home | 🟡 partial | Market widget uses tokens |
 | Pause flows | ✅ tokens | shadcn + Nox bridge |

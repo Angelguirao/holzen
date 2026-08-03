@@ -12,8 +12,8 @@
 
 | Piece | Location |
 |-------|----------|
-| Landing page | `apps/site/src/pages/welcome.astro` |
-| Waitlist form | `apps/site/src/components/WaitlistForm.astro` |
+| Landing page | `src/screens/marketing/welcome/WelcomeLandingScreen.tsx` (SPA `/welcome`) |
+| Waitlist form | Same screen — wired to `waitlist-signup` / `landing-ping` |
 | Edge: signup | `supabase/functions/waitlist-signup` |
 | Edge: page views | `supabase/functions/landing-ping` |
 | DB | `waitlist_signups`, `landing_daily_views` — migration `20260705140000_waitlist_and_landing_views.sql` |
@@ -104,7 +104,7 @@ Weekly (PersonalOS):
 
 | Symptom | Likely fix |
 |---------|------------|
-| "Waitlist signup is temporarily unavailable" on `/welcome` | Astro build missing `PUBLIC_SUPABASE_URL` + publishable key on Vercel |
+| "Waitlist signup is temporarily unavailable" on `/welcome` | SPA missing `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` on Vercel |
 | Signup 401/500 | Edge not deployed; run staging/production deploy workflow |
 | Metrics panel "not configured" on PersonalOS | Set `HOLZEN_SUPABASE_*` on Vercel personalos production |
 | Views always 0 | `landing-ping` blocked or adblock; check edge logs |
