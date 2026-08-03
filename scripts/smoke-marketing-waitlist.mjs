@@ -49,7 +49,7 @@ async function post(path, body) {
 
 const testEmail = `smoke-${Date.now()}@holzen.app.test`;
 
-const ping = await post('/landing-ping', { path: '/welcome' });
+const ping = await post('/landing-ping', { path: '/' });
 console.log('landing-ping:', ping.status, ping.data);
 
 const signup = await post('/waitlist-signup', {

@@ -53,7 +53,7 @@ export default function CompanionHistoryPage() {
     [historyInsight, zoomOut],
   );
 
-  if (missingRouteId) return <Navigate to="/" replace />;
+  if (missingRouteId) return <Navigate to="/home" replace />;
 
   if (loadError) {
     return (

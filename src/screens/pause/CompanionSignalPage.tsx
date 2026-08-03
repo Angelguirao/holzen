@@ -48,7 +48,7 @@ export default function CompanionSignalPage() {
 
   const { host, isTrusted } = useSignalSourceTrustedHost(signal?.url);
 
-  if (missingRouteId) return <Navigate to="/" replace />;
+  if (missingRouteId) return <Navigate to="/home" replace />;
 
   if (loadError) {
     return (

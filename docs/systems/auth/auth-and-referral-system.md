@@ -22,7 +22,7 @@ flowchart TD
   G -- no --> R1[Render public route]
   G -- yes --> UDR{`ProtectedRoute` checks `user`}
   UDR -- loading --> L1[Show `AuthLoading`]
-  UDR -- no user --> W[Redirect to `/welcome`]
+  UDR -- no user --> W[Redirect to `/`]
   UDR -- user --> OK[Render protected UI]
 
   P --> REF{`holzen_ref` exists?}
@@ -62,7 +62,7 @@ In `src/App.tsx`:
 
 - `ProtectedRoute`:
   - shows `AuthLoading` while `loading` is true
-  - redirects unauthenticated users to `/welcome`
+  - redirects unauthenticated users to `/`
   - renders children only when `user` is present
 - `PublicOnlyRoute`:
   - shows `AuthLoading` while `loading` is true

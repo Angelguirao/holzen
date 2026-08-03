@@ -3,7 +3,8 @@ import { isPrimaryTabActive } from './BottomNav';
 
 describe('isPrimaryTabActive', () => {
   it('matches home and archive', () => {
-    expect(isPrimaryTabActive('/', 'home')).toBe(true);
+    expect(isPrimaryTabActive('/home', 'home')).toBe(true);
+    expect(isPrimaryTabActive('/', 'home')).toBe(false);
     expect(isPrimaryTabActive('/archive', 'home')).toBe(false);
     expect(isPrimaryTabActive('/archive', 'archive')).toBe(true);
     expect(isPrimaryTabActive('/archive/segment', 'archive')).toBe(true);
