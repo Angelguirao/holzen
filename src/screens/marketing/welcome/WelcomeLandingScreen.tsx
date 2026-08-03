@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, useTransition } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { PageMeta } from "@/app/components/PageMeta";
 import svgPaths from "./welcome-svg-paths";
-import iphoneImg from "./assets/how-it-works-phone.png";
 import { pingLandingView, submitWaitlistEmail, waitlistConfigured } from "./waitlist-api";
 
 function Logo() {
@@ -721,18 +720,14 @@ function HowItWorks() {
             ))}
           </div>
 
-          {/* Right — iPhone image, cropped to match steps height */}
+          {/* Right — live product showcase (Make phone PNG was a blank bezel; reuse hero UI) */}
           <motion.div
-            className="relative overflow-hidden rounded-2xl w-full h-full min-h-[320px]"
+            className="relative w-full h-full min-h-[320px] flex items-center md:sticky md:top-24 md:self-start"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 16 }}
             transition={{ duration: 0.7, ease: "easeOut", delay: 0.3 }}
           >
-            <img
-              src={iphoneImg}
-              alt="Holzen app on iPhone"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
+            <PhoneShowcase gradientId="breatheGradFillHowItWorks" borderColor="rgba(255,255,255,0.12)" />
           </motion.div>
 
         </div>
