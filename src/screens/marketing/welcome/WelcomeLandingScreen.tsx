@@ -1211,7 +1211,7 @@ export default function WelcomeLandingScreen() {
   const waitlistRef = searchParams.get("ref");
 
   useEffect(() => {
-    void pingLandingView("/welcome");
+    void pingLandingView("/");
   }, []);
 
   return (
@@ -1219,7 +1219,7 @@ export default function WelcomeLandingScreen() {
       <PageMeta
         title="Holzen — Pause before you act when Bitcoin moves"
         description="Volatility-triggered pause practice for Bitcoin investors. Get early access to a science-backed ritual that creates space between impulse and action — not financial advice."
-        path="/welcome"
+        path="/"
       />
 
       {/* ── Animated background blobs ── */}

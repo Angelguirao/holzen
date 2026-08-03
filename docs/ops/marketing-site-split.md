@@ -12,14 +12,14 @@ Holzen is still **one website** for users: `https://holzen.app`.
 
 | Piece | Technology | Lives in repo | Example URLs |
 | --- | --- | --- | --- |
-| **Waitlist landing** | React SPA (Make port) | `src/screens/marketing/welcome/` | `/welcome` |
+| **Waitlist landing** | React SPA (Make port) | `src/screens/marketing/welcome/` | `/` (legacy `/welcome` → `/`) |
 | **Thin marketing** | Astro (static HTML) | `apps/site/` | `/about`, `/terms`, `/privacy`, `/blog` |
-| **Product** | React + Vite (SPA) | `src/` | `/`, `/auth`, `/archive`, `/pause` |
+| **Product** | React + Vite (SPA) | `src/` | `/home`, `/auth`, `/archive`, `/pause` |
 | **Backend** | Supabase | `supabase/` | (API — not a page you browse) |
 
 On deploy, Astro + Vite are **combined into one `dist/` folder**. Vercel serves real HTML when it exists; everything else loads the React app (`spa.html`).
 
-There is **no** edge redirect `/` → `/welcome`. Signed-out visitors hitting `/` get the SPA, which client-redirects to `/welcome`. Signed-in visitors see Home.
+There is **no** edge redirect that steals `/` from the SPA. Signed-out visitors see the waitlist landing at `/`. Signed-in visitors hitting `/` are client-redirected to Home at `/home`.
 
 ---
 
@@ -46,9 +46,10 @@ Think of `holzen.app` like a building:
 
 ```
 holzen.app
-├── /welcome                      ← Waitlist landing (SPA Make port)
+├── /                             ← Waitlist landing (SPA Make port)
+├── /welcome                      ← Legacy → `/` (query preserved)
 ├── /about, /blog, legal …        ← Thin Astro static pages
-└── /, /auth, /pause, /settings … ← Product (React SPA)
+└── /home, /auth, /pause, …       ← Product (React SPA)
 ```
 
 Supabase is the **basement** (database, auth, edge functions). Neither Astro nor React replaces it — they are just different **ways to render HTML** in the browser.
@@ -109,7 +110,7 @@ Shared **colors/fonts** live in `packages/design-tokens/` so marketing does not 
 holzen/
 ├── apps/
 │   └── site/                    # Astro marketing site
-│       ├── src/pages/           # One file ≈ one URL (e.g. welcome.astro → /welcome)
+│       ├── src/pages/           # One file ≈ one URL (e.g. about.astro → /about)
 │       ├── src/layouts/         # Shared HTML shell
 │       └── src/lib/app-url.ts   # Same-origin links like /auth?view=sign-up
 │
@@ -128,7 +129,7 @@ holzen/
 │
 ├── dist/                        # Production output (generated — do not edit)
 │   ├── spa.html                 # React entry (renamed from index.html at merge)
-│   ├── welcome/index.html       # Astro landing (when built)
+│   ├── about/index.html         # Astro thin pages (when built)
 │   └── assets/                  # Vite JS/CSS bundles
 │
 └── vercel.json                  # Build command + SPA fallback rewrite
@@ -175,29 +176,30 @@ Vercel rule (in root `vercel.json`):
 #### A) Cold visitor lands on marketing
 
 ```
-GET /welcome
-  → No Astro file → spa.html
+GET /
+  → spa.html
   → React WelcomeLandingScreen (Make port + waitlist)
   → User can Sign in → GET /auth
 ```
 
-#### B) Logged-out user hits home
+#### B) Legacy marketing URL
 
 ```
-GET /
+GET /welcome?ref=abc
   → spa.html
-  → React: ProtectedRoute sees no session
-  → Navigate to /welcome (client)
+  → React: LegacyLandingRedirect → /?ref=abc
 ```
 
 #### C) Logged-in user opens Home
 
 ```
-GET /
+GET /home
   → spa.html
   → React: ProtectedRoute sees session
   → Home screen (bottom nav shell)
 ```
+
+Signed-in users who hit `/` are redirected to `/home` via `PublicOnlyRoute`.
 
 #### D) User in a pause ritual
 
@@ -211,8 +213,9 @@ GET /pause
 
 | URL | Served by (target state) | Notes |
 | --- | --- | --- |
-| `/welcome` | **SPA** (Make port) | Waitlist + motion landing |
-| `/` | **SPA** | Home when signed in; else → `/welcome` |
+| `/` | **SPA** (Make port) | Waitlist + motion landing (`PublicOnlyRoute`) |
+| `/welcome` | **SPA** redirect | → `/` (preserves query, e.g. `?ref=`) |
+| `/home` | **SPA** | Authenticated Home |
 | `/auth` | **SPA** | Sign-in / sign-up |
 | `/archive`, `/journey`, `/settings` | **SPA** | App shell tabs |
 | `/pause`, `/companion/*` | **SPA** | Full-screen flows |
@@ -227,10 +230,10 @@ Locally we **do not merge** Astro + SPA into one dev server (yet). You run them 
 
 | Command | Port | What you see |
 | --- | --- | --- |
-| `npm run dev` | **8080** | Full React app (same as before) |
-| `npm run dev:site` | **4321** | Astro pages only (e.g. `/welcome`) |
+| `npm run dev` | **8080** | Full React app (landing at `/`, Home at `/home`) |
+| `npm run dev:site` | **4321** | Astro thin pages only (e.g. `/about`) |
 
-**Local gotcha:** On `:4321`, `/` redirects to `/welcome` in dev, but `/auth` and other product paths do **not** exist — Sign in / CTA links target `http://localhost:8080` automatically. Run **`npm run dev`** alongside **`npm run dev:site`** when testing the full landing → signup flow.
+**Local gotcha:** On `:4321`, product paths like `/auth` do **not** exist — Sign in / CTA links target `http://localhost:8080` automatically. Run **`npm run dev`** alongside **`npm run dev:site`** when testing the full landing → signup flow.
 
 **Why?** Vite and Astro each have their own dev server with HMR. The **unified routing** only exists after `npm run build:unified` + deploy (or `npm run preview` on the merged `dist/` if you build locally).
 
@@ -281,14 +284,14 @@ flowchart LR
 
 **No** for the current Astro scaffold:
 
-- Astro `/welcome` is static — no extra `VITE_*` or Supabase keys at build time.
+- Thin Astro pages are static — no extra `VITE_*` or Supabase keys at build time.
 - When you port **blog** to Astro with live Supabase data at build time, add those vars to GitHub + Vercel **build** env (same as SPA today).
 
 ### What to verify once
 
 - [ ] GitHub Actions preflight uses `build:unified` (not SPA-only `build`)
 - [ ] Root `vercel.json` has `buildCommand: npm run build:unified` and rewrite to `/spa.html`
-- [ ] After deploy: `/welcome` serves Astro HTML, `/auth` serves React
+- [ ] After deploy: `/` serves SPA waitlist, `/home` signed-in Home, `/auth` React
 
 Details: [cicd-overview.md](./cicd-overview.md).
 
@@ -311,11 +314,11 @@ Details: [cicd-overview.md](./cicd-overview.md).
 
 ### Do I need two URLs?
 
-**No.** One domain: `holzen.app`. Path-based split (`/welcome` = marketing, `/auth` = app).
+**No.** One domain: `holzen.app`. Path-based split (`/` = waitlist landing, `/home` = product Home, `/auth` = app).
 
 ### Is Astro replacing React?
 
-**No.** Astro only owns **public marketing HTML**. The product stays React.
+**No.** Astro only owns **thin public marketing HTML** (about, legal, blog). The waitlist landing and product stay React.
 
 ### Where does auth live?
 
@@ -323,7 +326,7 @@ Details: [cicd-overview.md](./cicd-overview.md).
 
 ### What is `spa.html`?
 
-The React app's `index.html`, renamed during merge so Astro can also place `index.html` files under paths like `/welcome/` without clobbering the app entry. Vercel's fallback rewrite points unmatched routes at `spa.html`.
+The React app's `index.html`, renamed during merge so Astro can also place `index.html` files under paths like `/about/` without clobbering the app entry. Vercel's fallback rewrite points unmatched routes at `spa.html`.
 
 ### What happened to `/roadmap` and `/reserve`?
 
@@ -333,9 +336,9 @@ Quarantined to legacy — **not shipped**. They 404 in the active app. Code: `sr
 
 **Never.** It is generated. Edit `src/` or `apps/site/`, then rebuild.
 
-### Why is landing at `/welcome` and not `/`?
+### Why is landing at `/` and Home at `/home`?
 
-Today **`/` is Home** for signed-in users. Marketing stays at `/welcome`. Do **not** add a Vercel redirect `/` → `/welcome` — that breaks signed-in Home on hard refresh. Optional later: move marketing to `/` and Home to `/home`.
+Marketing owns the apex URL so cold traffic and share links hit the waitlist without a redirect. Authenticated Home lives at `/home`. Legacy `/welcome` redirects to `/` (query preserved). Do **not** add a Vercel redirect that remaps `/` away from the SPA.
 
 ### How do waitlist CTAs work?
 
@@ -362,19 +365,20 @@ SPA calls Supabase edge `waitlist-signup` + `landing-ping` via `src/screens/mark
 - [x] Unified build (`build:unified` + merge script)
 - [x] Single-domain Vercel config (`spa.html` fallback)
 - [x] `/roadmap`, `/reserve` → legacy
-- [x] Waitlist landing on SPA (`WelcomeLandingScreen` — Figma Make port); Astro no longer owns `/welcome`
-- [x] Removed Vercel `/` → `/welcome` redirect (signed-in Home works on `/`)
+- [x] Waitlist landing on SPA (`WelcomeLandingScreen` — Figma Make port); Astro no longer owns landing
+- [x] Landing at `/`, Home at `/home`; legacy `/welcome` → `/`
+- [x] Removed Vercel `/` → `/welcome` redirect
 - [x] Port `/about`, legal, `/blog` to Astro; SPA `MarketingDevFallback` for those paths
 - [x] CI + deploy preflight use `npm run build:unified` (`.github/workflows/*.yml`)
-- [ ] Smoke-test after deploy: `/welcome` (SPA) + `/` signed-in Home + `/auth`
+- [ ] Smoke-test after deploy: `/` (SPA waitlist) + `/home` signed-in + `/auth`
 
 ---
 
 ## Commands cheat sheet
 
 ```bash
-npm run dev              # React product app → http://localhost:8080
-npm run dev:site         # Astro marketing only → http://localhost:4321/welcome
+npm run dev              # React product app → http://localhost:8080/ (landing)
+npm run dev:site         # Astro marketing only → http://localhost:4321/about
 npm run build            # React only → dist/ (SPA index.html)
 npm run build:site       # Astro only → apps/site/dist/
 npm run build:unified    # Production: both merged → dist/

@@ -52,14 +52,14 @@ const queryClient = createHolzenQueryClient();
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return <AuthLoading />;
-  if (!user) return <Navigate to="/welcome" replace />;
+  if (!user) return <Navigate to="/" replace />;
   return <>{children}</>;
 }
 
 function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return <AuthLoading />;
-  if (user) return <Navigate to="/" replace />;
+  if (user) return <Navigate to="/home" replace />;
   return <>{children}</>;
 }
 
@@ -73,8 +73,13 @@ function OnboardedRoute({ children }: { children: React.ReactNode }) {
 function PendingOnboardingRoute({ children }: { children: React.ReactNode }) {
   const { profileLoaded, hasOnboarded } = useProfile();
   if (!profileLoaded) return <AuthLoading />;
-  if (hasOnboarded) return <Navigate to="/" replace />;
+  if (hasOnboarded) return <Navigate to="/home" replace />;
   return <>{children}</>;
+}
+
+function LegacyLandingRedirect() {
+  const { search } = useLocation();
+  return <Navigate to={{ pathname: "/", search }} replace />;
 }
 
 /**
@@ -222,8 +227,8 @@ const App = () => (
             <Suspense fallback={<RouteChunkFallback />}>
               <Routes>
                 <Route element={<ProtectedRoute><OnboardedRoute><AppLayout /></OnboardedRoute></ProtectedRoute>}>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/index" element={<Navigate to="/" replace />} />
+                  <Route path="/home" element={<Home />} />
+                  <Route path="/index" element={<Navigate to="/home" replace />} />
                   <Route path="/archive" element={<Archive />} />
                   <Route path="/journey" element={<JourneyOverview />} />
                   <Route path="/settings" element={<SettingsRoot />}>
@@ -248,7 +253,8 @@ const App = () => (
                 <Route element={<ProtectedRoute><PendingOnboardingRoute><PrivateExperienceLayout /></PendingOnboardingRoute></ProtectedRoute>}>
                   <Route path="/onboarding" element={<Onboarding />} />
                 </Route>
-                <Route path="/welcome" element={<PublicOnlyRoute><WelcomeLanding /></PublicOnlyRoute>} />
+                <Route path="/" element={<PublicOnlyRoute><WelcomeLanding /></PublicOnlyRoute>} />
+                <Route path="/welcome" element={<LegacyLandingRedirect />} />
                 <Route path="/about" element={<MarketingDevFallback />} />
                 <Route path="/terms" element={<MarketingDevFallback />} />
                 <Route path="/privacy" element={<MarketingDevFallback />} />

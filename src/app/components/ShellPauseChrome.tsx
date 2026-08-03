@@ -12,7 +12,7 @@ type Props = {
  */
 export function ShellPauseChrome({ pauseReady, onDismissPauseReady }: Props) {
   const location = useLocation();
-  const isHome = location.pathname === '/' || location.pathname === '/index';
+  const isHome = location.pathname === '/home' || location.pathname === '/index';
 
   if (isHome) return null;
 

@@ -41,7 +41,7 @@ export default function CompanionGroundingPage() {
     severity,
   });
 
-  if (missingRouteId) return <Navigate to="/" replace />;
+  if (missingRouteId) return <Navigate to="/home" replace />;
 
   if (loadError) {
     return (

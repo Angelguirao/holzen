@@ -30,7 +30,7 @@ export function PauseReadyBanner({ visible, onDismiss }: Props) {
           <button type="button"
             onClick={() => {
               onDismiss();
-              navigate('/');
+              navigate('/home');
             }}
             className="flex items-center gap-2 flex-1 min-w-0"
           >

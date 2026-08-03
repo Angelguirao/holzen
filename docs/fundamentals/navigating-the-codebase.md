@@ -51,14 +51,14 @@ Full diagram, metadata, boot-recovery, and domain notes: **[index-html-and-spa-s
 
 Routes are declared in **`src/App.tsx`**. Screen modules under **`src/screens/`** are **`React.lazy`**-loaded. **`Suspense`** around **`Routes`** shows a small full-screen fallback while a chunk downloads. Two patterns matter:
 
-- **`ProtectedRoute`** — If auth is still loading, show `AuthLoading` (`src/app/components/`). If no user, redirect to `/welcome`. Otherwise render children.
+- **`ProtectedRoute`** — If auth is still loading, show `AuthLoading` (`src/app/components/`). If no user, redirect to `/`. Otherwise render children.
 - **`PublicOnlyRoute`** — Logged-in users are redirected to `/`.
 
 **Main shell (four tabs):** `/`, `/archive`, `/journey`, `/settings` (+ nested `/settings/about`, `/settings/billing-history`, `/settings/:section`) use **`AppLayout`** (`src/app/components/AppLayout.tsx`): max-width column, header (“Holzen” + `NotificationBell` from `features/notifications/public-hooks`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (Home, Archive, Journey, Settings). `AppLayout` uses `useShellProfile` + `ShellPauseChrome` (pause modal/banner; `useHolzen` only inside that component) and passes pause-ready state via outlet context; **`HolzenProvider`** ([`src/app/components/HolzenProvider.tsx`](../../src/app/components/HolzenProvider.tsx)) wraps signed-in routes (`useHolzenHomeContextState` in pause presentation).
 
 **Full-screen authenticated routes** (no `AppLayout`, `RobotsNoIndex`): `/onboarding`, `/pause`, companion deep links `/companion/{zoom-out,history,signal,grounding}/:pauseInstanceId`, `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage`.
 
-**Public / utility:** `/welcome` (landing), `/auth`, `/reset-password`, `/unsubscribe`, `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug`, `/roadmap`, `/reserve`.
+**Public / utility:** `/` (waitlist landing; legacy `/welcome` → `/`), `/auth`, `/reset-password`, `/unsubscribe`, `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug`. `/roadmap`, `/reserve` → 404.
 
 **Redirects:** `/index` → `/`.
 
@@ -119,13 +119,13 @@ Do **not** add global **`QueryClient` defaultOptions** lightly: they affect ever
 | Area | Screen module | Routes |
 |------|---------------|--------|
 | Onboarding | `screens/onboarding/OnboardingScreen.tsx` | `/onboarding` |
-| Home | `screens/home/HomeScreen.tsx` | `/` |
+| Home | `screens/home/HomeScreen.tsx` | `/home` |
 | Archive | `screens/archive/ArchiveScreen.tsx` | `/archive` |
 | Journey | `screens/journey/JourneyOverviewScreen.tsx` | `/journey` |
 | Settings | `screens/settings/*` | `/settings`, `/settings/:section`, billing, about |
 | Pause | `screens/pause/PauseSessionScreen.tsx` + `components/` | `/pause` |
 | Companions | `screens/pause/Companion*Page.tsx` | `/companion/*/:pauseInstanceId` |
-| Marketing | `screens/marketing/*Screen.tsx` | `/welcome`, `/auth`, legal, blog, … |
+| Marketing | `screens/marketing/*Screen.tsx` | `/` (landing), `/auth`, …; thin pages Astro |
 | Admin / ops | `screens/admin/`, `screens/ops/` | `/admin`, smoke-test, edge-coverage, … |
 
 Pre-strip pages (`ToolsHub`, `Library`, immersive `/tools/*`, …) live under **`src/legacy/`** — not routed in the shipped app.
@@ -304,7 +304,7 @@ Goal: **map** the rest of the surface area without drowning in files. Use **§4*
 | Step | What to do |
 |------|------------|
 | 1. **Route map** | Re-read **§4** above — list every **shipped** route (`/`, `/archive`, `/journey`, `/settings`, `/pause`, companion deep links, `/admin`, public marketing). **Dead IA** (`/tools/*`, `/library`, …) → **404** — see [active-surface.md](../ops/active-surface.md). |
-| 2. **Auth shell** | **§5** — `@/features/auth/public` (`useAuth`, `AuthProvider`), `ProtectedRoute` / `PublicOnlyRoute`. Trace **`/welcome`** vs **`/`** once in `App.tsx`. Optional: [route-gating-system.md](../systems/routing/route-gating-system.md). |
+| 2. **Auth shell** | **§5** — `@/features/auth/public` (`useAuth`, `AuthProvider`), `ProtectedRoute` / `PublicOnlyRoute`. Trace **`/`** vs **`/home`** once in `App.tsx`. Optional: [route-gating-system.md](../systems/routing/route-gating-system.md). |
 | 3. **Feature hooks** | **§6** table — for each row you care about, open the hook and **one** screen that uses it (`useSubscription` + Settings billing, `useProfile` + Settings, `usePushNotifications` + bell/settings, `useHolzen` + Home pause card). |
 | 4. **Components** | **§8** — skim `components/ui/`, `app/components/`, and one `screens/<route>/components/` folder (e.g. `pause/`). |
 | 5. **Edge functions** | **§12** — read the full table once; you do not need every `index.ts` until you touch a feature. [cron-setup.md](../ops/cron-setup.md) when you move to **server-triggered** pause and workers. |

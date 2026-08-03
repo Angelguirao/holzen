@@ -25,7 +25,7 @@ export function waitlistConfigured(): boolean {
   return Boolean(supabaseFunctionsBase() && anonKey());
 }
 
-export async function pingLandingView(path = "/welcome"): Promise<void> {
+export async function pingLandingView(path = "/"): Promise<void> {
   const base = supabaseFunctionsBase();
   const headers = edgeHeaders();
   if (!base || !headers) return;
