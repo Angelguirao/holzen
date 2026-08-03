@@ -1,5 +1,8 @@
+-- LEGACY MIRROR — do not add new LifeOS migrations in holzen/.
+-- Canonical: personal-agent/deploy/supabase/migrations/
+-- See holzen/supabase/LIFEOS-LEGACY.md and personal-agent/deploy/LIFEOS-SUPABASE.md
+--
 -- LifeOS venture control plane (PersonalOS /os/venture ledger).
--- Applied to holzen-staging via MCP; checked into holzen repo so CI db push matches remote history.
 -- Service role only — no anon/authenticated policies.
 
 create extension if not exists "pgcrypto";

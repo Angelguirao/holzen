@@ -30,7 +30,7 @@ export function PublicFooter() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground/60">
-          <Link to="/welcome" className="hover:text-foreground transition-colors">Home</Link>
+          <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
           <span className="text-muted-foreground/20">·</span>
           <Link to="/about" className="hover:text-foreground transition-colors">{t('landing.about')}</Link>
           <span className="text-muted-foreground/20">·</span>

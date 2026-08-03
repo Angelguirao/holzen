@@ -16,16 +16,29 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 
 | Path | Screen |
 | --- | --- |
-| `/` | Home |
+| `/home` | Home |
 | `/archive` | Archive (**Pauses** + **Echoes** tabs — user **Collections** tab not in shipped scope; see below) |
 | `/journey` | Journey overview |
 | `/settings` | Settings hub + sections |
 
-**Public (SPA, interim):** `/welcome` landing, `/auth`, legal, `/blog` — until Astro cutover on `holzen.app`.
+**Public:** `/` waitlist landing (SPA — Figma Make port); legacy `/welcome` redirects to `/`. Also `/auth`, legal + `/blog` (Astro).
 
 **Not shipped (404):** `/roadmap`, `/reserve` — quarantined in `src/legacy/marketing-roadmap-reserve/`. See [marketing-site-split.md](./marketing-site-split.md).
 
 **Full-screen (no bottom nav):** `/onboarding`, `/pause`, `/companion/*` (grounding full view reads orchestrate/hydrated nudge only — no `grounding-enrich`)
+
+### Admin (internal)
+
+Authenticated ops surfaces under `PrivateExperienceLayout` (not bottom-nav shell tabs). Registered in `App.tsx`; path constants in `src/lib/app-routes.ts` (`APP_ADMIN_ROUTES`).
+
+| Path | Screen |
+| --- | --- |
+| `/admin` | Admin hub |
+| `/admin/smoke-test` | Smoke test |
+| `/admin/sentry-alerts` | Sentry alerts |
+| `/admin/edge-coverage` | Edge coverage vs `config.toml` |
+
+These are **shipped for operators**, not primary product IA. Do not promote into `APP_SHELL_TABS` / BottomNav without an explicit product decision.
 
 **Dead IA (404 only):** `/tools`, `/tools/*`, `/library`, `/journey/stats`, `/journey/:tab`, …
 
