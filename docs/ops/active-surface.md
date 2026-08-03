@@ -21,7 +21,7 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 | `/journey` | Journey overview |
 | `/settings` | Settings hub + sections |
 
-**Public (SPA, interim):** `/welcome` landing, `/auth`, legal, `/blog` — until Astro cutover on `holzen.app`.
+**Public:** `/welcome` waitlist landing (SPA — Figma Make port), `/auth`, legal + `/blog` (Astro).
 
 **Not shipped (404):** `/roadmap`, `/reserve` — quarantined in `src/legacy/marketing-roadmap-reserve/`. See [marketing-site-split.md](./marketing-site-split.md).
 

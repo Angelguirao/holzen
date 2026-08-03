@@ -31,6 +31,7 @@ const SettingsStateLayout = lazy(() => import("./screens/settings/SettingsStateL
 const SettingsHub = lazy(() => import("./screens/settings/SettingsHubScreen"));
 const SettingsSectionPage = lazy(() => import("./screens/settings/SettingsSectionScreen"));
 const Auth = lazy(() => import("./screens/marketing/AuthScreen"));
+const WelcomeLanding = lazy(() => import("./screens/marketing/welcome/WelcomeLandingScreen"));
 const MarketingDevFallback = lazy(() => import("./screens/marketing/MarketingDevFallback"));
 const ResetPassword = lazy(() => import("./screens/marketing/ResetPasswordScreen"));
 const NotFound = lazy(() => import("./screens/marketing/NotFoundScreen"));
@@ -247,7 +248,7 @@ const App = () => (
                 <Route element={<ProtectedRoute><PendingOnboardingRoute><PrivateExperienceLayout /></PendingOnboardingRoute></ProtectedRoute>}>
                   <Route path="/onboarding" element={<Onboarding />} />
                 </Route>
-                <Route path="/welcome" element={<PublicOnlyRoute><MarketingDevFallback /></PublicOnlyRoute>} />
+                <Route path="/welcome" element={<PublicOnlyRoute><WelcomeLanding /></PublicOnlyRoute>} />
                 <Route path="/about" element={<MarketingDevFallback />} />
                 <Route path="/terms" element={<MarketingDevFallback />} />
                 <Route path="/privacy" element={<MarketingDevFallback />} />
