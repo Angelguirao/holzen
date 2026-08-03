@@ -34,7 +34,7 @@ This folder contains human-readable notes that complement the source code and in
 | Supabase **`Database` types** (`src/integrations/supabase/types.ts`) | [AGENTS.md](../AGENTS.md) (`npm run gen:types`) | Regenerate after migrations; if types lag, use `as unknown as T` per [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | Boot sequence, repo tour, deploy paths (Vercel + Supabase) | [fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) | Do not duplicate long boot narratives in AGENTS. |
 | **CI/CD** (workflows, secrets, deploy order) | [ops/cicd-overview.md](ops/cicd-overview.md) | Branch model in [branch-model.md](ops/branch-model.md); pre-push in [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
-| **Lovable sync risk, staging, platform exit** | [ops/lovable-staging-and-platform-exit.md](ops/lovable-staging-and-platform-exit.md) | Why merges hit prod DB; CI gaps; phased exit. Pairs with [platform-exit-runbook.md](ops/platform-exit-runbook.md), [vercel-frontend-setup.md](ops/vercel-frontend-setup.md), [production-supabase-setup.md](ops/production-supabase-setup.md). |
+| **Lovable sync risk, platform exit** | [ops/lovable-staging-and-platform-exit.md](ops/lovable-staging-and-platform-exit.md) | Why merges hit prod DB; CI gaps; phased exit. Pairs with [platform-exit-runbook.md](ops/platform-exit-runbook.md), [branch-model.md](ops/branch-model.md), [vercel-frontend-setup.md](ops/vercel-frontend-setup.md), [production-supabase-setup.md](ops/production-supabase-setup.md). Legacy holzen-staging deleted 2026-07-16. |
 | `index.html`, SPA shell, default SEO/PWA meta | [fundamentals/index-html-and-spa-shell.md](fundamentals/index-html-and-spa-shell.md) | Canonical origin `https://holzen.app`; pairs with §3 in navigating-the-codebase. |
 | **Marketing site + product app** (Astro + React, one URL, build merge) | [ops/marketing-site-split.md](ops/marketing-site-split.md) | Plain-language guide: `apps/site/`, `build:unified`, `spa.html` routing; pairs with [vercel-frontend-setup.md](ops/vercel-frontend-setup.md). |
 | Pause lifecycle (instances, events, artifacts, state machine) | [systems/pause-system.md](systems/pause-system.md) | Canonical **data model** and invariants (Pause V2). **Home widget projection:** [systems/home-pause-widget-projection.md](systems/home-pause-widget-projection.md). |
@@ -110,8 +110,8 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 ## Ops
 
 - `ops/deployment-sync-guide.md` — **GitHub → Vercel + Supabase**: what auto-deploys, safe workflow, pre-push checklist, **`npm run check:prepush`** (bash full gate), and troubleshooting (401s, migration failures, stale deploys, CRON_SECRET mismatches).
-- `ops/environment-matrix.md` — canonical **env/config inventory**: what each variable is for, where it lives, where to get it, naming rules, and how staging/preview/prod differ.
-- `ops/lovable-staging-and-platform-exit.md` — **staging DB + visible CI + leaving Lovable**: production migration risk, hybrid paths, phased exit checklist (strategic; not a day-to-day push guide).
+- `ops/environment-matrix.md` — canonical **env/config inventory**: what each variable is for, where it lives, where to get it, naming rules, and how local / Preview / prod differ (`feature/*` → PR → `main` → holzen-prod).
+- `ops/lovable-staging-and-platform-exit.md` — **visible CI + leaving Lovable**: production migration risk, hybrid paths, phased exit checklist (strategic; not a day-to-day push guide). Legacy staging note: [staging-supabase-setup.md](ops/staging-supabase-setup.md).
 - `ops/cron-setup.md` — scheduled jobs: pg_cron + `net.http_post` callouts for pause-adjacent workers.
 - `ops/logging-strategy.md` — edge vs browser vs DB logging; `observe.ts` patterns; correlation and PII.
 - `ops/versioning.md` — canonical version policy: changelog version vs build/release ID vs `package.json` metadata.

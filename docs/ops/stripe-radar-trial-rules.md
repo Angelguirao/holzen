@@ -15,7 +15,7 @@ Holzen blocks **prepaid** cards on **trial Checkout only** in two layers:
 
 ## 1. Prerequisites
 
-1. **Stripe Dashboard** access for **staging** and **production** (configure both if you use two Stripe accounts).
+1. **Stripe Dashboard** access for **test** mode (local / Preview) and **live** mode (**holzen-prod**). Configure Radar on the live account before launch; exercise the rule in test mode first.
 2. **Radar for Fraud Teams** enabled (Dashboard → **Radar** → you should see **Rules** with **Add rule**).
 3. **Edge deploy** with trial Checkout sending SetupIntent metadata (see `create-checkout` → `setup_intent_data.metadata.holzen_trial = 'true'`).
 4. Webhook endpoint **`stripe-webhook`** deployed with prepaid finalize logic.
@@ -70,11 +70,13 @@ Do **not** maintain a long custom BIN list unless you see the same BIN repeatedl
 
 ---
 
-## 5. Test (staging)
+## 5. Test (Stripe test mode / local)
+
+Prefer **local Docker** + Stripe **test** mode. Preview may share **holzen-prod** carefully — there is no holzen-staging (deleted 2026-07-16).
 
 ### A. Radar blocks prepaid in Checkout (if Fraud Teams + rule enabled)
 
-1. Sign in to Holzen **staging** with a test user who has **not** consumed a trial.
+1. Sign in to Holzen (local or Preview) with a test user who has **not** consumed a trial.
 2. Start onboarding trial → redirect to Stripe Checkout.
 3. Use Stripe’s **prepaid** test PAN (see [Stripe test cards](https://docs.stripe.com/testing#cards)) — commonly documented as **`4000002500003155`** (verify in your Stripe docs version; funding type must show as prepaid in Dashboard).
 4. **Expected:** Checkout shows a decline/block **before** returning to Holzen.
@@ -97,9 +99,9 @@ If Radar does not run or rule is off:
 
 ## 6. Production rollout checklist
 
-- [ ] Rule added on **production** Stripe account (not only staging).
-- [ ] SetupIntents enabled for Radar (production).
-- [ ] `create-checkout` + `stripe-webhook` deployed to production Supabase project.
+- [ ] Rule added on **live** Stripe account (not only test mode).
+- [ ] SetupIntents enabled for Radar (live).
+- [ ] `create-checkout` + `stripe-webhook` deployed to **holzen-prod**.
 - [ ] Spot-check one real trial signup after deploy.
 - [ ] Monitor: `trial.denied` (`trial_card_not_accepted`), edge `trial_checkout_prepaid_rejected`, Stripe Radar **Blocked** volume.
 

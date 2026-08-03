@@ -2,7 +2,7 @@
 
 **Default collection tree** for Holzen shipped-surface HTTP review. Open collection root [`../`](../) in Bruno, then run requests under **`active/`** only unless you are debugging pre-strip behavior ([`../legacy/full-shell/`](../legacy/full-shell/)).
 
-Environment: **`local`**, **`staging`**, or **`prod`** ([`../environments/`](../environments/)). Run **`auth/01-sign-in-password`** first for any user-JWT request.
+Environment: **`local`** (preferred) or **`prod`** ([`../environments/`](../environments/)). Run **`auth/01-sign-in-password`** first for any user-JWT request.
 
 ## Smoke sequence (pre-publish)
 
@@ -14,7 +14,7 @@ Environment: **`local`**, **`staging`**, or **`prod`** ([`../environments/`](../
 6. `billing/04-ensure-trial-subscription` — idempotent trial start (onboarding)
 7. `platform/health`
 
-Optional staging: `service-cron/check-volatility` with **`SERVICE_CRON_BEARER`** ([`service-cron/README.md`](service-cron/README.md)).
+Optional: `service-cron/check-volatility` with **`SERVICE_CRON_BEARER`** — prefer local ([`service-cron/README.md`](service-cron/README.md)).
 
 Full catalog: [`functions-catalog.md`](functions-catalog.md). Human checklist: [launch-runbook](../../docs/ops/launch-runbook.md) §4.
 

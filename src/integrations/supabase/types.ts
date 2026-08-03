@@ -1,8 +1,7 @@
 /**
  * Supabase-generated `Database` types.
  *
- * Regenerate after migrations: `npm run gen:types` (production) or
- * `npm run gen:types:staging` (staging).
+ * Regenerate after migrations: `npm run gen:types` (holzen-prod).
  * Generated from explicit target: production (geqkxsnyqvhtascjghuu).
  *
  * If this file drifts from production, dropped tables/columns may still appear
