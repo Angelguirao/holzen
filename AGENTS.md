@@ -43,6 +43,8 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 
 LifeOS (`pe.plan` / `pe.execute` / `pe.review`) mounts this repo and loads this file plus `.lifeos/expertise/**`.
 
+**Work SoT:** agent issues live in LifeOS Postgres (`external_tracker=lifeos`), not GitHub Issues. GH may mirror for humans; do **not** treat GH `agent-ready` as the wake signal for native LifeOS rows. Orchestration (ready / claim / prime) is on PersonalOS — see personal-agent `deploy/WORK-GRAPH-OPS.md` and `npm run work` in that repo.
+
 | Path | Role |
 |------|------|
 | `.lifeos/tester.yaml` | Independent Tester commands after `pe.execute` (authoritative suite — not the Writer’s self-report) |
