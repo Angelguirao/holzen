@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useInView } from "framer-motion";
 import { Info, CheckCircle, Activity, Clock, TrendingUp, ChevronDown } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useTransition } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { PageMeta } from "@/app/components/PageMeta";
 import svgPaths from "./welcome-svg-paths";
@@ -197,25 +197,25 @@ function MobileWaitlistCTA({ waitlistRef }: { waitlistRef: string | null }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, startSubmit] = useTransition();
   const configured = waitlistConfigured();
 
   const isValidEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) { setError("Please enter your email."); return; }
     if (!isValidEmail(email)) { setError("That doesn't look like a valid email."); return; }
     if (!configured) { setError("Waitlist is temporarily unavailable."); return; }
     setError("");
-    setSubmitting(true);
-    const result = await submitWaitlistEmail(email.trim(), { source: "welcome", ref: waitlistRef });
-    setSubmitting(false);
-    if (result.ok === false) {
-      setError(result.error);
-      return;
-    }
-    setSubmitted(true);
+    startSubmit(async () => {
+      const result = await submitWaitlistEmail(email.trim(), { source: "welcome", ref: waitlistRef });
+      if (result.ok === false) {
+        setError(result.error);
+        return;
+      }
+      setSubmitted(true);
+    });
   };
 
   useEffect(() => {
@@ -369,12 +369,12 @@ function WaitlistForm({ waitlistRef }: { waitlistRef: string | null }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, startSubmit] = useTransition();
   const configured = waitlistConfigured();
 
   const isValidEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) {
       setError("Please enter your email.");
@@ -389,14 +389,14 @@ function WaitlistForm({ waitlistRef }: { waitlistRef: string | null }) {
       return;
     }
     setError("");
-    setSubmitting(true);
-    const result = await submitWaitlistEmail(email.trim(), { source: "welcome", ref: waitlistRef });
-    setSubmitting(false);
-    if (result.ok === false) {
-      setError(result.error);
-      return;
-    }
-    setSubmitted(true);
+    startSubmit(async () => {
+      const result = await submitWaitlistEmail(email.trim(), { source: "welcome", ref: waitlistRef });
+      if (result.ok === false) {
+        setError(result.error);
+        return;
+      }
+      setSubmitted(true);
+    });
   };
 
   return (
@@ -908,7 +908,7 @@ function EarlyAccessCTA({ waitlistRef }: { waitlistRef: string | null }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, startSubmit] = useTransition();
   const configured = waitlistConfigured();
 
   // Mouse-following light spot
@@ -931,20 +931,20 @@ function EarlyAccessCTA({ waitlistRef }: { waitlistRef: string | null }) {
 
   const isValidEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) { setError("Please enter your email."); return; }
     if (!isValidEmail(email)) { setError("That doesn't look like a valid email."); return; }
     if (!configured) { setError("Waitlist is temporarily unavailable."); return; }
     setError("");
-    setSubmitting(true);
-    const result = await submitWaitlistEmail(email.trim(), { source: "welcome-cta", ref: waitlistRef });
-    setSubmitting(false);
-    if (result.ok === false) {
-      setError(result.error);
-      return;
-    }
-    setSubmitted(true);
+    startSubmit(async () => {
+      const result = await submitWaitlistEmail(email.trim(), { source: "welcome-cta", ref: waitlistRef });
+      if (result.ok === false) {
+        setError(result.error);
+        return;
+      }
+      setSubmitted(true);
+    });
   };
 
   return (
