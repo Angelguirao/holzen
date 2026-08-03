@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Sync Supabase Auth URL config (site_url + redirect allow list) for prod + staging.
+ * Sync Supabase Auth URL config (site_url + redirect allow list) for holzen-prod.
  * Requires SUPABASE_ACCESS_TOKEN (npx supabase login) or pass via env.
  *
  * Usage:
@@ -24,7 +24,6 @@ const REDIRECT_ALLOW_LIST = [
 
 const PROJECTS = [
   { ref: "geqkxsnyqvhtascjghuu", label: "production", siteUrl: "https://holzen.app" },
-  { ref: "ksplyxxdvandkwzundql", label: "staging", siteUrl: "https://holzen.app" },
 ];
 
 function loadToken() {

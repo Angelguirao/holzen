@@ -14,9 +14,10 @@ Requires a **signed-in user JWT** (`../auth/01-sign-in-password` or paste `SUPAB
 | `07-notify-checkout-confirmation` | [notify-checkout-confirmation](../../supabase/functions/notify-checkout-confirmation/index.ts) | Checkout confirmation summary; see sample body in the `.bru` file. |
 | `98-admin-check-stripe-prices-admin-only` | [admin-check-stripe-prices](../../supabase/functions/admin-check-stripe-prices/index.ts) | None — **admin JWT required**; verifies deployed Stripe price secrets. |
 
-## Local vs staged/prod hosts
+## Local vs prod hosts
 
-- **Staging / prod:** `STRIPE_SECRET_KEY` is set in the target Supabase project; Checkout/Portal work if Stripe test/live keys match that project's dashboard.
+- **Local Docker:** Stripe **test** mode keys in local edge env; Checkout/Portal work against test Dashboard.
+- **holzen-prod:** `STRIPE_SECRET_KEY` live (or carefully mirrored test) in Edge secrets; Checkout/Portal match that project's Stripe mode.
 - **Local `supabase functions serve`:** set secrets (e.g. `supabase secrets set` or `.env` per [Supabase local functions docs](https://supabase.com/docs/guides/functions/secrets)); without `STRIPE_SECRET_KEY`, responses will be **500** with a clear error message.
 
 Bruno does **not** run Stripe webhooks — use Stripe CLI or dashboard for webhook testing.

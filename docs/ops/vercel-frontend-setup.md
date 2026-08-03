@@ -4,7 +4,7 @@ Holzen is a **Vite + React SPA** with client-side routing (`react-router-dom`). 
 
 Netlify and Cloudflare Pages work too — same build output (`dist/`). We document Vercel first because it matches how most teams deploy Vite/React apps and avoids a separate CI deploy job when the GitHub integration is enabled.
 
-**Related:** [production-supabase-setup.md](production-supabase-setup.md), [stripe-environment-setup.md](stripe-environment-setup.md), [platform-exit-runbook.md](platform-exit-runbook.md), [branch-model.md](branch-model.md), [vercel.json](../../vercel.json). Env sync helper: `npm run vercel:sync-env` (reads `.env.prod(.local)` / `.env.staging.local`, writes Preview to **All Previews** by default).
+**Related:** [production-supabase-setup.md](production-supabase-setup.md), [stripe-environment-setup.md](stripe-environment-setup.md), [platform-exit-runbook.md](platform-exit-runbook.md), [branch-model.md](branch-model.md), [vercel.json](../../vercel.json). Env sync helper: `npm run vercel:sync-env` (reads `.env.prod(.local)`, writes Preview to **All Previews** by default).
 
 ---
 
@@ -66,19 +66,19 @@ Project → Settings → Environment Variables:
 
 | Variable | Production | Preview | Notes |
 |----------|------------|---------|--------|
-| `VITE_SUPABASE_URL` | owned prod URL | staging URL | From Supabase dashboard |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | prod anon key | staging anon key | Never service role |
+| `VITE_SUPABASE_URL` | owned prod URL | usually same (careful) | From Supabase dashboard |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | prod anon key | usually same (careful) | Never service role |
 | `VITE_APP_VERSION` | `$VERCEL_GIT_COMMIT_SHA` | same | Matches edge `SENTRY_RELEASE` after backend deploy |
-| `VITE_SITE_ORIGIN` | `https://holzen.app` | preview URL or staging | SEO canonical / OG |
+| `VITE_SITE_ORIGIN` | `https://holzen.app` | preview URL or omit | SEO canonical / OG |
 | `VITE_SENTRY_DSN` | prod DSN | optional | Frontend errors |
-| `VITE_POSTHOG_KEY` | prod key | staging key | Product analytics |
-| `VITE_POSTHOG_HOST` | `https://us.i.posthog.com` | same | |
+| `VITE_POSTHOG_KEY` | prod key | same or separate project | Product analytics |
+| `VITE_POSTHOG_HOST` | `https://eu.i.posthog.com` | same | |
 
 **Build-only (Production):** add `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` if you want source maps uploaded during `npm run build` (Vite Sentry plugin no-ops without them).
 
-Preview deployments should point at **staging Supabase**, not production — use Vercel **Preview** environment scope for staging keys.
+There is **no** separate staging Supabase. Preview may share **holzen-prod** keys carefully; prefer local Docker for risky schema work. When you need an isolated DB again, use **Supabase Pro Branching** on holzen-prod — see [branch-model.md](branch-model.md).
 
-To sync Production vars from local `.env.prod` / `.env.prod.local` / `.env.staging.local`:
+To sync Production vars from local `.env.prod` / `.env.prod.local`:
 
 ```sh
 node scripts/vercel-sync-env.mjs
@@ -88,16 +88,16 @@ node scripts/vercel-sync-env.mjs
 
 ### Preview environment (dashboard copy-paste)
 
-In Vercel → **holzen** → Settings → Environment Variables, add each row to **Preview** and choose **All Previews** (not Production). Values for staging come from [`.env.staging.example`](../../.env.staging.example) / your gitignored `.env.staging.local`.
+In Vercel → **holzen** → Settings → Environment Variables, add each row to **Preview** and choose **All Previews** (not Production). Values typically match Production (prod publishable key) unless you intentionally isolate analytics.
 
 | Variable | Value (Preview) | Notes |
 |----------|-----------------|--------|
-| `VITE_SUPABASE_PROJECT_ID` | `ksplyxxdvandkwzundql` | holzen-staging |
-| `VITE_SUPABASE_URL` | `https://ksplyxxdvandkwzundql.supabase.co` | |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Staging **publishable** key from Supabase → Project Settings → API | Never the service role key |
+| `VITE_SUPABASE_PROJECT_ID` | `geqkxsnyqvhtascjghuu` | holzen-prod (shared carefully) |
+| `VITE_SUPABASE_URL` | `https://geqkxsnyqvhtascjghuu.supabase.co` | |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Prod **publishable** key | Never the service role key |
 | `VITE_APP_VERSION` | `$VERCEL_GIT_COMMIT_SHA` | Same as Production; ties to edge `SENTRY_RELEASE` |
 | `VITE_SITE_ORIGIN` | *(optional)* preview deployment URL | Omit to use `https://holzen.app` fallback from `vite.config.ts` |
-| `VITE_POSTHOG_KEY` | Same as prod or a staging PostHog project key | Optional for PR analytics |
+| `VITE_POSTHOG_KEY` | Same as prod or a separate PostHog project key | Optional for PR analytics |
 | `VITE_POSTHOG_HOST` | `https://eu.i.posthog.com` | Match prod if using one PostHog project |
 | `VITE_SENTRY_DSN` | *(optional)* | Frontend errors on preview |
 
@@ -141,11 +141,9 @@ After first deploy, verify:
 | **Frontend** | Vercel | GitHub Actions `deploy-frontend` after backend ([cicd-overview.md](cicd-overview.md)) |
 | **DB + Edge** | Supabase | Same workflow, `deploy-backend` job first |
 
-Order for releases: merge to `staging` or `main` → **preflight** (`test:ci` + build) → **backend** (migrations + edges) → **frontend** (Vercel prebuilt deploy) → confirm `VITE_APP_VERSION` / `SENTRY_RELEASE` / `EDGE_RELEASE` equal the Git SHA.
+Order for releases: merge to **`main`** → **preflight** (`test:ci` + build) → **backend** (migrations + edges) → **frontend** (Vercel prebuilt deploy) → confirm `VITE_APP_VERSION` / `SENTRY_RELEASE` / `EDGE_RELEASE` equal the Git SHA.
 
-Vercel Git auto-deploy is **disabled** for `main` and `staging` in [vercel.json](../../vercel.json) so the frontend cannot ship before the backend. **PR previews** on feature branches remain automatic.
-
-Optional: assign a **branch domain** (e.g. `staging.holzen.app` → branch `staging`) in Vercel for a stable staging URL.
+Vercel Git auto-deploy is **disabled** for `main` in [vercel.json](../../vercel.json) so the frontend cannot ship before the backend. **PR previews** on feature branches remain automatic.
 
 ---
 
@@ -181,13 +179,13 @@ Keep `holzen.app` detached or parked; enable Deployment Protection on **Preview*
 
 Set a **Production-only** build env var, redeploy frontend:
 
-| Variable | Production | Preview / Staging |
-|----------|------------|-------------------|
+| Variable | Production | Preview |
+|----------|------------|---------|
 | `VITE_COMING_SOON` | `true` | *(unset)* |
 
 Vercel → Project → **Settings** → **Environment Variables** → add `VITE_COMING_SOON` = `true` scoped to **Production** only → run **Production deploy** (merge to `main` with approval, or `workflow_dispatch`).
 
-Visitors on `holzen.app` see a minimal **Coming soon** screen (`ComingSoonScreen`) instead of auth, pause, or checkout. Staging previews and local dev stay on the full app when the var is unset.
+Visitors on `holzen.app` see a minimal **Coming soon** screen (`ComingSoonScreen`) instead of auth, pause, or checkout. PR previews and local dev stay on the full app when the var is unset.
 
 **Launch:** delete `VITE_COMING_SOON` (or set `false`) on Production → redeploy → incognito smoke shows the full app.
 
@@ -201,7 +199,7 @@ Single vendor solution for password or Vercel Auth on `holzen.app`.
 
 ### While not public
 
-- Do **not** merge to **`main`** unless you intend to update prod; work on **`staging`** ([branch-model.md](./branch-model.md)).
+- Do **not** merge to **`main`** unless you intend to update prod; work on **`feature/*`** PRs ([branch-model.md](./branch-model.md)).
 - **Required reviewers** on GitHub **`production`** environment.
 - Optional: Supabase prod → Auth → disable new signups.
 
@@ -236,4 +234,4 @@ Set the same `VITE_*` env vars in the Vercel project first.
 
 ## Why not only GitHub Actions for frontend?
 
-PR previews use the **GitHub ↔ Vercel integration** (preview URLs, deployment comments) without extra YAML. **`main` and `staging`** frontend deploys run in Actions **after** Supabase so backend and frontend stay ordered — see [cicd-overview.md](cicd-overview.md). Backend stays on GitHub Actions because Supabase CLI deploy is not Vercel’s job.
+PR previews use the **GitHub ↔ Vercel integration** (preview URLs, deployment comments) without extra YAML. **`main`** frontend deploys run in Actions **after** Supabase so backend and frontend stay ordered — see [cicd-overview.md](cicd-overview.md). Backend stays on GitHub Actions because Supabase CLI deploy is not Vercel’s job.

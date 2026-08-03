@@ -4,9 +4,9 @@
 
 CI preflight treats these as **recommended** (edges no-op when unset — see [observability-setup.md](../ops/observability-setup.md)). Holzen.app can ship without them; you will not get `#holzen-alerts` or BetterStack log aggregation until this is done.
 
-## What’s missing (staging + production)
+## What’s missing (holzen-prod)
 
-Set on **both** Supabase projects (`holzen-staging`, `holzen-prod`) → Edge Functions → Secrets:
+Set on **holzen-prod** → Edge Functions → Secrets:
 
 | Secret | Source |
 |--------|--------|
@@ -23,18 +23,16 @@ Set on **both** Supabase projects (`holzen-staging`, `holzen-prod`) → Edge Fun
 
 ## Apply locally (preferred)
 
-1. Copy values into `.env.staging.secrets` and `.env.prod.secrets` (gitignored).
+1. Copy values into `.env.prod.secrets` (gitignored).
 2. Push to Supabase:
 
 ```bash
-npm run staging:secrets-set
 npm run prod:secrets-set
 ```
 
 3. Verify (optional):
 
 ```bash
-npm run check:cicd-env -- --profile=staging --platform=supabase
 npm run check:cicd-env -- --profile=production --platform=supabase
 ```
 
@@ -48,7 +46,7 @@ To create HTTP sources via API instead of the dashboard, add a **Telemetry API t
 BETTERSTACK_API_TOKEN=...
 ```
 
-Then create sources named e.g. `holzen-edges-staging` / `holzen-edges-prod` ([BetterStack create-source API](https://betterstack.com/docs/logs/api/create-a-source/)), copy `ingesting_host` + token into the secrets files, and run `staging:secrets-set` / `prod:secrets-set`.
+Then create a source named e.g. `holzen-edges-prod` ([BetterStack create-source API](https://betterstack.com/docs/logs/api/create-a-source/)), copy `ingesting_host` + token into `.env.prod.secrets`, and run `prod:secrets-set`.
 
 Slack incoming webhooks still require one manual create in the Slack UI (no repo automation yet).
 

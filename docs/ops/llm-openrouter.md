@@ -22,7 +22,9 @@ OpenRouter also offers **optional** features Holzen does **not** use by default:
 
 If you want to experiment with Auto Router later, it would be a deliberate product change (new env var, logging which model was chosen, JSON QA).
 
-## Supabase secrets (staging + prod)
+## Supabase secrets (holzen-prod)
+
+Set on the **holzen-prod** Edge secrets (and in local Docker env for `supabase functions serve`).
 
 **Set**
 
@@ -44,7 +46,7 @@ Redeploy edge functions after changing secrets.
 Remove Google keys from:
 
 - `supabase/.env.local`
-- `.env.staging.secrets` / `.env.prod.secrets`
+- `.env.prod.secrets`
 - Do **not** put `GOOGLE_AI_API_KEY` in `supabase/.env` for local serve
 
 Use `npm run edge:env:bootstrap` to regenerate `supabase/.env.local` (OpenRouter + Perplexity only).

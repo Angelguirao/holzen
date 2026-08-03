@@ -6,13 +6,13 @@
 
 ---
 
-## Three Supabase projects
+## Supabase projects
 
 | Ref | Role |
 |-----|------|
 | `edgbwdecaoottowliimu` | Legacy **Lovable-managed** prod (historical pg_cron URLs in old migrations) |
-| `ksplyxxdvandkwzundql` | Owned **holzen-staging** |
 | `geqkxsnyqvhtascjghuu` | Owned **holzen-prod** |
+| `ksplyxxdvandkwzundql` | Legacy **holzen-staging** — **deleted 2026-07-16**; do not recreate on Free |
 
 **Schema** always comes from Git: `supabase db push` replays `supabase/migrations/*.sql`.
 
@@ -34,7 +34,7 @@ SELECT count(*) FROM public.pause_instances;
 |-----------|--------|
 | Owned prod already has users (claimed/transferred project) | **Skip pg_dump** — verify secrets and DNS only |
 | Legacy has data, owned prod is empty | One-time cutover (below) |
-| Local dev only | `npm run supabase:reset` + optional pull from staging |
+| Local dev only | `npm run supabase:reset` (+ optional `db:pull:prod` carefully) |
 
 **Prefer claim/transfer first:** Supabase Dashboard on the Lovable project → transfer to your org. If the project ref and data stay intact, you avoid pg_dump entirely.
 
@@ -81,7 +81,7 @@ Set `INCLUDE_TELEMETRY=1` to also migrate telemetry tables.
 | Storage bucket files | Supabase Storage CLI / manual copy between projects |
 | Edge secrets | Password manager → Supabase Dashboard |
 | Vault secrets (`holzen_cron_service_role`, …) | [bootstrap-owned-project.sql](bootstrap-owned-project.sql) |
-| pg_cron schedules | [cron-setup.md](cron-setup.md) / `npm run staging:reschedule-crons` or `npm run prod:reschedule-crons` |
+| pg_cron schedules | [cron-setup.md](cron-setup.md) / `npm run prod:reschedule-crons` |
 | Realtime publications | Re-apply `ALTER PUBLICATION` if you added custom tables |
 
 ### After restore
@@ -94,7 +94,7 @@ Set `INCLUDE_TELEMETRY=1` to also migrate telemetry tables.
 
 ---
 
-## Local snapshots (staging / prod → Docker)
+## Local snapshots (prod → Docker)
 
 For debugging with real-ish data without touching prod schema:
 
@@ -103,11 +103,10 @@ For debugging with real-ish data without touching prod schema:
 npm run supabase:reset
 
 # 2. Pull snapshot (PII — never commit backups/)
-npm run db:pull:staging
-# or: npm run db:pull:prod
+npm run db:pull:prod
 
 # 3. Restore into local stack
-npm run db:restore:local -- backups/pull-staging-<timestamp>
+npm run db:restore:local -- backups/pull-prod-<timestamp>
 npm run dev:local
 ```
 
@@ -115,13 +114,13 @@ Scripts:
 
 | npm script | Script |
 |------------|--------|
-| `db:pull:staging` | [`scripts/db-pull-remote.sh`](../../scripts/db-pull-remote.sh) staging |
 | `db:pull:prod` | [`scripts/db-pull-remote.sh`](../../scripts/db-pull-remote.sh) prod |
+| `db:pull:legacy` | [`scripts/db-pull-remote.sh`](../../scripts/db-pull-remote.sh) legacy |
 | `db:restore:local` | [`scripts/db-restore-local.sh`](../../scripts/db-restore-local.sh) |
 
 Add `--include-telemetry` when invoking the shell script directly for full telemetry tables.
 
-**Default dev path (no remote pull):** `npm run supabase:reset` + `npm run dev:staging` hits hosted staging API — enough for most feature work.
+**Default dev path (no remote pull):** `npm run supabase:reset` + `npm run dev:local` — enough for most feature work.
 
 ---
 
@@ -129,9 +128,9 @@ Add `--include-telemetry` when invoking the shell script directly for full telem
 
 Lovable changes **work** for UI when:
 
-- Edits land on `feature/*` → PR → `staging` → `main`
+- Edits land on `feature/*` → PR → `main`
 - Lovable does **not** auto-sync SQL/functions to any Supabase project
-- Lovable preview uses **staging** `VITE_SUPABASE_*`, not Lovable Cloud DB
+- Lovable preview should use local or carefully scoped prod `VITE_SUPABASE_*`, not Lovable Cloud DB
 
 See [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) § Optional Lovable editor.
 

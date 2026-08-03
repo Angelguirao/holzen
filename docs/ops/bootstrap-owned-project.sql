@@ -1,9 +1,9 @@
--- One-time bootstrap for owned holzen-staging / holzen-prod (SQL Editor, postgres role).
--- Run holzen_project_url BEFORE `npm run staging:db-push` so pg_cron rewrite migration applies.
--- Replace <PROJECT_REF> and URLs per project.
+-- One-time bootstrap for owned holzen-prod (SQL Editor, postgres role).
+-- Run holzen_project_url BEFORE `npm run prod:db-push` so pg_cron rewrite migration applies.
+-- Replace <PROJECT_REF> with geqkxsnyqvhtascjghuu (or use that ref literally).
+-- Legacy holzen-staging (ksplyxx…) was deleted 2026-07-16 — do not recreate on Free.
 
--- Staging: ksplyxxdvandkwzundql
--- Prod:    geqkxsnyqvhtascjghuu
+-- Prod: geqkxsnyqvhtascjghuu
 
 SELECT vault.create_secret(
   'https://<PROJECT_REF>.supabase.co',
@@ -16,4 +16,4 @@ SELECT vault.create_secret(
 -- SELECT vault.create_secret('<random CRON_SECRET>', 'CRON_SECRET');
 
 -- Reschedule HTTP crons (do NOT rely on UPDATE cron.job — 42501 on hosted):
--- npm run staging:reschedule-crons
+-- npm run prod:reschedule-crons

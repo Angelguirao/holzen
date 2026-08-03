@@ -2,7 +2,7 @@
 
 One-time and ongoing steps for the **owned production project** after leaving Lovable Cloud auto-sync.
 
-**Prerequisite:** Staging validated per [staging-supabase-setup.md](staging-supabase-setup.md). Production project must **not** be linked to Lovable GitHub sync.
+**Prerequisite:** Prefer schema validation on **local Docker** before first prod push. Production project must **not** be linked to Lovable GitHub sync. Branch model: [branch-model.md](branch-model.md). Legacy **holzen-staging** was deleted 2026-07-16 — see [staging-supabase-setup.md](staging-supabase-setup.md).
 
 ---
 
@@ -11,7 +11,7 @@ One-time and ongoing steps for the **owned production project** after leaving Lo
 1. Supabase Dashboard → project **holzen-prod** (`geqkxsnyqvhtascjghuu`)
 2. Note publishable key in password manager — do not commit keys to git
 3. Enable **Point-in-Time Recovery** if available on your plan
-4. Set Vault `holzen_project_url` to `https://geqkxsnyqvhtascjghuu.supabase.co` (see [staging-supabase-setup.md](staging-supabase-setup.md) §1b)
+4. Set Vault `holzen_project_url` to `https://geqkxsnyqvhtascjghuu.supabase.co` (used by pg_cron HTTP callouts)
 
 ---
 
@@ -54,7 +54,7 @@ Optional (frontend host build on Netlify/CF Pages uses its own env — mirror th
 
 Supabase Dashboard → Project Settings → Edge Functions → Secrets.
 
-Copy staging values where appropriate; swap to **live** vendor keys where noted.
+Use values from `.env.prod.secrets` / password manager; swap to **live** vendor keys where noted.
 
 ### Required (pause-first active surface)
 
