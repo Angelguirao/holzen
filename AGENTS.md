@@ -51,7 +51,7 @@ LifeOS (`pe.plan` / `pe.execute` / `pe.review`) mounts this repo and loads this 
 | `.lifeos/expertise/` | Durable conventions / learnings for future PE slices |
 | `.lifeos/expertise/learnings/` | Short lessons landed with the PR that taught them |
 
-Complete agent-ready specs need **Behavior Specifications** (EARS + `Test:` / `Untestable:`) and **Implementation Steps**. Prefer small, reviewable `symphony/*` diffs. Do not push to `main` / `staging` from the harness.
+Complete agent-ready specs need **Behavior Specifications** (EARS + `Test:` / `Untestable:`) and **Implementation Steps**. Prefer small, reviewable `symphony/*` diffs. Do not push to `main` from the harness.
 
 ## Commands
 
@@ -83,7 +83,7 @@ Complete agent-ready specs need **Behavior Specifications** (EARS + `Test:` / `U
 | `npm run check:no-idle-query-polling` | Active `src/` invalidation-first TanStack Query: no timed `refetchInterval`, focus/reconnect refetch, or focus-driven `invalidateQueries` (alias: `check:invalidation-first-queries`) (in **`test:ci`** / **`check:prepush`**) |
 | `npm run check:prepush` | Full scripted preflight (`scripts/pre-push-check.sh`). **Requires real bash** — on Windows use **Git Bash** (`"C:\Program Files\Git\bin\bash.exe"`) or a working **WSL** distro. PowerShell alone will not run it. Prefer the Git Bash path: bare `bash` on PATH is often the WindowsApps/WSL stub and fails with `execvpe(/bin/bash)` when no distro is installed. |
 | `npm run smoke:edge-logging` | Optional: HTTP smoke against deployed edges — verifies `x-cid` round-trip through `withRequestLogging` (see `supabase/functions/README.md`). |
-| `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **production** Supabase project ref (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Use `npm run gen:types:staging` when you intentionally want staging. |
+| `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **production** Supabase project ref (`supabase login` or `SUPABASE_ACCESS_TOKEN`). For schema work, prefer local Docker (`npm run supabase:start`) then regenerate from prod when ready. |
 | `npm run design:lint` | Optional: validate root **[DESIGN.md](DESIGN.md)** ([`@google/design.md`](https://www.npmjs.com/package/@google/design.md)); uses `npx` (network on first run). |
 | `npm run doctor` | Optional: [React Doctor](https://react.doctor) health scan (`react-doctor` devDependency). Use `npm run doctor -- --verbose --diff` before/after React changes; skill `.cursor/skills/react-doctor/`. |
 | `npm run test:coverage` | Vitest with coverage reports only (no JUnit; use **`test:ci`** for the full CI gate). |
@@ -91,7 +91,7 @@ Complete agent-ready specs need **Behavior Specifications** (EARS + `Test:` / `U
 | `npm run stamp:release` | Writes **`git rev-parse --short=12 HEAD`** into **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE`) for edge Sentry/BetterStack **`SENTRY_RELEASE`**. Idempotent. |
 | `npm run check:release-stamp` | Exits non-zero if **`EDGE_RELEASE`** in **`release.ts`** ≠ current **`git rev-parse --short=12 HEAD`** (read-only; same comparison the stamper uses). |
 | `npm run env:doctor` | Prints repo-local Supabase link state, frontend targets by mode, and local Docker status. |
-| `npm run dev:staging` / `npm run dev:prod` / `npm run dev:local` · `npm run build:dev` · `supabase:*` | Staging vs prod-like vs localstack Vite modes and Docker Supabase CLI wrappers — see [README.md](README.md) npm scripts. |
+| `npm run dev:prod` / `npm run dev:local` · `npm run build:dev` · `supabase:*` | Prod-like vs local Docker Vite modes and Supabase CLI wrappers — see [README.md](README.md) npm scripts. |
 
 **Linting:** There are many **pre-existing** ESLint issues (~300). Do not treat cleaning the whole tree as part of a small task; avoid introducing *new* problems in files you touch.
 
@@ -128,7 +128,7 @@ Complete agent-ready specs need **Behavior Specifications** (EARS + `Test:` / `U
 - **Migrations:** `supabase/migrations/` — SQL is the source of truth for schema; follow the project’s normal flow to apply (target-specific scripts, explicit project refs, or dashboard SQL).
 - **SQL function conventions (mandatory):** every function in `supabase/migrations/` must `SET search_path = public` (or `public, extensions` when calling `net.*` / extension code), and use `SECURITY DEFINER` **only** when bypassing RLS is required — and then validate the caller and strip privileged columns. See [docs/ops/migration-security-conventions.md](docs/ops/migration-security-conventions.md) for templates and the pre-push checklist; companion rules for views are in [docs/ops/migration-view-safety.md](docs/ops/migration-view-safety.md).
 - **Edge functions:** `supabase/functions/<name>/index.ts` (Deno). Shared helpers: `supabase/functions/_shared/`. Larger handlers (e.g. **`companion-orchestrate`**) also use **`_shared/companion-orchestrate-*.ts`** (types, parse, logging, skip-cache, tasks, assemble). Add **`[functions.<name>]`** in **`supabase/config.toml`** for **every** new function (same PR). Unlisted names use **Supabase defaults** and can **401** on `invoke` or disagree with `functions serve` until you add the block and redeploy. **401** → session/`Authorization`, dashboard secrets, deployed `config.toml`. After editing edge TS, run **`npm run check:edge`** when Deno is installed.
-- **Deploy path:** Migrations and edge functions deploy to **owned Supabase** (staging / prod) via CI or CLI; the **React app** deploys on **Vercel** when `main` merges. See [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §17 and [docs/ops/vercel-frontend-setup.md](docs/ops/vercel-frontend-setup.md).
+- **Deploy path:** Migrations and edge functions deploy to **owned Supabase** (holzen-prod) via CI or CLI; schema work uses **local Docker**. The **React app** deploys on **Vercel** when `main` merges. See [docs/ops/branch-model.md](docs/ops/branch-model.md), [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §17, and [docs/ops/vercel-frontend-setup.md](docs/ops/vercel-frontend-setup.md).
 - **Runtime:** Functions run on Supabase in deployed environments. You typically **do not** start them locally during ordinary frontend work unless you are explicitly developing/testing a function.
 
 ## Environment variables
@@ -155,7 +155,7 @@ Never commit `.env` or service role keys.
 
 ### Before every push to GitHub
 
-Merging to `staging` or `main` triggers Supabase migrations/edge deploy (per CI) and Vercel frontend deploy (on `main`). Match release SHA across Vercel (`VITE_APP_VERSION`) and edges (`SENTRY_RELEASE` / `EDGE_RELEASE`).
+Merge feature → `main` to trigger Supabase migrations/edge deploy (per CI) and Vercel frontend deploy. Preview uses holzen-prod until Branching. Match release SHA across Vercel (`VITE_APP_VERSION`) and edges (`SENTRY_RELEASE` / `EDGE_RELEASE`).
 
 **Run the pre-push checklist** in [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) (boxed list + **`npm run check:prepush`** bash gate). Day-to-day minimum: **`npm run test`**, **`npm run build`** (**`prebuild`** → **`check:version-sync`**), lint on touched files. When edge code or **`config.toml`** / **`EdgeCoverage.tsx`** changes: also **`npm run check:edge`** (if Deno is installed), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**. After schema changes: **`npm run gen:types`** when you can authenticate to Supabase, and **`as unknown as T`** for new columns until types catch up. Cursor loads the same expectations via `.cursor/rules/deployment-sync.mdc`.
 

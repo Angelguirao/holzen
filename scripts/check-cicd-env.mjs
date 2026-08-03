@@ -4,9 +4,8 @@
  *
  * Usage:
  *   node scripts/check-cicd-env.mjs --profile=ci --platform=github
- *   node scripts/check-cicd-env.mjs --profile=staging --platform=all
  *   node scripts/check-cicd-env.mjs --profile=production --platform=all
- *   node scripts/check-cicd-env.mjs --profile=staging --platform=all --strict-recommended
+ *   node scripts/check-cicd-env.mjs --profile=production --platform=all --strict-recommended
  *
  * Platforms: github | vercel | supabase | all
  */
@@ -26,7 +25,7 @@ import {
   getVercelSpec,
 } from "./lib/cicd-env-catalog.mjs";
 
-const VALID_PROFILES = ["ci", "staging", "production"];
+const VALID_PROFILES = ["ci", "production"];
 const VALID_PLATFORMS = ["github", "vercel", "supabase", "all"];
 
 function parseArgs() {
@@ -36,7 +35,7 @@ function parseArgs() {
 
   if (!profile || !VALID_PROFILES.includes(profile)) {
     console.error(
-      `[check-cicd-env] Pass --profile=ci, --profile=staging, or --profile=production`,
+      `[check-cicd-env] Pass --profile=ci or --profile=production`,
     );
     process.exit(1);
   }
@@ -222,12 +221,15 @@ function fetchSupabaseSecretNames({ token, projectRef }) {
 }
 
 function checkSupabase(profile, strictRecommended) {
+  if (profile !== "production") {
+    throw new Error(
+      `Supabase audit only supports profile=production (got "${profile}").`,
+    );
+  }
+
   const token = process.env.SUPABASE_ACCESS_TOKEN?.trim();
-  const envKey = profile === "production" ? "production" : "staging";
   const projectRef =
-    profile === "production"
-      ? process.env.SUPABASE_PROD_PROJECT_REF?.trim() || SUPABASE_PROJECT_REFS.production
-      : process.env.SUPABASE_STAGING_PROJECT_REF?.trim() || SUPABASE_PROJECT_REFS.staging;
+    process.env.SUPABASE_PROD_PROJECT_REF?.trim() || SUPABASE_PROJECT_REFS.production;
 
   if (!token) {
     throw new Error(
@@ -235,11 +237,9 @@ function checkSupabase(profile, strictRecommended) {
     );
   }
 
-  const platform =
-    envKey === "production" ? "supabase-edge-production" : "supabase-edge-staging";
-  const keys = SUPABASE_EDGE_KEYS[envKey] ?? [];
-  const projectLabel =
-    envKey === "production" ? "holzen-prod (geqkxsnyqvhtascjghuu)" : "holzen-staging (ksplyxxdvandkwzundql)";
+  const platform = "supabase-edge-production";
+  const keys = SUPABASE_EDGE_KEYS.production ?? [];
+  const projectLabel = "holzen-prod (geqkxsnyqvhtascjghuu)";
 
   const present = fetchSupabaseSecretNames({ token, projectRef });
   const missingRequired = [];
@@ -319,7 +319,7 @@ function printReport(profile, results, strictRecommended) {
   console.error(
     "   Supabase Edge   → supabase.com/dashboard → project → Edge Functions → Secrets",
   );
-  console.error("   Local apply     → npm run staging:secrets-set / prod:secrets-set");
+  console.error("   Local apply     → npm run prod:secrets-set");
   console.error("   Vercel sync     → npm run vercel:sync-env");
   console.error(`   Full catalog    → ${DOCS}`);
   console.error(

@@ -17,8 +17,7 @@
   ],
   "git": {
     "deploymentEnabled": {
-      "main": false,
-      "staging": false
+      "main": false
     }
   },
   "headers": [

@@ -19,8 +19,7 @@ const target = resolveSupabaseTarget(process.argv[2] ?? "production");
 const banner = `/**
  * Supabase-generated \`Database\` types.
  *
- * Regenerate after migrations: \`npm run gen:types\` (production) or
- * \`npm run gen:types:staging\` (staging).
+ * Regenerate after migrations: \`npm run gen:types\` (production).
  * Generated from explicit target: ${formatSupabaseTarget(target)}.
  *
  * If this file drifts from production, dropped tables/columns may still appear
