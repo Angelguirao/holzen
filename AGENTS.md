@@ -43,6 +43,8 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 
 LifeOS (`pe.plan` / `pe.execute` / `pe.review`) mounts this repo and loads this file plus `.lifeos/expertise/**`.
 
+**Work SoT:** agent issues live in LifeOS Postgres (`external_tracker=lifeos`), not GitHub Issues. GH may mirror for humans; do **not** treat GH `agent-ready` as the wake signal for native LifeOS rows. Orchestration (ready / claim / prime) is on PersonalOS — see personal-agent `deploy/WORK-GRAPH-OPS.md` and `npm run work` in that repo.
+
 | Path | Role |
 |------|------|
 | `.lifeos/tester.yaml` | Independent Tester commands after `pe.execute` (authoritative suite — not the Writer’s self-report) |
@@ -79,7 +81,7 @@ Complete agent-ready specs need **Behavior Specifications** (EARS + `Test:` / `U
 | `npm run check:no-root-components` | No new `src/components/*.tsx` outside `ui/` + allowlist (in **`test:ci`**) |
 | `npm run check:architecture-alignment` | Features layout, no screens-in-features (in **`test:ci`**) |
 | `npm run check:no-idle-query-polling` | Active `src/` invalidation-first TanStack Query: no timed `refetchInterval`, focus/reconnect refetch, or focus-driven `invalidateQueries` (alias: `check:invalidation-first-queries`) (in **`test:ci`** / **`check:prepush`**) |
-| `npm run check:prepush` | Full scripted preflight (`scripts/pre-push-check.sh`). **Requires `bash`** (Git Bash / WSL on Windows). |
+| `npm run check:prepush` | Full scripted preflight (`scripts/pre-push-check.sh`). **Requires real bash** — on Windows use **Git Bash** (`"C:\Program Files\Git\bin\bash.exe"`) or a working **WSL** distro. PowerShell alone will not run it. Prefer the Git Bash path: bare `bash` on PATH is often the WindowsApps/WSL stub and fails with `execvpe(/bin/bash)` when no distro is installed. |
 | `npm run smoke:edge-logging` | Optional: HTTP smoke against deployed edges — verifies `x-cid` round-trip through `withRequestLogging` (see `supabase/functions/README.md`). |
 | `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **production** Supabase project ref (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Use `npm run gen:types:staging` when you intentionally want staging. |
 | `npm run design:lint` | Optional: validate root **[DESIGN.md](DESIGN.md)** ([`@google/design.md`](https://www.npmjs.com/package/@google/design.md)); uses `npx` (network on first run). |

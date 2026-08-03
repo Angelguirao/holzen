@@ -92,7 +92,7 @@ const AuthScreen = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 relative">
       <Link
-        to="/welcome"
+        to="/"
         aria-label="Close"
         className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground transition-colors"
       >

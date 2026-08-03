@@ -5,26 +5,7 @@ import { fileURLToPath } from 'node:url';
 const holzenRoot = fileURLToPath(new URL('../..', import.meta.url));
 const designTokensRoot = path.resolve(holzenRoot, 'packages/design-tokens');
 
-/** Dev-only: Astro site has no `/` page or SPA routes — send to `/welcome`. */
-function devMarketingRedirects() {
-  return {
-    name: 'holzen-dev-marketing-redirects',
-    configureServer(server) {
-      server.middlewares.use((req, res, next) => {
-        const url = req.url ?? '';
-        if (url === '/' || url.startsWith('/?')) {
-          const qs = url.length > 1 ? url.slice(1) : '';
-          res.writeHead(302, { Location: `/welcome${qs}` });
-          res.end();
-          return;
-        }
-        next();
-      });
-    },
-  };
-}
-
-/** @see docs/ops/marketing-site-split.md */
+/** @see docs/ops/marketing-site-split.md — waitlist landing is SPA `/` (Make port). */
 export default defineConfig({
   site: 'https://holzen.app',
   output: 'static',
@@ -39,6 +20,5 @@ export default defineConfig({
         '@holzen/design-tokens': designTokensRoot,
       },
     },
-    plugins: [devMarketingRedirects()],
   },
 });

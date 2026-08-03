@@ -1,10 +1,11 @@
 # Marketing / public screens
 
-Public routes (no auth shell). **Marketing HTML** (`/welcome`, `/about`, `/blog`, legal) is Astro — see `apps/site/`. This folder keeps SPA-only public flows.
+Public routes (no auth shell). **Thin marketing HTML** (`/about`, `/blog`, legal) is Astro — see `apps/site/`. Waitlist landing is SPA at `/`.
 
 | Screen | Route | Notes |
 |--------|-------|-------|
-| `MarketingDevFallback` | `/welcome`, `/about`, `/blog`, `/terms`, `/privacy` | Dev stub → Astro on :4321 |
+| `welcome/WelcomeLandingScreen` | `/` (`PublicOnlyRoute`); `/welcome` → `/` | Figma Make waitlist |
+| `MarketingDevFallback` | `/about`, `/blog`, `/terms`, `/privacy` | Dev stub → Astro on :4321 |
 | `AuthScreen` | `/auth` | Product SPA |
 | `ResetPasswordScreen` | `/reset-password` | Product SPA |
 | `NotFoundScreen` | `*` catch-all | Product SPA |

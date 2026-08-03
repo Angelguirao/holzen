@@ -7,8 +7,9 @@ const SITE_MARKETING =
 const STATIC_MARKETING_RELOAD_KEY = 'holzen-marketing-static-reload';
 
 /**
- * Dev: stub pointing at Astro dev server.
- * Prod: force a full document load so Vercel serves Astro HTML (not this SPA route).
+ * Dev: stub pointing at Astro for legal/blog/about.
+ * Prod: full document load so Vercel serves Astro HTML.
+ * Waitlist landing (`/`) is SPA — do not route it here.
  * @see docs/ops/marketing-site-split.md
  */
 export default function MarketingDevFallback() {
@@ -43,8 +44,8 @@ export default function MarketingDevFallback() {
           >
             Open {pathname} again
           </a>
-          <Link to="/auth?view=sign-up" className="text-sm text-muted-foreground hover:text-foreground">
-            Continue to sign up in the app
+          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+            Back to landing
           </Link>
         </div>
       );
@@ -64,8 +65,9 @@ export default function MarketingDevFallback() {
       <p className="font-mono text-xs tracking-[0.2em] uppercase text-muted-foreground">Holzen</p>
       <h1 className="text-lg font-editorial max-w-md">This page lives in Astro</h1>
       <p className="text-sm text-muted-foreground max-w-sm">
-        Run <code className="font-mono text-xs">npm run dev:site</code> for marketing pages, or use
-        the merged build after <code className="font-mono text-xs">npm run build:unified</code>.
+        Legal, about, and blog stay on the Astro marketing site. Run{' '}
+        <code className="font-mono text-xs">npm run dev:site</code> or use the merged build.
+        Waitlist landing is SPA at <code className="font-mono text-xs">/</code>.
       </p>
       <a
         href={marketingUrl}
@@ -73,8 +75,8 @@ export default function MarketingDevFallback() {
       >
         Open {pathname} on marketing dev server
       </a>
-      <Link to="/auth?view=sign-up" className="text-sm text-muted-foreground hover:text-foreground">
-        Continue to sign up in the app
+      <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+        Open waitlist landing
       </Link>
     </div>
   );

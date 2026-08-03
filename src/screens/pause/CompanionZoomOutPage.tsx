@@ -44,7 +44,7 @@ export default function CompanionZoomOutPage() {
     severity,
   });
 
-  if (missingRouteId) return <Navigate to="/" replace />;
+  if (missingRouteId) return <Navigate to="/home" replace />;
 
   if (loadError) {
     return (

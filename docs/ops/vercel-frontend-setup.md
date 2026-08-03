@@ -129,7 +129,7 @@ In Vercel → **holzen** → Settings → Environment Variables, add each row to
 
 After first deploy, verify:
 
-- `/welcome`, `/pause`, deep links load on refresh (not 404)
+- `/`, `/home`, `/pause`, deep links load on refresh (not 404)
 - `/sw.js` returns 200 (PWA service worker)
 
 ---

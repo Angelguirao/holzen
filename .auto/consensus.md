@@ -2,40 +2,47 @@
 
 **Venture:** holzen  
 **Phase:** operate  
-**Last updated:** 2026-06-13 (cycle 1)
+**Last updated:** 2026-07-30 (cycle 6)
 
 ---
 
 ## Last cycle
 
-**Cycle 1 — operate (Cursor live walkthrough)**
+**Cycle 6 — operate (deps_hygiene · read-only)**
 
-1. **Preflight:** `npm run test:ci` initially **failed** on `check:no-phase-labels` (2 forbidden `mvp` tokens).
-2. **Fix (CI priority):** Reworded comments only — no behavior change:
-   - `CheckoutConfirmation.tsx` — "MVP" → "shipped scope"
-   - `docs/ops/versioning.md` — "pause-first MVP" → "pause-first strip"
-3. **Preflight rerun:** `npm run test:ci` **passed** — 775 test files, 2996 tests, ~10 min.
-4. **Backlog audit (read-only):** Compared `active-surface.md` shell routes vs `app-routes.ts` / `App.tsx`:
-   - **Aligned:** `/`, `/archive`, `/journey`, `/settings`, `/pause`, `/onboarding`, `/companion/*`
-   - **Doc gap:** `App.tsx` registers `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage` — not listed in active-surface shipped routes table (ops surfaces; consider adding an "Admin (internal)" row)
+1. Ran `npm outdated` (first ~40 rows). Many **Wanted** within-range updates (Radix minors, Sentry 10.49→10.69, supabase-js 2.98→2.111, etc.).
+2. **No bumps applied** — operate rule: dep patches need human approval / security urgency.
+3. No single critical security pin spotted in the skim; escalate later if `npm audit` is desired as a separate Backlog item.
+
+**Cycle 5 — operate (ci_green)**
+
+1. `check:active-surface` OK; `check:edge-logging` 31/31 OK.
+
+**Cycle 4 — operate (measure_loop)**
+
+1. `check:posthog-events-allowlist` OK.
+
+**Cycles 2–3 — docs_drift**
+
+1. Prepush Windows/Git Bash docs; Admin routes on active-surface + `APP_ADMIN_ROUTES`.
 
 ---
 
 ## Next action
 
-Pick **one** backlog item:
-
-- [ ] Verify `npm run check:prepush` docs match Windows/Git Bash reality in AGENTS.md
-- [ ] Audit edge functions for any missing `withRequestLogging` wrapper *(check:edge-logging already reports 29/29 OK — likely close as verified)*
-- [ ] Add admin ops routes to `docs/ops/active-surface.md` (from cycle 1 audit finding)
+Human: add one Backlog item on this consensus (or set Next Action on `/os/venture?view=status`) before the next operate cycle — baton idle, no invent.
 
 ---
 
 ## Backlog (human-approved maintainer tasks)
 
-- [ ] Verify `npm run check:prepush` docs match Windows/Git Bash reality in AGENTS.md
-- [ ] Audit edge functions for any missing `withRequestLogging` wrapper
-- [ ] Confirm `docs/ops/active-surface.md` matches current route table in `src/lib/app-routes.ts`
+- [x] Verify `npm run check:prepush` docs match Windows/Git Bash reality in AGENTS.md
+- [x] Audit edge functions for any missing `withRequestLogging` wrapper
+- [x] Confirm `docs/ops/active-surface.md` matches `app-routes.ts` (admin ops)
+- [x] Confirm PostHog event taxonomy allowlist
+- [x] CI entropy: `check:active-surface` + `check:edge-logging`
+- [x] Deps hygiene read-only (`npm outdated`) — no bumps without approval
+- [ ] Optional: `npm audit` / approve a bounded within-range bump set (Sentry + supabase-js?)
 
 _Add items here before agents implement new work._
 
@@ -43,17 +50,18 @@ _Add items here before agents implement new work._
 
 ## Blockers / escalations
 
-_None._
+- Deps: many outdated packages; **do not auto-bump**. Optional follow-up Backlog: audit + approve patch set.
 
 ---
 
 ## Out of scope declined
 
-- Skipped backlog feature work — CI failure took priority (operate rule: fix red CI first).
+- No dependency version bumps this cycle.
+- No product features.
 
 ---
 
 ## Notes
 
-- Edge logging audit via CI: 29 functions, 0 violations — backlog item 2 may be redundant with `check:edge-logging`.
-- Cycles must not expand product scope without an item added to Backlog by human.
+- Holzen operate PR: https://github.com/Angelguirao/holzen/pull/132
+- LifeOS baton: clear or set from Status when you pick the next Backlog item.
