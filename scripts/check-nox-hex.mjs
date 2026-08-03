@@ -19,6 +19,11 @@ const FORBIDDEN_HEX = [
 
 const EXTENSIONS = new Set(['.ts', '.tsx', '.css', '.astro']);
 
+/** Figma Make pixel ports that intentionally keep source hexes. */
+const ALLOWLIST = new Set([
+  'src/screens/marketing/welcome/WelcomeLandingScreen.tsx',
+]);
+
 function walk(dir, files = []) {
   for (const name of readdirSync(dir)) {
     const full = join(dir, name);
@@ -40,6 +45,7 @@ function main() {
   for (const file of walk(srcRoot)) {
     const content = readFileSync(file, 'utf8');
     const rel = relative(root, file).replace(/\\/g, '/');
+    if (ALLOWLIST.has(rel)) continue;
     for (const { re, label } of FORBIDDEN_HEX) {
       if (re.test(content)) {
         violations.push({ file: rel, label, pattern: re.source });
