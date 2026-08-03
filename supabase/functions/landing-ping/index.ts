@@ -11,8 +11,8 @@ serve(
     }
 
     const body = await req.json().catch(() => ({}));
-    const path = typeof body?.path === "string" ? body.path.slice(0, 200) : "/welcome";
-    if (path !== "/welcome" && path !== "/") {
+    const path = typeof body?.path === "string" ? body.path.slice(0, 200) : "/";
+    if (path !== "/" && path !== "/welcome") {
       throw new EdgeError("bad_input", "Unsupported path.");
     }
 

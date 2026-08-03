@@ -6,12 +6,13 @@ Active Holzen frontend. **Pause ritual** is the product; Archive, Journey overvi
 
 | Tab / area | Path | Screen entry |
 | ---------- | ---- | ------------- |
-| Home | `/` | `screens/home/HomeScreen.tsx` |
+| Home | `/home` | `screens/home/HomeScreen.tsx` |
 | Archive | `/archive` | `screens/archive/ArchiveScreen.tsx` |
 | Journey | `/journey` | `screens/journey/JourneyOverviewScreen.tsx` |
 | Settings | `/settings/*` | `screens/settings/*` |
 | Pause | `/pause`, `/companion/*` | `screens/pause/` |
-| Public marketing | `/welcome`, `/about`, legal, `/blog` | Astro `apps/site/` (SPA dev stub: `MarketingDevFallback`) |
+| Waitlist landing | `/` (legacy `/welcome` → `/`) | `screens/marketing/welcome/` |
+| Thin marketing | `/about`, legal, `/blog` | Astro `apps/site/` (SPA stub: `MarketingDevFallback`) |
 | Public product | `/auth`, `/reset-password`, `/unsubscribe` | `screens/marketing/*Screen` |
 
 Dead IA (`/tools/*`, `/library`, `/journey/stats`, …) → `NotFound` (no legacy redirects).

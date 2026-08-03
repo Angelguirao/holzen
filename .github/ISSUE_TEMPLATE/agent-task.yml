@@ -1,0 +1,63 @@
+name: Agent task
+description: Spec-driven task for the LifeOS Symphony factory (product lane — Holzen)
+title: "[product] "
+labels: ["lane:product"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Spec is the control surface. Fill every section before labeling `agent-ready`.
+        Thin issues get `needs-spec` and a Spec-Drafting pass first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Goal
+      description: What should change, and why it matters for Holzen users.
+      placeholder: Users cannot… / We need…
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Checklist of observable outcomes. Prefer testable bullets.
+      placeholder: |
+        - [ ] …
+        - [ ] …
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: Concrete inputs/outputs, screenshots, or before/after.
+    validations:
+      required: true
+  - type: textarea
+    id: architecture
+    attributes:
+      label: Architecture Notes / Constraints
+      description: Files, modules, APIs, data model, or invariants the agent must respect.
+    validations:
+      required: true
+  - type: textarea
+    id: design
+    attributes:
+      label: Design References (UI)
+      description: Optional. Figma links, Storybook stories, or visual direction.
+    validations:
+      required: false
+  - type: textarea
+    id: edge_cases
+    attributes:
+      label: Edge Cases
+      description: Empty states, errors, auth, mobile, race conditions.
+    validations:
+      required: true
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Out of Scope
+      description: Explicit non-goals so the agent does not expand the blast radius.
+    validations:
+      required: true

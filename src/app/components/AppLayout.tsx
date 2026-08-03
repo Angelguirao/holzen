@@ -84,7 +84,7 @@ function useTabChunkPrefetch() {
  */
 /** Primary-tab label for the shell header center (Home intentionally has none). */
 function shellCenterNavLabel(pathname: string, t: (key: string) => string): string | null {
-  if (pathname === '/' || pathname === '/index') return null;
+  if (pathname === '/home' || pathname === '/index') return null;
   if (isPrimaryTabActive(pathname, 'archive')) return t('nav.archive');
   if (isPrimaryTabActive(pathname, 'journey')) return t('nav.journey');
   if (isPrimaryTabActive(pathname, 'settings')) return t('nav.settings');

@@ -7,10 +7,21 @@ Canonical branch flow for platform exit (owned Supabase + Vercel). Pairs with [p
 | Branch | Deploy target | CI / deploy |
 |--------|---------------|-------------|
 | Feature branches (`feature/*`, `fix/*`) | None (PR checks only) | `ci.yml` on PR; Vercel **PR preview** (auto) |
-| **`staging`** | Staging Supabase + Vercel Preview (`staging` branch) | [staging-deploy.yml](../../.github/workflows/staging-deploy.yml) on push (backend → frontend) |
-| **`main`** | Production Supabase + Vercel Production | [deploy-production.yml](../../.github/workflows/deploy-production.yml) on push (backend → frontend; **`production`** environment approval recommended) |
+| **`staging`** | Vercel Preview (`staging` branch) + Holzen staging DB | [staging-deploy.yml](../../.github/workflows/staging-deploy.yml) on push (backend → frontend) |
+| **`main`** | Production Supabase (`holzen-prod`) + Vercel Production | [deploy-production.yml](../../.github/workflows/deploy-production.yml) on push (backend → frontend; **`production`** environment approval recommended) |
 
 **Promotion:** merge features → `staging` → smoke → merge `staging` → `main`. **Hotfixes:** branch from `main`, merge back to `main`, then merge `main` → `staging` to keep them aligned.
+
+### Supabase: one Holzen project (target)
+
+| Environment | Target |
+|-------------|--------|
+| **Production DB** | Single project **`holzen-prod`** (`geqkxsnyqvhtascjghuu`) — Holzen product tables only |
+| **Product staging DB** | Prefer a **Supabase Branch** on `holzen-prod` (requires org **Pro+**; not available on Free). Until then: git/Vercel staging may share prod carefully, or use the legacy second project while retiring it |
+| **Legacy `holzen-staging` project** | Second Free project — **do not keep long-term**; it blocks creating dedicated LifeOS. Pause/delete after LifeOS cutover (see personal-agent `deploy/LIFEOS-SUPABASE.md`) |
+| **LifeOS ledger** | Separate Supabase project **`lifeos`** — never new `lifeos_*` migrations in this repo |
+
+Do **not** recreate a second Holzen staging *project* on Free to free local workflows — upgrade for Branching, or accept git-only staging.
 
 **Optional Lovable editor:** Lovable may stay connected for UI work on **`feature/*` branches only** — never as prod host or migration path. Full rules: [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) § Optional Lovable editor.
 
