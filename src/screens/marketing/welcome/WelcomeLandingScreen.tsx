@@ -1188,13 +1188,6 @@ function Footer() {
           >
             Terms
           </Link>
-          <span className="text-[#4a5568]">·</span>
-          <Link
-            to="/auth"
-            className="font-['Inter',sans-serif] font-normal text-[#7b8a9e] text-base hover:text-[#dbb366] transition-colors duration-200"
-          >
-            Sign in
-          </Link>
         </div>
       </div>
     </footer>
