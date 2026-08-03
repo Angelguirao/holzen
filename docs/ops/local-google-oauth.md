@@ -2,23 +2,11 @@
 
 Holzen uses **Supabase Auth** `signInWithOAuth({ provider: 'google' })` on `/auth`. You can test Google sign-in from **`http://localhost:8080`** in two ways.
 
-## Option A — Local frontend + staging Supabase (fastest)
+**Prefer Option A (local Docker).** Option B hits **holzen-prod** carefully — there is no holzen-staging project (deleted 2026-07-16).
 
-No Docker auth config. Point Vite at staging and allow localhost in the **staging** dashboard.
+## Option A — Full local stack (Docker Supabase) — preferred
 
-1. Copy [.env.staging.example](../../.env.staging.example) → `.env.staging.local` and fill `VITE_SUPABASE_*`.
-2. In **holzen-staging** → **Authentication → URL configuration**:
-   - **Site URL:** `http://localhost:8080` (while testing locally)
-   - **Redirect URLs:** `http://localhost:8080/**`
-3. **Authentication → Providers → Google:** enabled with your Google Cloud **Web client** ID + secret.
-4. In **Google Cloud Console** (same OAuth client):
-   - **Authorized JavaScript origins:** `http://localhost:8080`
-   - **Authorized redirect URI:** `https://ksplyxxdvandkwzundql.supabase.co/auth/v1/callback` (copy from the Supabase Google provider page)
-5. Run `npm run dev:staging`, open `http://localhost:8080/auth`, click **Continue with Google**.
-
-## Option B — Full local stack (Docker Supabase)
-
-Frontend + auth both run locally. Requires Google credentials in `supabase/.env.local` (see below).
+Frontend + auth both run locally. Requires Google credentials in `supabase/.env.local`.
 
 ### 1. Google Cloud Console
 
@@ -42,8 +30,8 @@ SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET="<client-secret>"
 
 **Where to copy from**
 
-1. **Client ID** — [Supabase staging → Google provider](https://supabase.com/dashboard/project/ksplyxxdvandkwzundql/auth/providers?provider=Google) (same Web client as prod if you reused it), or **Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs**.
-2. **Client secret** — Only in **Google Cloud** (Supabase does not show it again after save). Use **+ CREATE CREDENTIALS → OAuth client ID → Web application**, or open the existing Holzen Web client → copy secret / reset if lost.
+1. **Client ID** — [Supabase prod → Google provider](https://supabase.com/dashboard/project/geqkxsnyqvhtascjghuu/auth/providers?provider=Google), or **Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs**.
+2. **Client secret** — Only in **Google Cloud** (Supabase does not show it again after save).
 
 The CLI loads `supabase/.env.local` when you run `npm run supabase:start`.
 
@@ -79,8 +67,22 @@ After editing `supabase/config.toml` auth settings, always **`supabase:stop`** t
 | Button does nothing / provider disabled | Set both `SUPABASE_AUTH_EXTERNAL_GOOGLE_*` in `supabase/.env.local` and restart Docker stack |
 | Lands on wrong host after Google | App uses `redirectTo: window.location.origin` — use `localhost:8080`, not `127.0.0.1:8080`, for consistency |
 
+## Option B — Local frontend + holzen-prod (careful)
+
+No Docker auth config. Point Vite at prod and allow localhost in the **prod** dashboard. Risk: you are hitting live Auth/users.
+
+1. Copy `.env.prod.example` → `.env.prod.local` and fill `VITE_SUPABASE_*` for holzen-prod.
+2. In **holzen-prod** → **Authentication → URL configuration**, temporarily add:
+   - **Redirect URLs:** `http://localhost:8080/**`
+3. **Authentication → Providers → Google:** enabled with your Google Cloud **Web client** ID + secret.
+4. In **Google Cloud Console** (same OAuth client):
+   - **Authorized JavaScript origins:** `http://localhost:8080`
+   - **Authorized redirect URI:** `https://geqkxsnyqvhtascjghuu.supabase.co/auth/v1/callback`
+5. Run `npm run dev:prod`, open `http://localhost:8080/auth`, click **Continue with Google**.
+6. Remove localhost from prod redirect allow list when done.
+
 ## See also
 
-- [staging-supabase-setup.md](staging-supabase-setup.md) §6 — hosted redirect URLs
+- [staging-supabase-setup.md](staging-supabase-setup.md) — legacy staging deleted note
 - [platform-exit-runbook.md](platform-exit-runbook.md) — production Google provider setup
 - [auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md) — session + referral flow after sign-in

@@ -47,7 +47,7 @@ Click-paths and config for the Holzen observability stack. This is the setup sou
 |---|---|
 | `SENTRY_DSN_EDGES` | Sentry DSN for edges. Recommended: same project as frontend (unified quota + release health). Tag segmentation via `source:edge` vs `source:frontend`. |
 | `SENTRY_RELEASE` | Git SHA of the deploy (same value as `VITE_APP_VERSION`). Set by `npm run stamp:release` at deploy. |
-| `SENTRY_ENVIRONMENT` | `production` or `staging` |
+| `SENTRY_ENVIRONMENT` | `production` (local/dev may use `development`) |
 | `LOG_DRAIN_URL` | BetterStack log ingest endpoint (`https://in.logs.betterstack.com`) |
 | `LOG_DRAIN_TOKEN` | BetterStack source token (not the API token) |
 | `SLACK_WEBHOOK_URL` | Slack Incoming Webhook URL for `#holzen-alerts` |
@@ -64,7 +64,7 @@ If any edge secret is absent, the corresponding forwarder silently no-ops. Never
 1. Slack → Create channel `#holzen-alerts`. Private is fine; add whoever needs the pages.
 2. [api.slack.com/apps](https://api.slack.com/apps) → **Create New App → From scratch** → name `Holzen Alerts`.
 3. Enable **Incoming Webhooks** → **Add New Webhook to Workspace** → pick `#holzen-alerts`.
-4. Copy the webhook URL (`https://hooks.slack.com/services/...`). Store as `SLACK_WEBHOOK_URL` in **Supabase Edge secrets** (staging + prod).
+4. Copy the webhook URL (`https://hooks.slack.com/services/...`). Store as `SLACK_WEBHOOK_URL` in **Supabase Edge secrets** on **holzen-prod**.
 5. Optional `alerts@<yourdomain>` for vendors without Slack integration (Anthropic budget emails, Supabase usage alerts).
 
 Test once from any shell with network access:

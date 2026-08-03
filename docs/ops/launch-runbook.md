@@ -1,6 +1,6 @@
 # Pause-first launch runbook
 
-Human checklist for shipping pause-first to production. **Quick ticks:** [ship-checklist.md](./ship-checklist.md). Canonical deploy narrative: [deployment-sync-guide.md](./deployment-sync-guide.md).
+Human checklist for shipping pause-first to production. **Quick ticks:** [ship-checklist.md](./ship-checklist.md). Canonical deploy narrative: [deployment-sync-guide.md](./deployment-sync-guide.md). Branch model: [branch-model.md](./branch-model.md).
 
 ## Ship status (agent-complete vs human)
 
@@ -8,8 +8,8 @@ Human checklist for shipping pause-first to production. **Quick ticks:** [ship-c
 | --- | --- |
 | Steps 1–6 code + CI + docs | ✅ on integration branch |
 | `git push` | Set `VITE_APP_VERSION` / `SENTRY_RELEASE` to deploy Git SHA |
-| Staging migrations + smoke | 🚢 you |
-| Merge `staging → main` | 🚢 you |
+| Local Docker schema + smoke (before merge) | 🚢 you |
+| Merge PR → `main` | 🚢 you |
 | Vercel production deploy | 🚢 automatic on `main` merge |
 | §3.1 no real prod users (before destructive cutover) | 🚢 you |
 | Pre-launch: `holzen.app` not public (see §5.1 — Vercel Auth/password need Advanced on custom domains) | 🚢 you |
@@ -50,9 +50,11 @@ Naming audit (plan §5.0):
 npm run check:no-phase-labels
 ```
 
-## 2. Push backend (staging first)
+## 2. Push backend (`feature/*` → PR → `main`)
 
-Merge feature work to **`staging`**. CI or manual deploy applies migrations and edge functions to the **staging Supabase project**.
+Promotion: **`feature/*` → PR → `main` → holzen-prod**. Prefer **local Docker** (`npm run dev:local`) for schema work before merge. There is no git `staging` branch; legacy **holzen-staging** was deleted 2026-07-16 — see [staging-supabase-setup.md](./staging-supabase-setup.md). Preview may share prod; Pro Branching later if you need an isolated hosted DB.
+
+Merge the PR to **`main`**. CI applies migrations and edge functions to **holzen-prod**.
 
 Confirm migrations applied, especially any destructive cutover migrations listed in your release notes.
 
@@ -66,8 +68,6 @@ SELECT proname FROM pg_proc WHERE proname = 'user_can_engage_pause';
 SELECT user_id, subscription_status, subscription_tier FROM profiles WHERE subscription_status = 'lapsed' LIMIT 5;
 ```
 
-After staging smoke passes, merge **`staging → main`** for production Supabase + Vercel.
-
 ## 3. Frontend (Vercel)
 
 1. **Production** deploys automatically when **`main`** merges (Vercel GitHub integration).
@@ -78,7 +78,7 @@ After staging smoke passes, merge **`staging → main`** for production Supabase
 
 ## 4. Bruno smoke (`bruno/active/`)
 
-With `staging.bru` (preferred) or `prod.bru` env (JWT + Supabase URL/key). Full sequence: [bruno/active/README.md](../../bruno/active/README.md).
+With `local.bru` (preferred for pre-merge) or `prod.bru` env (JWT + Supabase URL/key). Full sequence: [bruno/active/README.md](../../bruno/active/README.md).
 
 1. `auth/01-sign-in-password`
 2. `platform/health` — 200

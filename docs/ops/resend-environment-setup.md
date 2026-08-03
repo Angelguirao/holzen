@@ -1,8 +1,10 @@
-# Resend — staging vs production
+# Resend — local vs production
 
-**Status:** Active (2026-05). Canonical setup for Holzen transactional email on **owned Supabase** projects.
+**Status:** Active. Canonical setup for Holzen transactional email on **holzen-prod** (and local Docker).
 
-**Related:** [platform-exit-runbook.md](platform-exit-runbook.md) § Auth & email, [staging-supabase-setup.md](staging-supabase-setup.md), [production-supabase-setup.md](production-supabase-setup.md), [`supabase/functions/_shared/email-env.ts`](../../supabase/functions/_shared/email-env.ts).
+**Related:** [platform-exit-runbook.md](platform-exit-runbook.md) § Auth & email, [production-supabase-setup.md](production-supabase-setup.md), [`supabase/functions/_shared/email-env.ts`](../../supabase/functions/_shared/email-env.ts).
+
+Legacy **holzen-staging** was deleted 2026-07-16. Email QA uses **local Docker** + Resend sandbox (`resend.dev`), or prod carefully.
 
 ---
 
@@ -20,23 +22,23 @@ All sends go through Supabase Edge Functions → [`transactional-email.ts`](../.
 | AI cost alerts | `ai-cost-alert` | Ops recipients in `app_config` |
 | Bounces / complaints | `handle-email-suppression` | **Inbound** Resend webhook (Svix) |
 
-Unlike Stripe, Resend has **no test/live API mode**. Separation is **per Supabase project** + **per API key** + **different From/subject branding**.
+Unlike Stripe, Resend has **no test/live API mode**. Separation is **API key** + **From/subject branding** (local sandbox vs prod domain).
 
 ---
 
-## Secrets (per Supabase project)
+## Secrets (holzen-prod)
 
-Set in Dashboard → Edge Functions → Secrets, or via `npm run staging:secrets-set` / `npm run prod:secrets-set`.
+Set in Dashboard → Edge Functions → Secrets, or via `npm run prod:secrets-set`.
 
-| Secret | Staging | Production |
-|--------|---------|--------------|
-| `RESEND_API_KEY` | Staging-only `re_*` key | Prod-only `re_*` key (different key) |
-| `RESEND_WEBHOOK_SECRET` | Signing secret for **staging** webhook endpoint | Signing secret for **prod** webhook endpoint |
-| `SEND_EMAIL_HOOK_SECRET` | Matches staging Auth → Send Email hook | Matches prod Auth → Send Email hook |
+| Secret | Local Docker | Production |
+|--------|--------------|------------|
+| `RESEND_API_KEY` | Dev/sandbox `re_*` in `supabase/.env.local` | Prod `re_*` on holzen-prod |
+| `RESEND_WEBHOOK_SECRET` | Optional local | Signing secret for prod webhook |
+| `SEND_EMAIL_HOOK_SECRET` | Local secret | Matches Auth → Send Email hook |
 
 Use **restricted** Resend API keys when possible (send-only for edges, read-only for Cursor MCP).
 
-**Send-only keys** (`sending_access`) can deliver mail but **cannot** list domains, create webhooks, or use most Resend MCP management tools. Use a **full_access** key (or the Resend dashboard) once to create webhooks, then store only send-only keys on Supabase Edge.
+**Send-only keys** (`sending_access`) can deliver mail but **cannot** list domains or create webhooks. Use a **full_access** key (or dashboard) once to create webhooks, then store only send-only keys on Edge.
 
 ---
 
@@ -44,66 +46,57 @@ Use **restricted** Resend API keys when possible (send-only for edges, read-only
 
 Read at runtime by [`email-env.ts`](../../supabase/functions/_shared/email-env.ts). **Omit on production** to use defaults (`holzen.app`, `notify.holzen.app`).
 
-| Variable | Production default | Staging recommendation |
-|----------|-------------------|------------------------|
-| `EMAIL_BRAND_NAME` | `holzen` | `Holzen Staging` |
-| `EMAIL_FROM_DOMAIN` | `holzen.app` | `resend.dev` (Resend sandbox) |
+| Variable | Production default | Local recommendation |
+|----------|-------------------|----------------------|
+| `EMAIL_BRAND_NAME` | `holzen` | `Holzen Local` |
+| `EMAIL_FROM_DOMAIN` | `holzen.app` | `resend.dev` |
 | `EMAIL_FROM_LOCAL` | `noreply` | `onboarding` (required for `resend.dev`) |
-| `EMAIL_NOTIFY_LOCAL` | `notify` | `onboarding` (when using `resend.dev`) |
+| `EMAIL_NOTIFY_LOCAL` | `notify` | `onboarding` |
 | `EMAIL_SENDER_DOMAIN` | `notify.holzen.app` | `resend.dev` |
-| `EMAIL_SUBJECT_PREFIX` | _(none)_ | `[STAGING]` (space added automatically) |
-| `EMAIL_ROOT_DOMAIN` | `holzen.app` | `holzen.app` (links in templates) |
-| `EMAIL_APP_URL` | `https://holzen.app` | `http://localhost:8080` or Vercel preview URL |
+| `EMAIL_SUBJECT_PREFIX` | _(none)_ | `[LOCAL]` |
+| `EMAIL_ROOT_DOMAIN` | `holzen.app` | `holzen.app` |
+| `EMAIL_APP_URL` | `https://holzen.app` | `http://localhost:8080` |
 | `EMAIL_FEEDBACK_INBOX` | `hello@holzen.app` | Same or a test inbox |
 | `PAUSE_VOLATILITY_EMAIL_ENABLED` | `true` (unset = on) | `false` to disable pause-offer email only |
 
-Set `PAUSE_VOLATILITY_EMAIL_ENABLED=false` in **Supabase Dashboard → Edge Functions → Secrets** (staging and/or prod) to stop “A moment to pause” mail without redeploying. Web push and in-app bell notifications are unchanged.
-
-Staging example (add to `.env.staging.secrets`):
+Local example (`supabase/.env.local`):
 
 ```env
-EMAIL_BRAND_NAME=Holzen Staging
+EMAIL_BRAND_NAME=Holzen Local
 EMAIL_FROM_DOMAIN=resend.dev
 EMAIL_FROM_LOCAL=onboarding
 EMAIL_NOTIFY_LOCAL=onboarding
 EMAIL_SENDER_DOMAIN=resend.dev
-EMAIL_SUBJECT_PREFIX=[STAGING]
+EMAIL_SUBJECT_PREFIX=[LOCAL]
 EMAIL_APP_URL=http://localhost:8080
 ```
 
-Production: verify **`holzen.app`** (and **`notify.holzen.app`** if used) in the Resend dashboard; leave identity vars unset.
+Production: verify **`holzen.app`** (and **`notify.holzen.app`** if used); leave identity vars unset.
 
 ---
 
 ## Resend dashboard checklist
 
-### Both environments
+### Production
 
-1. **API keys** — create separate keys; store in the matching Supabase project only.
-2. **Webhooks** — one endpoint per Supabase project:
-   - Staging: `https://ksplyxxdvandkwzundql.supabase.co/functions/v1/handle-email-suppression`
-   - Prod: `https://geqkxsnyqvhtascjghuu.supabase.co/functions/v1/handle-email-suppression`
+1. **API key** — store on holzen-prod only.
+2. **Webhook** — `https://geqkxsnyqvhtascjghuu.supabase.co/functions/v1/handle-email-suppression`
    - Events: `email.bounced`, `email.complained`
-   - Copy each endpoint’s signing secret → `RESEND_WEBHOOK_SECRET` on **that** project.
+   - Signing secret → `RESEND_WEBHOOK_SECRET`
+3. Verify domain **`holzen.app`** (SPF, DKIM, DMARC); optional **`notify.holzen.app`**.
 
-### Production only
+### Local
 
-- Verify domain **`holzen.app`** (SPF, DKIM, DMARC).
-- Optional: subdomain **`notify.holzen.app`** if your DNS setup uses it.
-
-### Staging only
-
-- Either send via **`onboarding@resend.dev`** (identity vars above), **or** verify a staging subdomain (e.g. `staging.holzen.app`) if you want prod-like From headers.
+- Prefer **`onboarding@resend.dev`** with identity vars above (no custom domain required).
 
 ---
 
-## Supabase Auth (per project)
+## Supabase Auth (holzen-prod)
 
 Authentication → Hooks → **Send Email**:
 
 | Project | Hook URL |
 |---------|----------|
-| Staging | `https://ksplyxxdvandkwzundql.supabase.co/functions/v1/auth-email-hook` |
 | Prod | `https://geqkxsnyqvhtascjghuu.supabase.co/functions/v1/auth-email-hook` |
 
 Hook secret → `SEND_EMAIL_HOOK_SECRET` on the same project.
@@ -112,21 +105,17 @@ Hook secret → `SEND_EMAIL_HOOK_SECRET` on the same project.
 
 ## Cursor Resend MCP
 
-The Resend MCP plugin is for **ops/debug** (domains, webhooks, logs). It does not replace Edge secrets.
-
-- Configure a valid `re_*` key in **Cursor → MCP → Resend**.
-- Prefer a **staging or read-only** key so agent tools cannot send prod mail accidentally.
+The Resend MCP plugin is for **ops/debug**. Prefer a **sandbox or read-only** key so agent tools cannot send prod mail accidentally.
 
 ---
 
 ## Verification
 
-| Check | Staging | Prod |
-|-------|---------|------|
-| Signup / magic link | Mail from `[STAGING]` subject + `onboarding@resend.dev` | Mail from `noreply@holzen.app` |
-| Resend webhook | Test bounce event updates `suppressed_emails` on staging DB | Same on prod |
+| Check | Local | Prod |
+|-------|-------|------|
+| Signup / magic link | `[LOCAL]` + `onboarding@resend.dev` when wired | `noreply@holzen.app` |
+| Resend webhook | Optional | Bounce updates `suppressed_emails` on prod |
 | Edge logs | `auth_email_hook_sent`, `dependency_call` dep=`resend-email` | Same |
-| No cross-leak | Staging key not in prod secrets | Prod key not in staging secrets |
 
 ```sh
 npm run test   # includes src/test/shared/email-env.test.ts
@@ -135,16 +124,6 @@ npm run test   # includes src/test/shared/email-env.test.ts
 ---
 
 ## Local development
-
-Local email testing uses the same Edge functions as hosted environments, but there
-are two important differences:
-
-1. **Mail is still delivered via Resend**, not via local SMTP/Mailpit.
-2. **Supabase Auth Send Email Hook is not auto-wired locally** the same way your
-   hosted staging/prod projects are, so full auth-email end-to-end testing is
-   usually easier on staging.
-
-Recommended local setup:
 
 1. Start the local stack and functions:
 
@@ -162,14 +141,14 @@ Recommended local setup:
    EMAIL_PREVIEW_SECRET=<local secret>
    ```
 
-3. Preview templates safely without sending:
+3. Preview templates without sending:
 
    ```sh
    curl http://127.0.0.1:55421/functions/v1/preview-transactional-email ^
      -H "Authorization: Bearer <EMAIL_PREVIEW_SECRET>"
    ```
 
-4. Drain queued transactional emails manually after enqueueing one:
+4. Drain queued transactional emails:
 
    ```sh
    npm run supabase:email:drain-local -- --until-empty
@@ -177,13 +156,9 @@ Recommended local setup:
 
 Notes:
 
-- `send-transactional-email` **enqueues** mail; `process-email-queue` performs the
-  actual delivery.
-- `auth-email-hook` sends directly once the hook request is verified, but local
-  Supabase Auth hook wiring still needs explicit setup if you want the full
-  signup / magic-link path locally.
-- If you use `resend.dev`, sending is sandboxed; use your Resend account email or
-  Resend's documented test addresses instead of random mailbox providers.
+- `send-transactional-email` **enqueues**; `process-email-queue` delivers.
+- Local Auth Send Email Hook needs explicit setup for full signup / magic-link E2E.
+- With `resend.dev`, use your Resend account email or documented test addresses.
 
 ---
 

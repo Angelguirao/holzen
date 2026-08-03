@@ -11,7 +11,7 @@ Authorization: Bearer {{SERVICE_CRON_BEARER}}
 x-cid: bruno-{{$timestamp}}-review
 ```
 
-Set **`SERVICE_CRON_BEARER`** in `environments/local.bru`, `staging.bru`, or `prod.bru` to the project **service_role** JWT or **`CRON_SECRET`** (see [`verifyServiceAuth`](../../../supabase/functions/_shared/auth.ts)).
+Set **`SERVICE_CRON_BEARER`** in `environments/local.bru` or `prod.bru` to the project **service_role** JWT or **`CRON_SECRET`** (see [`verifyServiceAuth`](../../../supabase/functions/_shared/auth.ts)).
 
 | File | Function |
 | --- | --- |
