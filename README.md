@@ -55,7 +55,7 @@ Environment variables (see [.env.example](.env.example) and [docs/ops/environmen
 
 - **Vercel (prod/preview):** Set `VITE_SUPABASE_*`, `VITE_SENTRY_DSN`, `VITE_POSTHOG_*`, `VITE_APP_VERSION` in the Vercel project. See [docs/ops/vercel-frontend-setup.md](docs/ops/vercel-frontend-setup.md).
 - **Default (local machine):** `cp .env.example .env` then `npm run dev` — uses your `.env` values. `VITE_SUPABASE_*` is now required for `npm run dev` and `npm run build`; missing values fail fast instead of silently pointing at a hosted project.
-- **Two files / two backends (optional on your machine):** `**.env.prod.local`** is for `**npm run dev:prod**` when you want the app on your laptop to use **production** Supabase. If you want **staging**, use `**.env.staging.local`** / `**npm run dev:staging**`. If you **only** develop against **local Docker** Supabase, use `**.env.localstack`** / `**npm run dev:local**` and you can **ignore** `.env.prod` entirely.
+- **Two backends (optional on your machine):** `**.env.prod.local`** / `**npm run dev:prod**` hits **production** Supabase from your laptop. Prefer **local Docker** (`**.env.localstack`** / `**npm run dev:local**`) for everyday schema work — you can ignore `.env.prod` entirely.
   - **Prod-like from local Vite:** copy [.env.prod.example](.env.prod.example) to `**.env.prod.local`**, fill in URL + anon key, run `**npm run dev:prod**`.
   - **Local Docker only:** copy [.env.localstack.example](.env.localstack.example) to `**.env.localstack.local`**, set the anon key from `npm run supabase:status`, run `**npm run dev:local**`.
 
@@ -97,7 +97,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run supabase:stop`                | Stop local stack                                                                                                                           |
 | `npm run supabase:reset`               | Reapply `supabase/migrations/` on local DB                                                                                                 |
 | `npm run env:doctor`                   | Print current frontend targets, repo-local Supabase link state, and local Docker status                                                    |
-| `npm run gen:types`                    | Regenerate `src/integrations/supabase/types.ts` from the explicit **production** project ref; use `npm run gen:types:staging` for staging  |
+| `npm run gen:types`                    | Regenerate `src/integrations/supabase/types.ts` from the explicit **production** project ref |
 | `npm run check:edge-logging`           | Fail if an edge function serves HTTP without `withRequestLogging` (runs in `test:ci` / `check:prepush`)                                    |
 | `npm run check:edge-coverage-manifest` | Fail if `EdgeCoverage.tsx` is missing any `supabase/config.toml` edge function name (runs in `test:ci` / `check:prepush`)                  |
 | `npm run check:edge`                   | Optional **Deno** typecheck of every `supabase/functions/*/index.ts`; **no-op** if `deno` is not installed                                 |
@@ -171,7 +171,7 @@ The local API gateway exposes `http://127.0.0.1:55421/functions/v1`, but your fu
 
 **Edge function secrets:** Start from `supabase/.env.example`, then copy it to `supabase/.env` (shared local defaults) or `supabase/.env.local` (personal overrides). The CLI reads `supabase/.env.local`, then `supabase/.env`, then OS env. Add only the secrets needed for the flows you are testing locally: Stripe test keys, Resend/auth-email values, AI provider keys, VAPID keys, or observability overrides.
 
-**Google sign-in locally:** Either use `**npm run dev:staging`** with staging dashboard redirect URLs for `localhost:8080`, or enable Google on Docker Supabase via `SUPABASE_AUTH_EXTERNAL_GOOGLE_*` in `supabase/.env.local` — full steps in [docs/ops/local-google-oauth.md](docs/ops/local-google-oauth.md).
+**Google sign-in locally:** Enable Google on Docker Supabase via `SUPABASE_AUTH_EXTERNAL_GOOGLE_*` in `supabase/.env.local` — full steps in [docs/ops/local-google-oauth.md](docs/ops/local-google-oauth.md). Or use `**npm run dev:prod**` with production dashboard redirect URLs for `localhost:8080` (careful with live data).
 
 **Bootstrap helper:** `npm run supabase:env:local` fills `supabase/.env.local` with reusable local defaults, generated local-only hook secrets, Stripe test-mode values from your Stripe CLI login, and Gemini aliases from `.cursor/mcp-secrets.env` when present. Pass `-- --stripe-webhook-secret <whsec_...>` after `stripe listen ...` to wire local webhook verification too.
 
@@ -187,7 +187,7 @@ stripe listen --forward-to http://127.0.0.1:55421/functions/v1/stripe-webhook
 
 **Edge functions:** You can also run functions locally with `npx supabase functions serve`, but production behavior depends on **Supabase dashboard secrets** (Stripe, email, AI keys, etc.). Local testing may need those set for the CLI or a `.env` used by `supabase functions serve`—see [Supabase Functions local secrets](https://supabase.com/docs/guides/functions/secrets).
 
-**No Docker:** Use a separate hosted project (staging), put its URL and anon key in `.env`, and apply migrations there before production.
+**No Docker:** Point `.env` at holzen-prod (or wait for Supabase Branching) and apply migrations carefully — prefer local Docker for schema work. See [docs/ops/branch-model.md](docs/ops/branch-model.md).
 
 ## PWA & offline
 

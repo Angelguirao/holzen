@@ -7,7 +7,7 @@
  * the target is never implicit.
  *
  * Usage:
- *   node scripts/run-remote-sql.mjs staging --file scripts/sql/reschedule-owned-crons.sql
+ *   node scripts/run-remote-sql.mjs prod --file scripts/sql/reschedule-owned-crons.sql
  *   node scripts/run-remote-sql.mjs prod --query "select now();"
  */
 import { spawnSync } from "node:child_process";
@@ -20,7 +20,7 @@ const query = queryFlagIndex >= 0 ? process.argv[queryFlagIndex + 1] : undefined
 const filePath = fileFlagIndex >= 0 ? process.argv[fileFlagIndex + 1] : undefined;
 
 if (!targetArg) {
-  console.error("Usage: node scripts/run-remote-sql.mjs <staging|prod> [--file <path> | --query <sql>]");
+  console.error("Usage: node scripts/run-remote-sql.mjs <prod|production> [--file <path> | --query <sql>]");
   process.exit(1);
 }
 

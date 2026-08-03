@@ -12,7 +12,7 @@
  * This check does NOT try to police every ad-hoc helper-script env var. It is a
  * fitness function for the documented app/deploy surface.
  */
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -32,14 +32,15 @@ const runtimeScanTargets = [
   join(root, "vite.react-compiler.ts"),
 ];
 
-const exampleEnvFiles = [
+/** Candidate example env files; only existing files are scanned (missing files are skipped). */
+const exampleEnvCandidates = [
   ".env.example",
-  ".env.staging.example",
   ".env.prod.example",
   ".env.localstack.example",
-  ".env.staging.secrets.example",
   ".env.prod.secrets.example",
 ].map((path) => join(root, path));
+
+const exampleEnvFiles = exampleEnvCandidates.filter((path) => existsSync(path));
 
 const envTokenRe = /[A-Z][A-Z0-9_]*[A-Z0-9]/;
 const codeEnvPatterns = [
