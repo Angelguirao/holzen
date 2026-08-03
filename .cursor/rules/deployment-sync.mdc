@@ -24,21 +24,21 @@ Run and address failures before push:
 
 | What | Effect on deploy |
 |------|------------------|
-| `supabase/migrations/` | Applied to the **target Supabase project** when CI / `db push` runs (staging vs prod per branch) |
+| `supabase/migrations/` | Applied to **holzen-prod** when CI / `db push` runs on `main` |
 | `supabase/functions/` + `config.toml` | Edge functions deploy to that project |
 | `src/` frontend | **Vercel** production on merge to `main`; preview on PRs |
 
 - New `[functions.*]` block in `supabase/config.toml` for every new edge function (same PR).
 - New columns queried before `types.ts` regenerates: use `as unknown as YourRow[]` (see deployment guide).
 - Destructive migrations: order-of-operations per the guide (code ↔ schema).
-- Branch flow: `feature/* → staging → main` — see [docs/ops/branch-model.md](docs/ops/branch-model.md).
+- Branch flow: `feature/* → PR → main` — see [docs/ops/branch-model.md](docs/ops/branch-model.md). No git `staging` branch; use local Docker or (later) Supabase Branching for risky schema work.
 
 ## Observability secrets (Vercel + Supabase + CI)
 
 Before every push that touches frontend observability or edge logging/Sentry wiring, verify:
 
 - **Vercel** (prod/preview build env): `VITE_SENTRY_DSN`, `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST`, `VITE_APP_VERSION` (= Git SHA).
-- **Supabase Edge secrets** (staging + prod): `SENTRY_DSN_EDGES`, `SENTRY_RELEASE` (= same Git SHA), `SENTRY_ENVIRONMENT`, `LOG_DRAIN_URL`, `LOG_DRAIN_TOKEN`, `SLACK_WEBHOOK_URL`.
+- **Supabase Edge secrets** (holzen-prod): `SENTRY_DSN_EDGES`, `SENTRY_RELEASE` (= same Git SHA), `SENTRY_ENVIRONMENT`, `LOG_DRAIN_URL`, `LOG_DRAIN_TOKEN`, `SLACK_WEBHOOK_URL`.
 - **CI build** (source-map upload): `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` (optional — plugin no-ops without them).
 
 Additional reminders:

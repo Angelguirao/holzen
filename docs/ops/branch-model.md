@@ -1,102 +1,65 @@
 # Branch model and GitHub protection
 
-Canonical branch flow for platform exit (owned Supabase + Vercel). Pairs with [platform-exit-runbook.md](platform-exit-runbook.md) and [deployment-sync-guide.md](deployment-sync-guide.md).
+Canonical Holzen git flow. Pairs with [cicd-overview.md](cicd-overview.md) and [deployment-sync-guide.md](deployment-sync-guide.md).
 
 ## Branches
 
 | Branch | Deploy target | CI / deploy |
 |--------|---------------|-------------|
-| Feature branches (`feature/*`, `fix/*`) | None (PR checks only) | `ci.yml` on PR; Vercel **PR preview** (auto) |
-| **`staging`** | Vercel Preview (`staging` branch) + Holzen staging DB | [staging-deploy.yml](../../.github/workflows/staging-deploy.yml) on push (backend → frontend) |
-| **`main`** | Production Supabase (`holzen-prod`) + Vercel Production | [deploy-production.yml](../../.github/workflows/deploy-production.yml) on push (backend → frontend; **`production`** environment approval recommended) |
+| Feature branches (`feature/*`, `fix/*`) | None (PR checks + Vercel **PR preview**) | `ci.yml` on PR |
+| **`main`** | Production Supabase (`holzen-prod`) + Vercel Production | [deploy-production.yml](../../.github/workflows/deploy-production.yml) after CI on `main` |
 
-**Promotion:** merge features → `staging` → smoke → merge `staging` → `main`. **Hotfixes:** branch from `main`, merge back to `main`, then merge `main` → `staging` to keep them aligned.
+**Promotion:** `feature/*` → PR → `main` → smoke [holzen.app](https://holzen.app).
 
-### Supabase: one Holzen project (target)
+There is **no** git `staging` branch. The legacy `holzen-staging` Supabase project was deleted (2026-07-16) for LifeOS. When migrations feel too risky against prod, upgrade to **Supabase Pro** and use **Branching** on `holzen-prod` — do not recreate a second Free Holzen project.
+
+### Supabase
 
 | Environment | Target |
 |-------------|--------|
-| **Production DB** | Single project **`holzen-prod`** (`geqkxsnyqvhtascjghuu`) — Holzen product tables only |
-| **Product staging DB** | Prefer a **Supabase Branch** on `holzen-prod` (requires org **Pro+**; not available on Free). Until then: git/Vercel staging may share prod carefully, or use the legacy second project while retiring it |
-| **Legacy `holzen-staging` project** | Second Free project — **do not keep long-term**; it blocks creating dedicated LifeOS. Pause/delete after LifeOS cutover (see personal-agent `deploy/LIFEOS-SUPABASE.md`) |
-| **LifeOS ledger** | Separate Supabase project **`lifeos`** — never new `lifeos_*` migrations in this repo |
+| **Production DB** | **`holzen-prod`** (`geqkxsnyqvhtascjghuu`) |
+| **Product staging DB** | None today. Prefer a **Supabase Branch** on `holzen-prod` (Pro+) when needed |
+| **LifeOS ledger** | Separate project **`lifeos`** — never new `lifeos_*` migrations in this repo |
 
-Do **not** recreate a second Holzen staging *project* on Free to free local workflows — upgrade for Branching, or accept git-only staging.
+**Optional Lovable editor:** feature branches only — never as prod host or migration path. See [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md).
 
-**Optional Lovable editor:** Lovable may stay connected for UI work on **`feature/*` branches only** — never as prod host or migration path. Full rules: [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) § Optional Lovable editor.
-
-## One-time setup
-
-### 1. Create `staging` branch
-
-From an up-to-date `main`:
-
-```bash
-git checkout main
-git pull origin main
-git checkout -b staging
-git push -u origin staging
-```
-
-Keep `staging` updated by merging `main` (or feature PRs) regularly.
-
-### 2. GitHub branch protection — `main`
+## GitHub protection — `main`
 
 GitHub → **Settings → Branches → Add branch protection rule** (pattern: `main`):
 
-- [ ] Require a pull request before merging (1 approval recommended)
-- [ ] Require status checks to pass: **`CI`** (from `.github/workflows/ci.yml`)
+- [ ] Require a pull request before merging
+- [ ] Require status checks to pass: **`CI`**
 - [ ] Require branches to be up to date before merging
-- [ ] Do not allow bypassing the above settings (except admins if needed)
-- [ ] Restrict who can push (optional — force pushes disabled)
+- [ ] Restrict force pushes
 
-### 3. GitHub branch protection — `staging` (recommended)
-
-Same as `main`, but optionally allow direct pushes for fast staging iteration. Minimum: require **`CI`** on PRs into `staging`.
-
-### 4. GitHub Environments
-
-**Settings → Environments:**
+## GitHub Environments
 
 | Environment | Used by | Recommended |
 |-------------|---------|-------------|
-| `staging` | `staging-deploy.yml` | Required reviewers optional |
 | `production` | `deploy-production.yml` | **Required reviewers** before deploy |
 
-### 5. GitHub Actions secrets
+## GitHub Actions secrets
 
 | Secret | Purpose |
 |--------|---------|
 | `SUPABASE_ACCESS_TOKEN` | CLI link + deploy |
-| `SUPABASE_STAGING_PROJECT_REF` | Staging project |
 | `SUPABASE_PROD_PROJECT_REF` | Production project |
-| `VERCEL_TOKEN` | CI frontend deploy ([vercel-ci-deploy.mjs](../../scripts/vercel-ci-deploy.mjs)) |
-| `VERCEL_ORG_ID` | Vercel team/org id (from `vercel link` / `.vercel/project.json`) |
+| `VERCEL_TOKEN` | CI frontend deploy |
+| `VERCEL_ORG_ID` | Vercel team/org id |
 | `VERCEL_PROJECT_ID` | Vercel project id |
-| `VITE_SUPABASE_STAGING_URL` | Staging preflight build in Actions |
-| `VITE_SUPABASE_STAGING_PUBLISHABLE_KEY` | Staging preflight build in Actions |
-| `VITE_SUPABASE_URL` | CI / prod preflight build |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | CI / prod preflight build |
-| `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | Source map upload in CI (optional) |
+| `VITE_SUPABASE_URL` | CI / prod Vite build |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | CI / prod Vite build |
+| `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | Source map upload (optional) |
 
-Full matrix and flow: [cicd-overview.md](cicd-overview.md).
+Full matrix: [cicd-overview.md](cicd-overview.md).
 
-Frontend runtime `VITE_*` for deployed sites live in **Vercel** project env — not Supabase Edge secrets. See [observability-setup.md](observability-setup.md).
-
-## Workflows (reference)
+## Workflows
 
 | Workflow | Trigger |
 |----------|---------|
-| [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | Pull requests; push `main` / `staging` / `dev` |
-| [`.github/workflows/staging-deploy.yml`](../../.github/workflows/staging-deploy.yml) | Push to `staging`, `workflow_dispatch` — preflight → backend → Vercel preview |
-| [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) | Push to `main`, `workflow_dispatch` — preflight → backend → Vercel production |
+| [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | Pull requests; push `main` / `dev` |
+| [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) | After CI on `main`; `workflow_dispatch` |
 
-End-to-end diagram, secrets, and troubleshooting: **[cicd-overview.md](cicd-overview.md)**.
+## Local development
 
-## Optional `dev` branch
-
-Not required. Some teams add **`dev`** as a long-lived integration branch (`feature/* → dev → staging → main`). Holzen defaults to **feature → staging → main**; add `dev` only if you want an extra integration step before formal staging QA. Do **not** point `dev` at Lovable Cloud — use owned staging or local Docker. See [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) § Three environments.
-
-## Phase 4 secret cleanup
-
-After Resend auth hook + webhooks are live on owned Supabase, remove **`LOVABLE_API_KEY`** from Edge secrets in **both** staging and prod dashboards. See [platform-exit-runbook.md](platform-exit-runbook.md) Phase 4.
+Prefer **local Docker** Supabase (`npm run dev:local`) for schema experiments. `npm run dev:prod` hits production — use carefully.

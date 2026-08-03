@@ -6,7 +6,6 @@ set -euo pipefail
 
 # Legacy Lovable-managed prod (see supabase/migrations/* edgbwdecaoottowliimu).
 export HOLZEN_LEGACY_LOVABLE_REF="${HOLZEN_LEGACY_LOVABLE_REF:-edgbwdecaoottowliimu}"
-export HOLZEN_STAGING_REF="${HOLZEN_STAGING_REF:-ksplyxxdvandkwzundql}"
 export HOLZEN_PROD_REF="${HOLZEN_PROD_REF:-geqkxsnyqvhtascjghuu}"
 
 # Tier B tables dropped in 20260521200000_holzen_mvp_launch_cutover.sql — do not restore.
@@ -57,9 +56,6 @@ db_resolve_database_url() {
     legacy|lovable|old)
       printf '%s' "${OLD_DATABASE_URL:-${LEGACY_DATABASE_URL:-${LOVABLE_DATABASE_URL:-}}}"
       ;;
-    staging)
-      printf '%s' "${STAGING_DATABASE_URL:-}"
-      ;;
     prod|production)
       printf '%s' "${PROD_DATABASE_URL:-${NEW_DATABASE_URL:-}}"
       ;;
@@ -70,7 +66,7 @@ db_resolve_database_url() {
       printf '%s' "${LOCAL_DATABASE_URL:-}"
       ;;
     *)
-      db_die "Unknown env '$env_name'. Use legacy|staging|prod|new|local."
+      db_die "Unknown env '$env_name'. Use legacy|prod|new|local."
       ;;
   esac
 }

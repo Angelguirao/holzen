@@ -1,5 +1,10 @@
 #!/usr/bin/env node
-/** Sync holzen Vercel env vars from local gitignored files. */
+/**
+ * Sync holzen Vercel env vars from local gitignored files.
+ *
+ * Preview uses holzen-prod URL/keys until Supabase Branching is enabled
+ * (schema work stays on local Docker). See docs/ops/branch-model.md.
+ */
 import { execSync } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -60,14 +65,16 @@ const prod = {
   ...parseEnv(join(root, ".env.prod")),
   ...parseEnv(join(root, ".env.prod.local")),
 };
-const staging = parseEnv(join(root, ".env.staging.local"));
 const { previewBranches } = parseArgs(process.argv.slice(2));
 
+const PROD_URL = "https://geqkxsnyqvhtascjghuu.supabase.co";
+const PROD_REF = "geqkxsnyqvhtascjghuu";
+
 console.log("Production…");
-add("VITE_SUPABASE_URL", "https://geqkxsnyqvhtascjghuu.supabase.co", "production");
-add("VITE_SUPABASE_PROJECT_ID", "geqkxsnyqvhtascjghuu", "production");
+add("VITE_SUPABASE_URL", PROD_URL, "production");
+add("VITE_SUPABASE_PROJECT_ID", PROD_REF, "production");
 add("VITE_SUPABASE_PUBLISHABLE_KEY", prod.VITE_SUPABASE_PUBLISHABLE_KEY, "production");
-add("PUBLIC_SUPABASE_URL", "https://geqkxsnyqvhtascjghuu.supabase.co", "production");
+add("PUBLIC_SUPABASE_URL", PROD_URL, "production");
 add("PUBLIC_SUPABASE_PUBLISHABLE_KEY", prod.VITE_SUPABASE_PUBLISHABLE_KEY, "production");
 add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "production");
 add("VITE_SITE_ORIGIN", "https://holzen.app", "production");
@@ -75,10 +82,11 @@ add("VITE_POSTHOG_KEY", prod.VITE_POSTHOG_KEY, "production");
 add("VITE_POSTHOG_HOST", prod.VITE_POSTHOG_HOST, "production");
 
 function syncPreviewEnvironment(gitBranch) {
+  // Until Branching: Preview shares holzen-prod backend (not a separate staging project).
   console.log(gitBranch ? `Preview (branch: ${gitBranch})…` : "Preview (all previews)…");
-  add("VITE_SUPABASE_URL", "https://ksplyxxdvandkwzundql.supabase.co", "preview", gitBranch);
-  add("VITE_SUPABASE_PROJECT_ID", "ksplyxxdvandkwzundql", "preview", gitBranch);
-  add("VITE_SUPABASE_PUBLISHABLE_KEY", staging.VITE_SUPABASE_PUBLISHABLE_KEY, "preview", gitBranch);
+  add("VITE_SUPABASE_URL", PROD_URL, "preview", gitBranch);
+  add("VITE_SUPABASE_PROJECT_ID", PROD_REF, "preview", gitBranch);
+  add("VITE_SUPABASE_PUBLISHABLE_KEY", prod.VITE_SUPABASE_PUBLISHABLE_KEY, "preview", gitBranch);
   add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "preview", gitBranch);
   add("VITE_POSTHOG_KEY", prod.VITE_POSTHOG_KEY, "preview", gitBranch);
   add("VITE_POSTHOG_HOST", prod.VITE_POSTHOG_HOST, "preview", gitBranch);
