@@ -28,9 +28,9 @@ Source of truth: `supabase/config.toml` + [active-surface.md](../../docs/ops/act
 | `send-transactional-email` | `email/` | User JWT or service-role JWT | ops |
 | `handle-email-unsubscribe` | `email/` | Public token | n |
 | `process-email-queue` | `email/` | Service-role JWT only | ops |
-| `check-volatility` | `service-cron/` | `SERVICE_CRON_BEARER` | staging |
-| `refresh-market-prices` | `service-cron/` | `SERVICE_CRON_BEARER` | staging |
-| `pregenerate-companions` | `service-cron/` | `SERVICE_CRON_BEARER` | staging |
+| `check-volatility` | `service-cron/` | `SERVICE_CRON_BEARER` | local |
+| `refresh-market-prices` | `service-cron/` | `SERVICE_CRON_BEARER` | local |
+| `pregenerate-companions` | `service-cron/` | `SERVICE_CRON_BEARER` | local |
 | `backfill-market-prices` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |
 | `seed-market-history` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |
 | `ai-cost-alert` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |

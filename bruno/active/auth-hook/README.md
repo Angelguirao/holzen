@@ -6,7 +6,7 @@
 
 **Supabase Send Email Hook** — signed with **`SEND_EMAIL_HOOK_SECRET`** (Standard Webhooks / Svix-style headers). Configure in Supabase Dashboard → Authentication → Hooks.
 
-The hook body is not easily reproducible from Bruno alone; use Supabase's hook test flow or trigger a real auth email in staging.
+The hook body is not easily reproducible from Bruno alone; use Supabase's hook test flow or trigger a real auth email locally / on prod carefully.
 
 ## Local preview
 

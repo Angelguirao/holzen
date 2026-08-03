@@ -4,7 +4,7 @@ Untested backups don't exist. Run this drill every 3 months; document outcomes i
 
 ## Scope
 
-**After platform exit:** Holzen uses **owned Supabase projects** (staging + prod). Use the Supabase Dashboard for PITR, backups, and restore drills. See [production-supabase-setup.md](production-supabase-setup.md) and [staging-supabase-setup.md](staging-supabase-setup.md).
+**After platform exit:** Holzen uses owned **holzen-prod**. Use the Supabase Dashboard for PITR, backups, and restore drills. Prefer a **temporary restore target** (new project or Pro Branch when available) — do not recreate legacy **holzen-staging** (deleted 2026-07-16). See [production-supabase-setup.md](production-supabase-setup.md), [branch-model.md](branch-model.md), [staging-supabase-setup.md](staging-supabase-setup.md).
 
 **Before exit (legacy):** Lovable-managed Supabase limited direct dashboard access until the project was claimed. That path is deprecated — [platform-exit-runbook.md](platform-exit-runbook.md).
 
@@ -25,10 +25,10 @@ Frontend static assets are reproducible from Git + Vercel; no separate asset bac
 
 ## Quarterly drill — DB PITR
 
-**Preconditions:** Owned Supabase project with dashboard access (staging clone recommended for drills).
+**Preconditions:** Owned **holzen-prod** with dashboard access. Restore into a **new disposable project** (or Pro Branch later) — never overwrite prod during a drill.
 
 1. **Pick a restore point** ~1 hour before now.
-2. **PITR restore** to a **new** staging project: Supabase Dashboard → Database → Backups → Point in Time → choose timestamp → restore.
+2. **PITR restore** to a **new** disposable project: Supabase Dashboard → Database → Backups → Point in Time → choose timestamp → restore.
 3. **Verify row counts** on the restored project against expected:
    - `auth.users` count stable.
    - `pause_instances` count.
@@ -36,16 +36,16 @@ Frontend static assets are reproducible from Git + Vercel; no separate asset bac
    - `generation_attempts` count (last 24h).
    - `audit_log` count (last 7 days).
 4. **Sanity check a user journey** — recent `user_id` from `audit_log`; confirm `pause_instances` and `companion_serves` rows exist.
-5. **Tear down** the drill staging project when done.
+5. **Tear down** the disposable drill project when done.
 6. **Record the drill** in the log at the bottom of this doc.
 
-**Target RTO:** 4 hours to a functional staging restore. **Target RPO:** 1 hour of data loss max.
+**Target RTO:** 4 hours to a functional restore on a disposable target. **Target RPO:** 1 hour of data loss max.
 
 ## Quarterly drill — Edge secrets
 
 Supabase Edge secrets are not exported automatically.
 
-1. Open **Supabase Dashboard → Edge Functions → Secrets** (prod; mirror checklist for staging).
+1. Open **Supabase Dashboard → Edge Functions → Secrets** (**holzen-prod**).
 2. Verify each of these is present (list should match [observability-setup.md](observability-setup.md)):
    - `SENTRY_DSN_EDGES`, `SENTRY_RELEASE`, `SENTRY_ENVIRONMENT`
    - `LOG_DRAIN_URL`, `LOG_DRAIN_TOKEN`

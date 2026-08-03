@@ -26,8 +26,8 @@ function describeFrontendTarget(env) {
   let kind = "unset";
   if (projectId || url) {
     if (projectId === "local" || /127\.0\.0\.1:55421/.test(url)) kind = "local";
-    else if (projectId === SUPABASE_PROJECT_REFS.staging || url.includes(SUPABASE_PROJECT_REFS.staging)) kind = "staging";
-    else if (projectId === SUPABASE_PROJECT_REFS.production || url.includes(SUPABASE_PROJECT_REFS.production)) kind = "production";
+    else if (projectId === SUPABASE_PROJECT_REFS.production || url.includes(SUPABASE_PROJECT_REFS.production))
+      kind = "production";
     else if (url.includes("supabase.co")) kind = "custom hosted";
     else kind = "custom";
   }
@@ -104,7 +104,6 @@ function printMode(label, env) {
 
 const baseEnvPaths = [join(root, ".env"), join(root, ".env.local")];
 const defaultEnv = mergeEnvFiles(baseEnvPaths);
-const stagingEnv = mergeEnvFiles([...baseEnvPaths, join(root, ".env.staging"), join(root, ".env.staging.local")]);
 const prodEnv = mergeEnvFiles([...baseEnvPaths, join(root, ".env.prod"), join(root, ".env.prod.local")]);
 const localEnv = mergeEnvFiles([...baseEnvPaths, join(root, ".env.localstack"), join(root, ".env.localstack.local")]);
 const linkedProject = readLinkedProject();
@@ -115,8 +114,8 @@ console.log("");
 
 console.log("Supabase config");
 console.log(`- repo config project_id: ${readRepoConfigProjectId()}`);
-console.log(`- staging ref: ${SUPABASE_PROJECT_REFS.staging}`);
 console.log(`- production ref: ${SUPABASE_PROJECT_REFS.production}`);
+console.log("- product staging: none (legacy holzen-staging deleted; prefer local Docker / Pro Branching)");
 if (!linkedProject) {
   console.log("- linked remote: none (.supabase/project.json not found)");
 } else if (linkedProject.invalid) {
@@ -128,7 +127,6 @@ if (!linkedProject) {
 console.log("");
 console.log("Frontend targets");
 printMode("npm run dev", defaultEnv);
-printMode("npm run dev:staging", stagingEnv);
 printMode("npm run dev:prod", prodEnv);
 printMode("npm run dev:local", localEnv);
 

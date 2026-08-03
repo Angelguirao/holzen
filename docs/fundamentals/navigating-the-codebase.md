@@ -229,9 +229,8 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 |--------|------|-----------------------------------------------|
 | `npm run dev` | `development` | Requires explicit `VITE_SUPABASE_*` in `.env` / `.env.development*`; missing values fail fast. |
 | `npm run build` | `production` (default) | Requires explicit `VITE_SUPABASE_*` (or `SUPABASE_*` for `check:version-sync`) from `.env.production` / CI / Vercel env. |
-| `npm run dev:staging` | `staging` | Loads env for the staging backend (e.g. `.env.staging` / `.env.staging.local` per README). |
-| `npm run dev:prod` | `prod` | Loads env for the prod-like backend (e.g. `.env.prod` / `.env.prod.local` per README). |
-| `npm run dev:local` | `localstack` | Forces explicit local Supabase values from `.env.localstack*`. |
+| `npm run dev:prod` | `prod` | Loads env for holzen-prod (e.g. `.env.prod` / `.env.prod.local` per README). Use carefully. |
+| `npm run dev:local` | `localstack` | Forces explicit local Supabase values from `.env.localstack*`. Prefer this for schema work. |
 
 ---
 
@@ -245,15 +244,15 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 ## 17. Deploy paths: Vercel + owned Supabase
 
-**Production (after platform exit):** GitHub is source of truth. **`main`** merge deploys the SPA to **Vercel** and applies migrations / edge functions to the **production Supabase project** (via CI or CLI). **`staging`** branch targets the staging Supabase project for pre-prod QA.
+**Production (after platform exit):** GitHub is source of truth. **`feature/*` → PR → `main`** deploys the SPA to **Vercel** and applies migrations / edge functions to **holzen-prod**. There is no git `staging` branch; legacy **holzen-staging** was deleted (see [staging-supabase-setup.md](../ops/staging-supabase-setup.md)). Prefer local Docker for schema; Pro Branching later if needed.
 
 | Change in repo | Typical effect |
 |----------------|----------------|
-| New or updated SQL under **`supabase/migrations/`** | Applied to the **target Supabase project** when CI / `db push` runs for that branch |
-| Changes under **`supabase/functions/`** | Edge functions **redeploy** to that project |
-| Changes under **`src/`**, `public/`, etc. | **Vercel** production build on **`main`** merge (preview builds on PRs) |
+| New or updated SQL under **`supabase/migrations/`** | Applied to **holzen-prod** when CI / `db push` runs on `main` |
+| Changes under **`supabase/functions/`** | Edge functions **redeploy** to holzen-prod |
+| Changes under **`src/`**, `public/`, etc. | **Vercel** production build on **`main`** merge (preview builds on PRs; may share prod keys carefully) |
 
-**Locally**, nothing in this table runs by itself: your machine uses **`.env` / `.env.*.local`** and **`npm run dev`** (or `dev:staging` / `dev:prod` / `dev:local`). Use **local Supabase** (`npm run supabase:start`, `supabase:reset`) to test migrations safely; use **`npx supabase functions serve`** (and [function secrets](https://supabase.com/docs/guides/functions/secrets)) to approximate hosted function behavior.
+**Locally**, nothing in this table runs by itself: your machine uses **`.env` / `.env.*.local`** and **`npm run dev`** (or `dev:prod` / `dev:local`). Use **local Supabase** (`npm run supabase:start`, `supabase:reset`) to test migrations safely; use **`npx supabase functions serve`** (and [function secrets](https://supabase.com/docs/guides/functions/secrets)) to approximate hosted function behavior.
 
 **Optional Lovable editor:** You may use [Lovable](https://lovable.dev) on **feature branches only** for UI iteration — do **not** use **Publish → Update** for prod. See [lovable-staging-and-platform-exit.md](../ops/lovable-staging-and-platform-exit.md).
 
@@ -273,7 +272,7 @@ These are observations from a structural pass — not a full security or QA audi
 
 ## 19. Learning path: pause first, then whole app
 
-**Once — run the app:** `cp .env.example .env`, fill Supabase URL + anon key, `npm install`, `npm run dev` (or `dev:staging` / `dev:prod` / `dev:local` per [README.md](../README.md)), open `http://localhost:8080`, **sign in**.
+**Once — run the app:** `cp .env.example .env`, fill Supabase URL + anon key, `npm install`, `npm run dev` (or `dev:local` / `dev:prod` per [README.md](../README.md)), open `http://localhost:8080`, **sign in**.
 
 If SPA/React vocabulary is still fuzzy, skim [mental-models-for-contributors.md](mental-models-for-contributors.md) first, then return here.
 

@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * Create Stripe webhooks, resolve v1 price IDs, push secrets to Supabase.
+ * Create Stripe webhooks, resolve v1 price IDs, push live secrets to holzen-prod.
  *
  * Keys:
  * - Test: full sk_test_… from ~/.config/stripe/config.toml after `npm run stripe:login`
+ *   (prices + test webhook ensured; secrets printed for local Docker — not pushed to prod)
  * - Live checkout: rk_live_… from Stripe CLI Windows credential store (or sk_live_… in env)
  * - Live webhooks: require sk_live_… (STRIPE_LIVE_SECRET_KEY) — CLI rk_live cannot create webhooks
  *
@@ -14,9 +15,7 @@ import { homedir, platform } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 
-const STAGING_REF = "ksplyxxdvandkwzundql";
 const PROD_REF = "geqkxsnyqvhtascjghuu";
-const STAGING_WEBHOOK = `https://${STAGING_REF}.supabase.co/functions/v1/stripe-webhook`;
 const PROD_WEBHOOK = `https://${PROD_REF}.supabase.co/functions/v1/stripe-webhook`;
 
 const EVENTS = [
@@ -159,7 +158,7 @@ async function ensureWebhook(adminKey, url) {
   return created.secret;
 }
 
-async function bootstrapMode({ label, checkoutKey, webhookAdminKey, projectRef, webhookUrl }) {
+async function bootstrapMode({ label, checkoutKey, webhookAdminKey, projectRef, webhookUrl, pushSecrets }) {
   if (!checkoutKey) throw new Error(`No checkout key for ${label}`);
   console.log(`\n=== ${label} ===`);
 
@@ -192,7 +191,11 @@ async function bootstrapMode({ label, checkoutKey, webhookAdminKey, projectRef, 
     }
   }
 
-  setSupabaseSecrets(projectRef, secrets);
+  if (pushSecrets && projectRef) {
+    setSupabaseSecrets(projectRef, secrets);
+  } else {
+    console.log("  (not pushed to Supabase — copy into supabase/.env.local for local Docker)");
+  }
 }
 
 const keys = resolveKeys();
@@ -202,16 +205,19 @@ if (!keys.test) {
 }
 
 try {
+  // Test mode: ensure catalog + webhook URL for local/careful use; do not overwrite prod live secrets.
   await bootstrapMode({
-    label: "TEST (staging)",
+    label: "TEST (local Docker)",
     checkoutKey: keys.test,
     webhookAdminKey: keys.test,
-    projectRef: STAGING_REF,
-    webhookUrl: STAGING_WEBHOOK,
+    projectRef: null,
+    webhookUrl: PROD_WEBHOOK,
+    pushSecrets: false,
   });
 
   if (!keys.liveCheckout) {
     console.log("\nLive key not found. Run: npm run stripe:login");
+    console.log("Test prices ready for local Docker; prod live secrets not updated.");
     process.exit(0);
   }
 
@@ -221,9 +227,10 @@ try {
     webhookAdminKey: keys.liveAdmin,
     projectRef: PROD_REF,
     webhookUrl: PROD_WEBHOOK,
+    pushSecrets: true,
   });
 
-  console.log("\nDone. Stripe secrets pushed to staging + prod.");
+  console.log("\nDone. Live Stripe secrets pushed to holzen-prod.");
 } catch (err) {
   console.error(err instanceof Error ? err.message : err);
   process.exit(1);

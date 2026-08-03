@@ -4,7 +4,7 @@
 
 **Metric:** Waitlist signups / unique `/` visitors (7d rolling; legacy `/welcome` pings still count)
 
-**Default git flow:** `feature/*` → **`staging`** (smoke) → **`main`** (prod ship). See [branch-model.md](branch-model.md).
+**Default git flow:** `feature/*` → PR → **`main`** → holzen-prod. See [branch-model.md](branch-model.md).
 
 ---
 
@@ -27,45 +27,23 @@
 ### 1. Build (feature branch)
 
 ```bash
-git checkout staging && git pull
+git checkout main && git pull
 git checkout -b feature/landing-waitlist-<slice>
 # edit apps/site, edges, or migrations
 npm run test:ci   # or targeted checks
 git push -u origin HEAD
-# open PR → staging
+# open PR → main
 ```
 
-### 2. Staging smoke (after merge to `staging`)
-
-CI runs [staging-deploy.yml](../../.github/workflows/staging-deploy.yml): migrations + edges → Vercel preview for `staging`.
+Prefer **local Docker** for schema/edge smoke before merge:
 
 ```bash
-# Edge functions (staging Supabase)
-export VITE_SUPABASE_URL=https://ksplyxxdvandkwzundql.supabase.co
-export VITE_SUPABASE_PUBLISHABLE_KEY=<staging anon key>
-node scripts/smoke-marketing-waitlist.mjs
-
-# Browser: open staging preview URL /
-# - form renders (not "temporarily unavailable")
-# - submit test email → success message
-# - duplicate submit → still ok (idempotent)
+npm run supabase:reset
+npm run supabase:functions:serve
+npm run smoke:marketing-waitlist   # with local VITE_SUPABASE_* if needed
 ```
 
-Checklist:
-
-- [ ] `landing-ping` returns 200
-- [ ] `waitlist-signup` returns 200
-- [ ] `/` shows waitlist form (hero + footer)
-- [ ] `/welcome` redirects to `/` (query preserved)
-- [ ] No console errors on submit
-
-### 3. Production (after staging looks good)
-
-```bash
-git checkout main && git pull
-git merge staging
-git push origin main
-```
+### 2. Production (after PR merge to `main`)
 
 CI runs [deploy-production.yml](../../.github/workflows/deploy-production.yml).
 
@@ -75,7 +53,13 @@ export VITE_SUPABASE_PUBLISHABLE_KEY=<prod anon key>
 node scripts/smoke-marketing-waitlist.mjs
 ```
 
-Confirm [holzen.app](https://holzen.app/) — same checks as staging.
+Confirm [holzen.app](https://holzen.app/) checklist:
+
+- [ ] `landing-ping` returns 200
+- [ ] `waitlist-signup` returns 200
+- [ ] `/` shows waitlist form (hero + footer)
+- [ ] `/welcome` redirects to `/` (query preserved)
+- [ ] No console errors on submit
 
 ---
 
@@ -96,7 +80,7 @@ Weekly (PersonalOS):
 
 | Variable | Value |
 |----------|--------|
-| `HOLZEN_SUPABASE_URL` | `https://geqkxsnyqvhtascjghuu.supabase.co` (prod — where waitlist data lives) |
+| `HOLZEN_SUPABASE_URL` | `https://geqkxsnyqvhtascjghuu.supabase.co` |
 | `HOLZEN_SUPABASE_SERVICE_ROLE_KEY` | holzen-prod service role |
 
 ---
@@ -106,9 +90,9 @@ Weekly (PersonalOS):
 | Symptom | Likely fix |
 |---------|------------|
 | "Waitlist signup is temporarily unavailable" on `/` | SPA missing `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` on Vercel |
-| Signup 401/500 | Edge not deployed; run staging/production deploy workflow |
+| Signup 401/500 | Edge not deployed; run production deploy workflow |
 | Metrics panel "not configured" on PersonalOS | Set `HOLZEN_SUPABASE_*` on Vercel personalos production |
 | Views always 0 | `landing-ping` blocked or adblock; check edge logs |
-| Staging form works, prod doesn't | Confirm prod migration applied + edges deployed on holzen-prod |
+| Local works, prod doesn't | Confirm prod migration applied + edges deployed on holzen-prod |
 
 Related: [marketing-site-split.md](marketing-site-split.md) · [deployment-sync-guide.md](deployment-sync-guide.md)

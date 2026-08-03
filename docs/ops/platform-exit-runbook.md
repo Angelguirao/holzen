@@ -13,7 +13,7 @@ flowchart TB
   subgraph dev [Development]
     GH[GitHub]
     CI[GitHub_Actions]
-    LOCAL[Local_Docker_or_staging]
+    LOCAL[Local_Docker]
   end
 
   subgraph prod [Production_you_own]
@@ -60,22 +60,22 @@ Legacy edges under `supabase/functions/legacy/` may still reference Lovable; the
 Until backend deploy is yours, **every merge to the branch Lovable tracks still applies migrations to prod**.
 
 1. In Lovable project settings: **stop tracking `main`** for auto-deploy, or disconnect GitHub sync for SQL/functions (exact UI varies).
-2. Create **owned** Supabase project(s): `holzen-staging`, `holzen-prod` (or claim existing via [Lovable ownership docs](https://docs.lovable.dev/tips-tricks/deployment-hosting-ownership)).
+2. Create (or claim) owned **Supabase** project: `holzen-prod` (legacy `holzen-staging` was deleted 2026-07-16 — prefer local Docker / Pro Branching; do not recreate on Free).
 3. Export all **Lovable Cloud → Secrets** to password manager; map to Supabase Edge secrets.
 
 ---
 
-## Phase 1 — Staging (prove the stack)
+## Phase 1 — Local stack (prove the stack)
 
-See [staging-supabase-setup.md](staging-supabase-setup.md).
+See [staging-supabase-setup.md](staging-supabase-setup.md) (deleted-project note) and prefer Docker:
 
-1. `supabase link --project-ref <staging-ref>`
-2. `npm run staging:deploy` (or `staging:db-push` + `staging:functions-deploy`)
-3. Copy `.env.staging.example` → `.env.staging.local`; `npm run dev:staging`
-4. Supabase Auth → URL config: `http://localhost:8080/**`, staging site URL
+1. `npm run supabase:start` / `npm run supabase:reset`
+2. `npm run supabase:functions:serve` with `supabase/.env.local`
+3. Copy `.env.localstack.example` → `.env.localstack.local`; `npm run dev:local`
+4. Optional careful prod check: `.env.prod.local` + `npm run dev:prod`
 5. Bruno smoke: [bruno/active/](../../bruno/active/functions-catalog.md)
 
-**Secrets (staging minimum):**
+**Secrets (local minimum):**
 
 - `OPENROUTER_API_KEY` (see [llm-openrouter.md](llm-openrouter.md))
 - `PERPLEXITY_API_KEY`
@@ -91,13 +91,12 @@ GitHub Actions (see [`.github/workflows/`](../../.github/workflows/)):
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `ci.yml` | PR; push `main` / `staging` / `dev` | `npm run test:ci` + build |
-| `staging-deploy.yml` | `workflow_dispatch` / push `staging` | Preflight → backend → Vercel preview |
-| `deploy-production.yml` | `workflow_dispatch` / push `main` | Preflight → backend → Vercel production (**`production`** environment approval recommended) |
+| `ci.yml` | PR; push `main` / `dev` | `npm run test:ci` + build |
+| `deploy-production.yml` | After CI on `main`; `workflow_dispatch` | Preflight → backend → Vercel production (**`production`** environment approval recommended) |
 
 **GitHub secrets:** See [cicd-overview.md](cicd-overview.md) (Supabase, Vercel, `VITE_*` for preflight builds).
 
-**Setup guides:** [staging-supabase-setup.md](staging-supabase-setup.md), [production-supabase-setup.md](production-supabase-setup.md), [vercel-frontend-setup.md](vercel-frontend-setup.md), [cicd-overview.md](cicd-overview.md).
+**Setup guides:** [production-supabase-setup.md](production-supabase-setup.md), [vercel-frontend-setup.md](vercel-frontend-setup.md), [cicd-overview.md](cicd-overview.md). Legacy staging note: [staging-supabase-setup.md](staging-supabase-setup.md).
 
 ---
 
@@ -109,7 +108,7 @@ GitHub Actions (see [`.github/workflows/`](../../.github/workflows/)):
 2. Apply migrations: `supabase db push`
 3. **If legacy Lovable DB has live users:** one-time data cutover — [database-data-migration.md](database-data-migration.md) (`npm run db:migrate-prod` after `.env.db.local`)
 4. Deploy active functions: `npm run prod:functions-deploy` (31 edges from `config.toml`; skips `legacy/`)
-5. Set Edge secrets (mirror staging + **live** Stripe keys)
+5. Set Edge secrets (**live** Stripe keys + Resend / AI / observability)
 6. Re-verify `pg_cron` vault + `CRON_SECRET` ([deployment-sync-guide.md](deployment-sync-guide.md))
 
 ### Frontend
@@ -125,7 +124,7 @@ Alternatives: Netlify or Cloudflare Pages with the same `npm run build` / `dist`
 
 ### Auth & email
 
-1. Supabase → Authentication → Providers → Google: client ID/secret from Google Cloud Console; redirect URLs = prod + staging + localhost
+1. Supabase → Authentication → Providers → Google: client ID/secret from Google Cloud Console; redirect URLs = prod + localhost (see [local-google-oauth.md](local-google-oauth.md))
 2. Supabase → Auth → **Hooks** → Send Email: point HTTPS URL at `auth-email-hook`; set `SEND_EMAIL_HOOK_SECRET` in Edge secrets (matches dashboard webhook secret)
 3. Resend → Webhooks: point at `handle-email-suppression`; set `RESEND_WEBHOOK_SECRET` in Edge secrets
 4. Stripe: webhook URL → prod `stripe-webhook` edge URL — full checklist [stripe-environment-setup.md](stripe-environment-setup.md)
@@ -142,10 +141,10 @@ Update [observability-setup.md](observability-setup.md) checklist: Lovable secre
 - [ ] No Lovable GitHub sync to prod DB
 - [ ] Supabase Auth Send Email Hook live (not Lovable auth email)
 - [ ] Resend webhooks live for suppression
-- [ ] **`LOVABLE_API_KEY` deleted** from Edge secrets (staging + prod) — Gemini + Resend only
+- [ ] **`LOVABLE_API_KEY` deleted** from Edge secrets — Gemini + Resend only
 - [ ] Cancel or downgrade Lovable subscription when editor no longer needed
 
-Dashboard checklist (both projects):
+Dashboard checklist:
 
 ```text
 Supabase → Edge Functions → Secrets → delete LOVABLE_API_KEY
@@ -154,15 +153,14 @@ Verify: RESEND_API_KEY, SEND_EMAIL_HOOK_SECRET, RESEND_WEBHOOK_SECRET, OPENROUTE
 
 ## Branch model (recommended)
 
-See **[branch-model.md](branch-model.md)** for `staging` / `main` protection and GitHub Environment setup.
+See **[branch-model.md](branch-model.md)** for `feature/*` → PR → `main` and GitHub Environment setup.
 
 | Branch | Environment | Database |
 |--------|-------------|----------|
-| `dev` / feature branches | Local / PR CI | Local Docker or staging |
-| `staging` | Staging host preview | `holzen-staging` Supabase |
+| `feature/*` | Local / PR CI + Vercel preview | Local Docker (prefer); preview may share prod carefully |
 | `main` | Production | `holzen-prod` Supabase |
 
-**Features move up; hotfixes move down** (merge hotfix from `main` → `staging`).
+**Features move up via PR.** There is no git `staging` branch.
 
 ---
 

@@ -2,10 +2,9 @@
  * Push edge secrets from a gitignored env file to a Supabase project.
  *
  * Usage:
- *   npm run staging:secrets-set
  *   npm run prod:secrets-set
  *
- * Or: node scripts/supabase-secrets-set.mjs .env.staging.secrets ksplyxxdvandkwzundql
+ * Or: node scripts/supabase-secrets-set.mjs .env.prod.secrets geqkxsnyqvhtascjghuu
  */
 import { readFileSync, existsSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { spawnSync } from "node:child_process";
@@ -15,7 +14,7 @@ import { tmpdir } from "node:os";
 import { parseDotenv } from "./parse-dotenv.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const envPath = join(root, process.argv[2] ?? ".env.staging.secrets");
+const envPath = join(root, process.argv[2] ?? ".env.prod.secrets");
 const projectRef = process.argv[3];
 
 if (!existsSync(envPath)) {

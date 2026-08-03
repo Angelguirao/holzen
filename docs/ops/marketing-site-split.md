@@ -256,29 +256,21 @@ flowchart LR
   CI --> B[build:unified]
   B --> BS[check:bundle-shipped]
 
-  STG[Push staging] --> SD[staging-deploy.yml]
-  SD --> PF[preflight: test:ci + build:unified]
-  PF --> BE[deploy-backend]
-  BE --> FE[vercel-ci-deploy]
-
   MAIN[Push main] --> PD[deploy-production.yml]
   PD --> PF2[preflight: test:ci + build:unified]
   PF2 --> BE2[deploy-backend]
   BE2 --> FE2[vercel-ci-deploy]
 
-  FE --> V[Vercel preview]
   FE2 --> VP[Vercel production]
 ```
 
 | Stage | Workflow | Frontend build | What deploys |
 | --- | --- | --- | --- |
 | **PR / push** | `.github/workflows/ci.yml` | `npm run build:unified` + `check:bundle-shipped` | Nothing (validate only) |
-| **Staging** | `staging-deploy.yml` preflight | `npm run build:unified` | — |
-| **Staging** | `staging-deploy.yml` deploy-frontend | `vercel build` (same `vercel.json`) | Preview URL |
 | **Production** | `deploy-production.yml` | Same chain | `holzen.app` |
 | **PR preview** | Vercel Git integration (auto) | `vercel.json` → `build:unified` | Ephemeral preview |
 
-**Order:** Backend (migrations + edges) **always** runs before frontend deploy on `staging` / `main` — unchanged. Marketing HTML ships in the **same** prebuilt `dist/` as the SPA.
+**Order:** Backend (migrations + edges) **always** runs before frontend deploy on `main` — unchanged. Marketing HTML ships in the **same** prebuilt `dist/` as the SPA.
 
 ### New secrets or jobs?
 

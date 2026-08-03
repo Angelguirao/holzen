@@ -65,7 +65,7 @@ Pre-PMF we're a team of one. "On-call" means: Slack unmuted during waking hours;
 ### Scenario: UptimeRobot `/health` 503
 
 1. Open `/health` response. If `status: degraded, error: db_unreachable`, DB is the issue.
-2. Check **Supabase Dashboard** (staging or prod) for ongoing platform incident or connection limits.
+2. Check **Supabase Dashboard** (**holzen-prod**) for ongoing platform incident or connection limits.
 3. If DB is fine but `/health` still 503, check edge function logs for boot failures (import errors, missing env).
 
 ### Scenario: Cron heartbeat miss
