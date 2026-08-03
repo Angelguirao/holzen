@@ -4,7 +4,7 @@ How GitHub merges deploy Holzen to **owned Supabase** + **Vercel**, and how to a
 
 **Repo integration:** This checklist is referenced from [AGENTS.md](../../AGENTS.md) (humans + AI) and enforced for Cursor via [`.cursor/rules/deployment-sync.mdc`](../../.cursor/rules/deployment-sync.mdc) (`alwaysApply`). Run it before every push that touches app code, migrations, or edge functions.
 
-**Branch model:** `feature/* → staging → main`. See [branch-model.md](branch-model.md). **CI/CD map:** [cicd-overview.md](cicd-overview.md). **Platform exit:** [platform-exit-runbook.md](platform-exit-runbook.md) · [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) (optional Lovable editor only — not prod host).
+**Branch model:** `feature/*` → PR → `main` → production. See [branch-model.md](branch-model.md). **CI/CD map:** [cicd-overview.md](cicd-overview.md). **Platform exit:** [platform-exit-runbook.md](platform-exit-runbook.md) · [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) (optional Lovable editor only — not prod host).
 
 ## What happens on merge / deploy
 
@@ -15,10 +15,10 @@ How GitHub merges deploy Holzen to **owned Supabase** + **Vercel**, and how to a
 | `supabase/config.toml` | Merged into project config on edge deploy | With edge deploy |
 | Frontend (`src/`, `index.html`, etc.) | GitHub Actions `deploy-frontend` → [`vercel-ci-deploy.mjs`](../../scripts/vercel-ci-deploy.mjs) **after** backend (or alone on frontend-only diffs) | After Vercel prebuilt deploy succeeds |
 
-**Trigger:** Push to `staging` or `main` runs **CI** first (`test:ci` + build + Vercel prebuilt artifact). **Staging deploy** / **Production deploy** start automatically when CI succeeds on that commit (`workflow_run`) — they do **not** re-run `test:ci`. See [cicd-overview.md](cicd-overview.md).
+**Trigger:** Push to `main` runs **CI** first (`test:ci` + build + Vercel prebuilt artifact). **Production deploy** starts automatically when CI succeeds on that commit (`workflow_run`) — it does **not** re-run `test:ci`. See [cicd-overview.md](cicd-overview.md).
 | PR previews | Vercel Git integration (automatic; not Actions) | On PR open/sync |
 
-**Key insight:** `main` and `staging` **do not** auto-deploy from Vercel Git ([vercel.json](../../vercel.json) `git.deploymentEnabled`) — Actions runs **backend first, then frontend** so the SPA never races migrations/edges. PR previews on feature branches still auto-deploy via Vercel.
+**Key insight:** `main` **does not** auto-deploy from Vercel Git ([vercel.json](../../vercel.json) `git.deploymentEnabled`) — Actions runs **backend first, then frontend** so the SPA never races migrations/edges. PR previews on feature branches still auto-deploy via Vercel.
 
 ### When CI or Supabase reports a migration error (ownership / “must be owner”)
 
@@ -43,7 +43,7 @@ files so `check:view-migrations` + full chain stay honest.
 | `VITE_*` | Browser (built SPA) | **Vercel** project env (prod/preview); local `.env` for dev | Next Vercel deploy (or local `npm run dev`) |
 | Edge secrets (`OPENROUTER_API_KEY`, `RESEND_API_KEY`, `CRON_SECRET`, Stripe keys, …) | Supabase Edge | **Supabase Dashboard → Edge Functions → Secrets** (per project) | Next function invocation after secret update |
 
-**Important:** Files like `.env.example`, `.env.prod`, or `.env` in this repo **only affect the frontend build** when you run Vite locally (or when Vercel/CI loads them). They are **not** read by deployed Edge functions. Configure edge secrets in the **Supabase dashboard** for staging and prod separately.
+**Important:** Files like `.env.example`, `.env.prod`, or `.env` in this repo **only affect the frontend build** when you run Vite locally (or when Vercel/CI loads them). They are **not** read by deployed Edge functions. Configure edge secrets in the **Supabase dashboard** for `holzen-prod` (and in `supabase/.env*` for local Docker).
 
 **Local development only:** `supabase functions serve` can load `supabase/.env` (gitignored). That path does not apply to hosted runs.
 
@@ -51,7 +51,7 @@ files so `check:view-migrations` + full chain stay honest.
 
 ### 1. Migrations
 
-**Rule:** Never push a migration you haven't tested locally or on staging first.
+**Rule:** Never push a migration you haven't tested locally first (prefer Docker).
 
 ```sh
 # Test locally with Docker
@@ -79,8 +79,8 @@ supabase/migrations/20260407120000_add_foo_column.sql
 
 **Remote-only migrations (`Remote migration versions not found in local migrations directory`):**
 - Caused by applying SQL on Supabase outside git (dashboard, MCP) without committing matching files under `supabase/migrations/`.
-- **Fix:** add migration files with the **exact** remote version timestamps (e.g. `20260713185413_lifeos_control_plane_core.sql`), idempotent `IF NOT EXISTS` SQL, merge to `staging`, re-run deploy.
-- **LifeOS venture ledger** (`lifeos_*` tables) lives in **holzen** migrations — PersonalOS reads/writes via service role on holzen-staging/prod. Do not apply LifeOS schema only via personal-ai-os without checking in here.
+- **Fix:** add migration files with the **exact** remote version timestamps (e.g. `20260713185413_lifeos_control_plane_core.sql`), idempotent `IF NOT EXISTS` SQL, merge to `main`, re-run deploy.
+- **LifeOS venture ledger** (`lifeos_*` tables) lives in a separate **`lifeos`** project — never new `lifeos_*` migrations in this repo. See [branch-model.md](branch-model.md).
 
 ### 2. Edge functions
 
@@ -99,7 +99,7 @@ verify_jwt = false
 
 **Secrets:** Edge functions read secrets from the Supabase environment, not from repo `.env` files. See [Hosted env files vs Edge secrets](#hosted-env-files-vs-edge-secrets). If you add a new secret dependency:
 1. Document it in your PR / commit message.
-2. Add the secret via **Supabase Dashboard → Edge Functions → Secrets** **before** the code that uses it goes live (staging first, then prod).
+2. Add the secret via **Supabase Dashboard → Edge Functions → Secrets** **before** the code that uses it goes live (local Docker first when possible, then prod).
 3. If the secret is missing at runtime, the function will fail silently or throw — check Edge Function logs.
 
 ### 3. Frontend
@@ -112,9 +112,9 @@ See [vercel-frontend-setup.md](vercel-frontend-setup.md).
 
 ### 4. config.toml
 
-- **`project_id`** in the checked-in `config.toml` is a neutral local CLI identifier, not a staging/prod selector.
+- **`project_id`** in the checked-in `config.toml` is a neutral local CLI identifier, not a prod selector.
 - Browser traffic follows `VITE_SUPABASE_*`.
-- Target-specific scripts (`staging:*`, `prod:*`, `gen:types`, `*:reschedule-crons`) use explicit project refs or relink the target for you before they run.
+- Target-specific scripts (`prod:*`, `gen:types`, `*:reschedule-crons`) use explicit project refs or relink the target for you before they run.
 - Only add `[functions.*]` blocks for new edge functions.
 - Don't remove existing function blocks unless you're also deleting the function folder.
 
@@ -166,9 +166,9 @@ Define your own interface for the expected shape and cast through `unknown`. The
 **Prevention (workflow):**
 
 1. **Same-commit migrations + code:** Always use `as unknown as T` for queries touching new columns.
-2. **Two-commit approach (safest):** Push the migration first, wait for staging/prod to apply it and regenerate types, then push the code that uses the new columns.
+2. **Two-commit approach (safest):** Push the migration first, wait for prod to apply it and regenerate types, then push the code that uses the new columns.
 3. **Wrap in try/catch** when the table or column genuinely might not exist yet (pre-migration graceful degradation).
-4. **`npm run gen:types`** — Regenerates `src/integrations/supabase/types.ts` from the explicit **production** project ref (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Use `npm run gen:types:staging` when you intentionally want staging instead.
+4. **`npm run gen:types`** — Regenerates `src/integrations/supabase/types.ts` from the explicit **production** project ref (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Prefer local Docker schema iteration before regenerating from prod.
 
 ### Migrations that unlock Edge code (same push)
 
@@ -241,7 +241,7 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
 
 ### GitHub → Vercel / Supabase deploy seems stuck
 
-**Symptom:** You merged but staging or prod didn't update.
+**Symptom:** You merged but prod didn't update.
 
 **Checklist:**
 1. **Vercel:** Check the deployment for the commit on the correct branch (`main` = prod).

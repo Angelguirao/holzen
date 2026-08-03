@@ -48,13 +48,9 @@ const githubSecrets = parseEnv(join(root, '.env.github-secrets.local'));
 const literals = {
   VERCEL_ORG_ID: vercelProject.orgId,
   VERCEL_PROJECT_ID: vercelProject.projectId,
-  SUPABASE_STAGING_PROJECT_REF: 'ksplyxxdvandkwzundql',
   SUPABASE_PROD_PROJECT_REF: 'geqkxsnyqvhtascjghuu',
   VITE_SUPABASE_URL: 'https://geqkxsnyqvhtascjghuu.supabase.co',
-  VITE_SUPABASE_STAGING_URL: 'https://ksplyxxdvandkwzundql.supabase.co',
   VITE_SUPABASE_PUBLISHABLE_KEY: prod.VITE_SUPABASE_PUBLISHABLE_KEY,
-  VITE_SUPABASE_STAGING_PUBLISHABLE_KEY:
-    parseEnv(join(root, '.env.staging.local')).VITE_SUPABASE_PUBLISHABLE_KEY,
 };
 
 for (const [name, value] of Object.entries(literals)) {

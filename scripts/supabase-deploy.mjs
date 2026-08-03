@@ -6,9 +6,6 @@
  *   npx supabase login
  *
  * Usage:
- *   npm run staging:db-push            — migrations only (staging)
- *   npm run staging:functions-deploy   — active edges only (staging)
- *   npm run staging:deploy             — migrations + active edges (staging)
  *   npm run prod:db-push               — migrations only (production)
  *   npm run prod:functions-deploy      — active edges only (production)
  *   npm run prod:deploy                — migrations + active edges (production)
@@ -16,7 +13,7 @@
 import { spawnSync } from "node:child_process";
 import { formatSupabaseTarget, resolveSupabaseTarget } from "./lib/supabase-targets.mjs";
 
-const targetArg = process.argv[2] ?? "staging";
+const targetArg = process.argv[2] ?? "production";
 const mode = process.argv[3] ?? "deploy";
 const target = resolveSupabaseTarget(targetArg);
 

@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-# Pull a data-only snapshot from staging or prod for local debugging / dry-runs.
+# Pull a data-only snapshot from prod (or legacy) for local debugging / dry-runs.
 #
 # Usage:
-#   npm run db:pull:staging
 #   npm run db:pull:prod
-#   bash scripts/db-pull-remote.sh staging
+#   bash scripts/db-pull-remote.sh prod
 #   bash scripts/db-pull-remote.sh prod --include-telemetry
 #
 # Writes to backups/pull-<env>-<timestamp>/ (gitignored).
@@ -28,7 +27,7 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-[[ -n "$ENV_NAME" ]] || db_die "Usage: db-pull-remote.sh <staging|prod|legacy> [--include-telemetry]"
+[[ -n "$ENV_NAME" ]] || db_die "Usage: db-pull-remote.sh <prod|legacy> [--include-telemetry]"
 
 db_load_env_file "$ROOT/.env.db.local"
 db_load_env_file "$ROOT/.env.db"
