@@ -63,7 +63,7 @@ This matches the “skills-first” stats organization documented in `docs/decis
 
 | Paths                                                  | Access                                                                                                                                                                   |
 | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `/welcome`, `/auth`                                    | `PublicOnlyRoute` (signed-out users; signed-in users redirect to `/`).                                                                                                   |
+| `/`, `/auth`                                    | `PublicOnlyRoute` (signed-out users; signed-in users redirect to `/home`). Legacy `/welcome` → `/`.                                                                                                   |
 | `/reset-password`                                      | No PublicOnly/Protected wrapper in router — works for auth flows.                                                                                                        |
 | `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug` | Open.                                                                                                                                                                    |
 | `/reserve`                                             | Open (reservation / waitlist style page).                                                                                                                                |

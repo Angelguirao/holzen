@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const holzenRoot = fileURLToPath(new URL('../..', import.meta.url));
 const designTokensRoot = path.resolve(holzenRoot, 'packages/design-tokens');
 
-/** @see docs/ops/marketing-site-split.md — waitlist landing is SPA `/welcome` (Make port). */
+/** @see docs/ops/marketing-site-split.md — waitlist landing is SPA `/` (Make port). */
 export default defineConfig({
   site: 'https://holzen.app',
   output: 'static',

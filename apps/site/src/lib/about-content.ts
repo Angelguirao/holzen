@@ -27,7 +27,7 @@ export const aboutCopy = {
       label: about.pauseResearchTitle,
       lead: about.pauseResearchIntro,
       paragraphs: [landing.scienceStepsSummary],
-      link: { href: '/welcome', label: about.readFullScience },
+      link: { href: '/', label: about.readFullScience },
     },
     {
       label: about.whyBitcoin,

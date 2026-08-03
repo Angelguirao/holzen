@@ -2,7 +2,7 @@
 
 Static marketing HTML for **legal / about / blog**. Merges into the same `holzen.app` deploy as the React app.
 
-**Waitlist landing** is no longer Astro — it lives in the SPA at `/welcome` (Figma Make port).
+**Waitlist landing** is no longer Astro — it lives in the SPA at `/` (Figma Make port; legacy `/welcome` redirects).
 
 ## Read the full guide first
 
@@ -23,6 +23,6 @@ Static marketing HTML for **legal / about / blog**. Merges into the same `holzen
 | `src/lib/app-url.ts` | Auth links (`:8080` in dev, same-origin in prod) |
 | `src/layouts/MarketingLayout.astro` | Shared HTML `<head>` |
 
-**Venture experiment:** [landing-waitlist runbook](../../docs/ops/landing-waitlist-runbook.md) — SPA `/welcome` + weekly observe.
+**Venture experiment:** [landing-waitlist runbook](../../docs/ops/landing-waitlist-runbook.md) — SPA `/` + weekly observe.
 
 Production Vercel settings live in **repo root** `vercel.json`, not `apps/site/vercel.json`.

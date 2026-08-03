@@ -30,8 +30,8 @@ Users see **one website** (`holzen.app`). The repo builds **two** frontends that
 
 | Codebase | Folder | Serves |
 | --- | --- | --- |
-| Product app | `src/` (React) | `/`, `/auth`, `/pause`, settings, … |
-| Marketing site | `apps/site/` (Astro) | `/welcome`, later blog/legal |
+| Product app | `src/` (React) | `/`, `/home`, `/auth`, `/pause`, settings, … |
+| Marketing site | `apps/site/` (Astro) | `/about`, `/blog`, legal |
 
 **Read this first if it is confusing:** [docs/ops/marketing-site-split.md](docs/ops/marketing-site-split.md) — plain-language guide with diagrams, user journeys, and FAQ.
 
@@ -77,7 +77,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run dev:local`                    | Dev server using `.env.localstack` / `.env.localstack.local` (local Supabase only)                                                         |
 | `npm run build`                        | Production build — React SPA only (runs `**check:version-sync`** via `**prebuild**`; requires explicit Supabase env)                      |
 | `npm run build:unified`                | **Production deploy** — React + Astro merged into `dist/` (see [marketing-site-split.md](docs/ops/marketing-site-split.md))              |
-| `npm run dev:site`                     | Astro marketing dev server on port **4321** (`/welcome`, etc.)                                                                           |
+| `npm run dev:site`                     | Astro marketing dev server on port **4321** (`/about`, etc.)                                                                           |
 | `npm run build:site`                   | Astro marketing build only → `apps/site/dist/`                                                                                             |
 | `npm run build:dev`                    | Build in development mode                                                                                                                  |
 | `npm run preview`                      | Serve the production build locally                                                                                                         |

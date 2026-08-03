@@ -1,9 +1,18 @@
 /** Authenticated Journey overview (shipped shell — no tab subpaths). */
 export const JOURNEY_PREFIX = '/journey' as const;
 
+/** Authenticated Home (shell). Public waitlist landing owns `/`. */
+export const HOME_PATH = '/home' as const;
+
+/** Public waitlist / marketing landing. */
+export const LANDING_PATH = '/' as const;
+
+/** Legacy landing URL — keep as redirect to {@link LANDING_PATH}. */
+export const LEGACY_LANDING_PATH = '/welcome' as const;
+
 /** Shipped primary shell tabs (order matches BottomNav). */
 export const APP_SHELL_TABS = [
-  { to: '/', key: 'home' },
+  { to: HOME_PATH, key: 'home' },
   { to: '/archive', key: 'archive' },
   { to: JOURNEY_PREFIX, key: 'journey' },
   { to: '/settings', key: 'settings' },
@@ -13,7 +22,7 @@ export type AppShellTabKey = (typeof APP_SHELL_TABS)[number]['key'];
 
 /** True for primary bottom-nav destinations (incl. `/settings/*` subpaths). */
 export function isAppShellPath(pathname: string): boolean {
-  if (pathname === '/' || pathname === '/index') return true;
+  if (pathname === HOME_PATH || pathname === '/index') return true;
   if (pathname === '/archive' || pathname.startsWith('/archive/')) return true;
   if (pathname === JOURNEY_PREFIX) return true;
   if (pathname === '/settings' || pathname.startsWith('/settings/')) return true;
@@ -21,7 +30,7 @@ export function isAppShellPath(pathname: string): boolean {
 }
 
 /** Registered authenticated shell paths (404 for anything else). */
-export const APP_SHELL_ROUTES = ['/', '/archive', JOURNEY_PREFIX, '/settings'] as const;
+export const APP_SHELL_ROUTES = [HOME_PATH, '/archive', JOURNEY_PREFIX, '/settings'] as const;
 
 /**
  * Admin / ops routes (`App.tsx` PrivateExperienceLayout).

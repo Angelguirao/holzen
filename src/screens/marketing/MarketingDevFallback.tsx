@@ -9,7 +9,7 @@ const STATIC_MARKETING_RELOAD_KEY = 'holzen-marketing-static-reload';
 /**
  * Dev: stub pointing at Astro for legal/blog/about.
  * Prod: full document load so Vercel serves Astro HTML.
- * Waitlist landing (`/welcome`) is SPA — do not route it here.
+ * Waitlist landing (`/`) is SPA — do not route it here.
  * @see docs/ops/marketing-site-split.md
  */
 export default function MarketingDevFallback() {
@@ -44,7 +44,7 @@ export default function MarketingDevFallback() {
           >
             Open {pathname} again
           </a>
-          <Link to="/welcome" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             Back to landing
           </Link>
         </div>
@@ -67,7 +67,7 @@ export default function MarketingDevFallback() {
       <p className="text-sm text-muted-foreground max-w-sm">
         Legal, about, and blog stay on the Astro marketing site. Run{' '}
         <code className="font-mono text-xs">npm run dev:site</code> or use the merged build.
-        Waitlist landing is SPA at <code className="font-mono text-xs">/welcome</code>.
+        Waitlist landing is SPA at <code className="font-mono text-xs">/</code>.
       </p>
       <a
         href={marketingUrl}
@@ -75,7 +75,7 @@ export default function MarketingDevFallback() {
       >
         Open {pathname} on marketing dev server
       </a>
-      <Link to="/welcome" className="text-sm text-muted-foreground hover:text-foreground">
+      <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
         Open waitlist landing
       </Link>
     </div>

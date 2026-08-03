@@ -2,7 +2,8 @@
 
 Port of Figma Make [Animated Background Colors](https://www.figma.com/make/58fanoTVfFFzMrgx4a8jyh/Animated-Background-Colors) into Holzen.
 
-- Route: `/welcome` (`PublicOnlyRoute`)
+- Route: `/` (`PublicOnlyRoute`); legacy `/welcome` redirects here
+- Authenticated Home: `/home`
 - Waitlist: `waitlist-api.ts` → edge `waitlist-signup` + `landing-ping`
 - Legal links: Astro `/privacy`, `/terms`
 

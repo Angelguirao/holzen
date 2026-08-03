@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Folder, Compass, Settings as SettingsIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
-import { APP_SHELL_TABS, JOURNEY_PREFIX, type AppShellTabKey } from '@/lib/app-routes';
+import { APP_SHELL_TABS, HOME_PATH, JOURNEY_PREFIX, type AppShellTabKey } from '@/lib/app-routes';
 import { trackPrimaryTabOpened } from '@/app/lib/navigation-telemetry';
 import { APP_SHELL_WIDTH_CLASS } from '@/app/lib/app-shell-layout';
 
@@ -10,7 +10,7 @@ export type PrimaryTabKey = AppShellTabKey;
 
 /** Matches which bottom tab is “current” (same rules as `NavLink` active styling). */
 export function isPrimaryTabActive(pathname: string, key: PrimaryTabKey): boolean {
-  if (key === 'home') return pathname === '/';
+  if (key === 'home') return pathname === HOME_PATH;
   if (key === 'archive') {
     return pathname === '/archive' || pathname.startsWith('/archive/');
   }
@@ -39,7 +39,7 @@ export function BottomNav() {
             <NavLink
               key={key}
               to={to}
-              end={to === '/'}
+              end={to === HOME_PATH}
               onClick={() => {
                 if (!isPrimaryTabActive(pathname, key)) {
                   trackPrimaryTabOpened(key);

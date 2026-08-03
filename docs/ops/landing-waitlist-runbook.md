@@ -2,7 +2,7 @@
 
 **Experiment:** `landing-waitlist` · **Hypothesis:** `stranger-pull` · **Folio:** [holzen-observe](https://github.com/Angelguirao/brain/blob/master/wiki/self/inquiry/projects/holzen-observe.md)
 
-**Metric:** Waitlist signups / unique `/welcome` visitors (7d rolling)
+**Metric:** Waitlist signups / unique `/` visitors (7d rolling; legacy `/welcome` pings still count)
 
 **Default git flow:** `feature/*` → **`staging`** (smoke) → **`main`** (prod ship). See [branch-model.md](branch-model.md).
 
@@ -12,7 +12,7 @@
 
 | Piece | Location |
 |-------|----------|
-| Landing page | `src/screens/marketing/welcome/WelcomeLandingScreen.tsx` (SPA `/welcome`) |
+| Landing page | `src/screens/marketing/welcome/WelcomeLandingScreen.tsx` (SPA `/`; `/welcome` redirects) |
 | Waitlist form | Same screen — wired to `waitlist-signup` / `landing-ping` |
 | Edge: signup | `supabase/functions/waitlist-signup` |
 | Edge: page views | `supabase/functions/landing-ping` |
@@ -45,7 +45,7 @@ export VITE_SUPABASE_URL=https://ksplyxxdvandkwzundql.supabase.co
 export VITE_SUPABASE_PUBLISHABLE_KEY=<staging anon key>
 node scripts/smoke-marketing-waitlist.mjs
 
-# Browser: open staging preview URL /welcome
+# Browser: open staging preview URL /
 # - form renders (not "temporarily unavailable")
 # - submit test email → success message
 # - duplicate submit → still ok (idempotent)
@@ -55,7 +55,8 @@ Checklist:
 
 - [ ] `landing-ping` returns 200
 - [ ] `waitlist-signup` returns 200
-- [ ] `/welcome` shows waitlist form (hero + footer)
+- [ ] `/` shows waitlist form (hero + footer)
+- [ ] `/welcome` redirects to `/` (query preserved)
 - [ ] No console errors on submit
 
 ### 3. Production (after staging looks good)
@@ -74,7 +75,7 @@ export VITE_SUPABASE_PUBLISHABLE_KEY=<prod anon key>
 node scripts/smoke-marketing-waitlist.mjs
 ```
 
-Confirm [holzen.app/welcome](https://holzen.app/welcome) — same checks as staging.
+Confirm [holzen.app](https://holzen.app/) — same checks as staging.
 
 ---
 
@@ -85,11 +86,11 @@ Confirm [holzen.app/welcome](https://holzen.app/welcome) — same checks as stag
 Weekly (PersonalOS):
 
 1. Open inquiry desk → **holzen-observe** → **landing-waitlist** experiment
-2. Live metrics panel pulls signups + `/welcome` views (7d)
+2. Live metrics panel pulls signups + landing views (7d; `/` and legacy `/welcome` pings)
 3. **Log signal** with conversion rate — use suggested text from panel
 4. Commit folio update on `brain` **`master`** when nudged
 
-**Stress test (`no-waitlist-traction`):** 500 unique `/welcome` views and **zero** waitlist emails in 4 weeks → kill `stranger-pull` bet.
+**Stress test (`no-waitlist-traction`):** 500 unique landing views and **zero** waitlist emails in 4 weeks → kill `stranger-pull` bet.
 
 **PersonalOS env (production):**
 
@@ -104,7 +105,7 @@ Weekly (PersonalOS):
 
 | Symptom | Likely fix |
 |---------|------------|
-| "Waitlist signup is temporarily unavailable" on `/welcome` | SPA missing `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` on Vercel |
+| "Waitlist signup is temporarily unavailable" on `/` | SPA missing `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` on Vercel |
 | Signup 401/500 | Edge not deployed; run staging/production deploy workflow |
 | Metrics panel "not configured" on PersonalOS | Set `HOLZEN_SUPABASE_*` on Vercel personalos production |
 | Views always 0 | `landing-ping` blocked or adblock; check edge logs |
