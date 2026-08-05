@@ -59,3 +59,7 @@ bruno/environments/hosted.bru
 .env.prod
 .vercel
 .env*
+
+# Local code-review-graph artifacts
+.code-review-graph/
+
