@@ -1,0 +1,14 @@
+---
+description: Holzen uses Nox only — DESIGN.md + shadcn; do not import personal LifeOS Industrial or cream tokens.
+globs: DESIGN.md,**/components.json,**/components/ui/**,**/index.css,**/design-tokens/**
+alwaysApply: false
+---
+
+# Holzen design system (Nox)
+
+- Visual law: repo-root `DESIGN.md` (Nox).
+- Runtime tokens: `@holzen/design-tokens` / `src/index.css`.
+- Components: shadcn under `components/ui` — map to Nox variables.
+- Do **not** use `@angelguirao/personal-tokens`, LifeOS Industrial amber/zinc, or cream/terracotta.
+- Portfolio map (sibling): `personal-agent/docs/DESIGN-SYSTEMS.md`.
+- Figma / Code Connect: only when asked; reconcile Figma extract vs shipped link blue per DESIGN.md callout.
