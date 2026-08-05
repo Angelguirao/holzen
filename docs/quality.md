@@ -17,3 +17,4 @@ _Updated by LifeOS Symphony `mode=audit`._
 _None yet._
 
 - LifeOS PE prove 2026-08-03 20:43 UTC
+- Docs smoke test added on 2026-08-05
