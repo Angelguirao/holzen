@@ -30,14 +30,14 @@ return <>{children}</>;
 ### `PublicOnlyRoute`
 
 ```tsx
-if (loading) return <AuthLoading />;
 if (user) return <Navigate to="/home" replace />;
+if (loading && hasPersistedAuthSessionHint()) return <AuthLoading />;
 return <>{children}</>;
 ```
 
-- **`loading`**: same `AuthLoading` behavior.
 - **User present**: redirect to `/home` so signed-in users do not stay on landing/auth screens.
-- **No user**: render children (e.g. waitlist landing, `Auth`).
+- **`loading` + persisted session hint**: show `AuthLoading` only when localStorage likely has a Supabase token, so returning users do not flash marketing before `/home`.
+- **Anonymous (no hint)**: render children immediately — do **not** block the waitlist landing on “Restoring your session…”. Auth still hydrates in the background; if a session appears, redirect to `/home`.
 
 ### `OnboardedRoute`
 
@@ -79,12 +79,14 @@ Ungated routes are intentional: marketing/legal/blog content and password reset 
 
 ```mermaid
 flowchart TD
-  L[loading true] --> AL[AuthLoading]
-  L --> P{user?}
+  L[loading true] --> P{user?}
+  L -->|ProtectedRoute| AL[AuthLoading]
+  L -->|PublicOnlyRoute + persisted session hint| AL
+  L -->|PublicOnlyRoute + no hint| PUB[Render public children]
   P -- ProtectedRoute + no user --> W[Navigate /]
   P -- ProtectedRoute + user --> OK[Render protected children]
   P -- PublicOnlyRoute + user --> H[Navigate /home]
-  P -- PublicOnlyRoute + no user --> PUB[Render public children]
+  P -- PublicOnlyRoute + no user --> PUB
 ```
 
 ## Invariants
@@ -93,6 +95,7 @@ flowchart TD
 2. **First-run users are gated**: signed-in users with `has_onboarded = false` are redirected to `/onboarding` before protected app surfaces mount.
 3. **Deterministic redirects**: unauthenticated users hitting protected URLs always go to `/`; authenticated users hitting public-only URLs go to `/home`; onboarded users hitting `/onboarding` go to `/home`.
 4. **No redirect loop** between `/`, `/onboarding`, and `/home` for normal flows: `/` is public-only, `/onboarding` is protected + first-run only, and `/home` is protected + onboarded-only. Legacy `/welcome` only redirects to `/`.
+5. **Anonymous landing is not blocked on session restore**: `PublicOnlyRoute` does not show `AuthLoading` unless `hasPersistedAuthSessionHint()` is true. First-time visitors must see the waitlist page, not “Restoring your session…”.
 
 ## Security note
 
@@ -105,7 +108,7 @@ Route gating is **UX and navigation policy** only. It does not replace:
 ## Files
 
 - `src/App.tsx` - `ProtectedRoute`, `PublicOnlyRoute`, onboarding profile gates, route table
-- `@/features/auth/public` (`AuthProvider` / `useAuth`) — `user`, `loading`
+- `@/features/auth/public` (`AuthProvider` / `useAuth`) — `user`, `loading`; `hasPersistedAuthSessionHint` for public-route paint
 - `@/features/user/public-hooks` (`useProfile`) — `profileLoaded`, `hasOnboarded`
 - `src/app/components/AuthLoading.tsx` - loading UI used by both wrappers
 - `src/lib/app-routes.ts` — `HOME_PATH`, `LANDING_PATH`, `LEGACY_LANDING_PATH`

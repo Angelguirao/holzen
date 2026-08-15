@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useInView } from "framer-motion";
 import { Info, CheckCircle, Activity, Clock, TrendingUp, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { Link, useSearchParams } from "react-router-dom";
 import { PageMeta } from "@/app/components/PageMeta";
 import svgPaths from "./welcome-svg-paths";
@@ -198,6 +199,7 @@ function MobileWaitlistCTA({ waitlistRef }: { waitlistRef: string | null }) {
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, startSubmit] = useTransition();
+  const [backdropArmed, setBackdropArmed] = useState(false);
   const configured = waitlistConfigured();
 
   const isValidEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
@@ -219,55 +221,60 @@ function MobileWaitlistCTA({ waitlistRef }: { waitlistRef: string | null }) {
   };
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (!open) {
+      setBackdropArmed(false);
+      document.body.style.overflow = "";
+      return;
+    }
+    document.body.style.overflow = "hidden";
+    const arm = window.setTimeout(() => setBackdropArmed(true), 400);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.clearTimeout(arm);
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
-  return (
-    <>
-      {/* CTA button + helper */}
-      <div className="flex flex-col items-center gap-3">
-        <button
-          onClick={() => setOpen(true)}
-          className="w-full bg-[#f0f3f7] text-[#0a0f1a] font-['Inter',sans-serif] font-medium text-base rounded-lg px-7 h-[48px] transition-all duration-200 hover:bg-[#dbb366] hover:shadow-[0_0_16px_rgba(219,179,102,0.35)] active:scale-[0.97]"
-        >
-          Reserve your Spot
-        </button>
-        <p className="font-['Inter',sans-serif] text-[#7b8a9e] text-sm text-center">
-          First week free when we launch.
-        </p>
-      </div>
-
-      {/* Bottom sheet modal */}
+  const sheet = typeof document === "undefined"
+    ? null
+    : createPortal(
       <AnimatePresence>
         {open && (
           <>
-            {/* Backdrop */}
             <motion.div
-              className="fixed inset-0 bg-black/60 z-40"
+              key="waitlist-backdrop"
+              className="fixed inset-0 z-[70] bg-black/60"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              onClick={() => setOpen(false)}
+              onClick={backdropArmed ? () => setOpen(false) : undefined}
             />
 
-            {/* Sheet */}
             <motion.div
-              className="fixed bottom-0 left-0 right-0 z-50 bg-[#0e1625] border-t border-[rgba(42,59,84,0.6)] rounded-t-2xl px-6 pt-4 pb-10 flex flex-col gap-5"
+              key="waitlist-sheet"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="waitlist-sheet-title"
+              className="fixed bottom-0 left-0 right-0 z-[80] bg-[#0e1625] border-t border-[rgba(42,59,84,0.6)] rounded-t-2xl px-6 pt-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] flex flex-col gap-5"
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 32, stiffness: 320 }}
             >
-              {/* Drag handle */}
               <div className="flex justify-center mb-1">
                 <div className="w-10 h-1 rounded-full bg-[#2a3b54]" />
               </div>
 
-              {/* Header */}
               <div className="flex flex-col gap-1">
-                <h3 className="font-['Newsreader',serif] font-light text-white text-2xl tracking-tight leading-snug">
+                <h3
+                  id="waitlist-sheet-title"
+                  className="font-['Newsreader',serif] font-light text-white text-2xl tracking-tight leading-snug"
+                >
                   Leave your email
                 </h3>
                 <p className="font-['Inter',sans-serif] text-[#7b8a9e] text-sm leading-relaxed">
@@ -275,7 +282,6 @@ function MobileWaitlistCTA({ waitlistRef }: { waitlistRef: string | null }) {
                 </p>
               </div>
 
-              {/* Form */}
               <AnimatePresence mode="wait">
                 {submitted ? (
                   <motion.div
@@ -303,13 +309,15 @@ function MobileWaitlistCTA({ waitlistRef }: { waitlistRef: string | null }) {
                     <div className="flex flex-col gap-4">
                       <input
                         type="email"
+                        inputMode="email"
+                        autoComplete="email"
                         value={email}
                         onChange={(e) => { setEmail(e.target.value); if (error) setError(""); }}
                         onBlur={() => {
                           if (email.trim() && !isValidEmail(email)) setError("That doesn't look like a valid email.");
                         }}
                         placeholder="you@example.com"
-                        className="w-full bg-[#0f172a] rounded-lg border px-5 h-[48px] font-['Inter',sans-serif] text-[#f0f3f7] text-sm placeholder:text-[#7b8a9e] outline-none transition-all duration-200 focus:border-[#dbb366] focus:ring-1 focus:ring-[rgba(219,179,102,0.25)]"
+                        className="w-full bg-[#0f172a] rounded-lg border px-5 h-[48px] font-['Inter',sans-serif] text-[#f0f3f7] text-base placeholder:text-[#7b8a9e] outline-none transition-all duration-200 focus:border-[#dbb366] focus:ring-1 focus:ring-[rgba(219,179,102,0.25)]"
                         style={{ borderColor: error ? "#a66678" : "#2a3b54" }}
                       />
                       {error && (
@@ -324,7 +332,7 @@ function MobileWaitlistCTA({ waitlistRef }: { waitlistRef: string | null }) {
                       )}
                       <button
                         type="submit"
-                        className="w-full bg-[#f0f3f7] text-[#0a0f1a] font-['Inter',sans-serif] font-medium text-sm rounded-lg px-5 h-[48px] whitespace-nowrap transition-all duration-200 hover:bg-[#dbb366] hover:shadow-[0_0_16px_rgba(219,179,102,0.35)] active:scale-[0.97] disabled:opacity-60"
+                        className="w-full bg-[#f0f3f7] text-[#0a0f1a] font-['Inter',sans-serif] font-medium text-base rounded-lg px-5 h-[48px] whitespace-nowrap touch-manipulation transition-all duration-200 [@media(hover:hover)]:hover:bg-[#dbb366] [@media(hover:hover)]:hover:shadow-[0_0_16px_rgba(219,179,102,0.35)] active:scale-[0.97] disabled:opacity-60"
                         disabled={submitting}
                       >
                         {submitting ? "Saving…" : "Get early access"}
@@ -334,7 +342,6 @@ function MobileWaitlistCTA({ waitlistRef }: { waitlistRef: string | null }) {
                 )}
               </AnimatePresence>
 
-              {/* Info row */}
               <div className="flex items-start gap-1.5">
                 <Info className="size-[14px] shrink-0 mt-0.5 text-[#c1cbd7]" />
                 <p className="font-['Inter',sans-serif] font-medium text-[#c1cbd7] text-xs leading-4">
@@ -342,7 +349,6 @@ function MobileWaitlistCTA({ waitlistRef }: { waitlistRef: string | null }) {
                 </p>
               </div>
 
-              {/* Chips */}
               <div className="flex flex-wrap gap-1.5">
                 {["Science-backed ritual", "Your data stays yours", "Not financial advice"].map((label) => (
                   <span
@@ -360,7 +366,27 @@ function MobileWaitlistCTA({ waitlistRef }: { waitlistRef: string | null }) {
             </motion.div>
           </>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body,
+    );
+
+  return (
+    <>
+      <div className="flex flex-col items-center gap-3">
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          onClick={() => setOpen(true)}
+          className="w-full bg-[#f0f3f7] text-[#0a0f1a] font-['Inter',sans-serif] font-medium text-base rounded-lg px-7 h-[48px] touch-manipulation transition-all duration-200 [@media(hover:hover)]:hover:bg-[#dbb366] [@media(hover:hover)]:hover:shadow-[0_0_16px_rgba(219,179,102,0.35)] active:scale-[0.97]"
+        >
+          Reserve your Spot
+        </button>
+        <p className="font-['Inter',sans-serif] text-[#7b8a9e] text-sm text-center">
+          First week free when we launch.
+        </p>
+      </div>
+      {sheet}
     </>
   );
 }
@@ -1033,7 +1059,7 @@ function EarlyAccessCTA({ waitlistRef }: { waitlistRef: string | null }) {
                       if (email.trim() && !isValidEmail(email)) setError("That doesn't look like a valid email.");
                     }}
                     placeholder="you@example.com"
-                    className="w-full sm:flex-1 bg-[#0f172a] rounded-lg border px-3 h-[40px] sm:h-[42px] font-['Inter',sans-serif] text-[#f0f3f7] text-sm placeholder:text-[#7b8a9e] outline-none transition-all duration-200 focus:border-[#dbb366] focus:ring-1 focus:ring-[rgba(219,179,102,0.25)]"
+                    className="w-full sm:flex-1 bg-[#0f172a] rounded-lg border px-3 h-[40px] sm:h-[42px] font-['Inter',sans-serif] text-[#f0f3f7] text-base sm:text-sm placeholder:text-[#7b8a9e] outline-none transition-all duration-200 focus:border-[#dbb366] focus:ring-1 focus:ring-[rgba(219,179,102,0.25)]"
                     style={{ borderColor: error ? "#a66678" : "#2a3b54" }}
                   />
                   <button
