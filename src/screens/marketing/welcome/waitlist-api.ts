@@ -1,5 +1,7 @@
 ﻿/** Public waitlist + landing view edge calls (no auth). */
 
+import type { LandingAttribution } from "./landing-attribution";
+
 function supabaseFunctionsBase(): string | null {
   const url = import.meta.env.VITE_SUPABASE_URL;
   if (!url || typeof url !== "string") return null;
@@ -43,13 +45,18 @@ export async function pingLandingView(path = "/"): Promise<void> {
 
 export async function submitWaitlistEmail(
   email: string,
-  options?: { source?: string; ref?: string | null },
+  options?: {
+    source?: string;
+    ref?: string | null;
+    attribution?: LandingAttribution | null;
+  },
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const base = supabaseFunctionsBase();
   const headers = edgeHeaders();
   if (!base || !headers) {
     return { ok: false, error: "Waitlist is not configured yet." };
   }
+  const attr = options?.attribution;
   try {
     const res = await fetch(`${base}/waitlist-signup`, {
       method: "POST",
@@ -57,7 +64,12 @@ export async function submitWaitlistEmail(
       body: JSON.stringify({
         email,
         source: options?.source ?? "welcome",
-        ref: options?.ref ?? undefined,
+        ref: options?.ref ?? attr?.ref ?? undefined,
+        utm_source: attr?.utm_source ?? undefined,
+        utm_medium: attr?.utm_medium ?? undefined,
+        utm_campaign: attr?.utm_campaign ?? undefined,
+        utm_content: attr?.utm_content ?? undefined,
+        utm_term: attr?.utm_term ?? undefined,
       }),
     });
     const data = (await res.json().catch(() => ({}))) as {
