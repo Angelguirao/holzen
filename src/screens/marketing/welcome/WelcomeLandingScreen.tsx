@@ -6,6 +6,10 @@ import { Link, useSearchParams } from "react-router-dom";
 import { PageMeta } from "@/app/components/PageMeta";
 import svgPaths from "./welcome-svg-paths";
 import iphoneImg from "./assets/how-it-works-phone.png";
+import {
+  resolveLandingAttribution,
+  type LandingAttribution,
+} from "./landing-attribution";
 import { pingLandingView, submitWaitlistEmail, waitlistConfigured } from "./waitlist-api";
 
 function Logo() {
@@ -193,7 +197,7 @@ function PhoneShowcase({ gradientId = "breatheGradFill", borderColor = "rgba(255
   );
 }
 
-function MobileWaitlistCTA({ waitlistRef }: { waitlistRef: string | null }) {
+function MobileWaitlistCTA({ attribution }: { attribution: LandingAttribution }) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -211,7 +215,10 @@ function MobileWaitlistCTA({ waitlistRef }: { waitlistRef: string | null }) {
     if (!configured) { setError("Waitlist is temporarily unavailable."); return; }
     setError("");
     startSubmit(async () => {
-      const result = await submitWaitlistEmail(email.trim(), { source: "welcome", ref: waitlistRef });
+      const result = await submitWaitlistEmail(email.trim(), {
+        source: "welcome",
+        attribution,
+      });
       if (result.ok === false) {
         setError(result.error);
         return;
@@ -391,7 +398,7 @@ function MobileWaitlistCTA({ waitlistRef }: { waitlistRef: string | null }) {
   );
 }
 
-function WaitlistForm({ waitlistRef }: { waitlistRef: string | null }) {
+function WaitlistForm({ attribution }: { attribution: LandingAttribution }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -416,7 +423,10 @@ function WaitlistForm({ waitlistRef }: { waitlistRef: string | null }) {
     }
     setError("");
     startSubmit(async () => {
-      const result = await submitWaitlistEmail(email.trim(), { source: "welcome", ref: waitlistRef });
+      const result = await submitWaitlistEmail(email.trim(), {
+        source: "welcome",
+        attribution,
+      });
       if (result.ok === false) {
         setError(result.error);
         return;
@@ -926,7 +936,7 @@ function ResearchQuote() {
   );
 }
 
-function EarlyAccessCTA({ waitlistRef }: { waitlistRef: string | null }) {
+function EarlyAccessCTA({ attribution }: { attribution: LandingAttribution }) {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.3 });
   const canHover = useCanHover();
@@ -964,7 +974,10 @@ function EarlyAccessCTA({ waitlistRef }: { waitlistRef: string | null }) {
     if (!configured) { setError("Waitlist is temporarily unavailable."); return; }
     setError("");
     startSubmit(async () => {
-      const result = await submitWaitlistEmail(email.trim(), { source: "welcome-cta", ref: waitlistRef });
+      const result = await submitWaitlistEmail(email.trim(), {
+        source: "welcome-cta",
+        attribution,
+      });
       if (result.ok === false) {
         setError(result.error);
         return;
@@ -1227,7 +1240,7 @@ function Footer() {
 
 export default function WelcomeLandingScreen() {
   const [searchParams] = useSearchParams();
-  const waitlistRef = searchParams.get("ref");
+  const attribution = resolveLandingAttribution(searchParams);
 
   useEffect(() => {
     void pingLandingView("/");
@@ -1319,11 +1332,11 @@ export default function WelcomeLandingScreen() {
               />
 
               <div className="md:hidden relative z-10">
-                <MobileWaitlistCTA waitlistRef={waitlistRef} />
+                <MobileWaitlistCTA attribution={attribution} />
               </div>
 
               <div className="hidden md:block relative z-10">
-                <WaitlistForm waitlistRef={waitlistRef} />
+                <WaitlistForm attribution={attribution} />
               </div>
             </div>
           </div>
@@ -1340,7 +1353,7 @@ export default function WelcomeLandingScreen() {
       <HowItWorks />
       <WhyHolzen />
       <ResearchQuote />
-      <EarlyAccessCTA waitlistRef={waitlistRef} />
+      <EarlyAccessCTA attribution={attribution} />
       <FAQ />
       <Footer />
     </div>

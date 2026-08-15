@@ -27,6 +27,11 @@ serve(
     const email = emailRaw.toLowerCase();
     const source = trimTo(body?.source, 64) ?? "welcome";
     const ref = trimTo(body?.ref, 128);
+    const utm_source = trimTo(body?.utm_source, 64);
+    const utm_medium = trimTo(body?.utm_medium, 64);
+    const utm_campaign = trimTo(body?.utm_campaign, 128);
+    const utm_content = trimTo(body?.utm_content, 128);
+    const utm_term = trimTo(body?.utm_term, 128);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -36,11 +41,20 @@ serve(
       email,
       source,
       ref,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
     });
 
     if (insertError) {
       if (insertError.code === "23505") {
-        log("waitlist_duplicate", { source, cid });
+        log("waitlist_duplicate", {
+          source,
+          cid,
+          utm_source: utm_source ?? undefined,
+        });
         return jsonResponse({ ok: true, duplicate: true });
       }
       log.error("waitlist_insert_failed", {
@@ -50,7 +64,12 @@ serve(
       throw new Error(`waitlist insert failed: ${insertError.message}`);
     }
 
-    log("waitlist_signup", { source, has_ref: Boolean(ref) });
+    log("waitlist_signup", {
+      source,
+      has_ref: Boolean(ref),
+      utm_source: utm_source ?? undefined,
+      utm_campaign: utm_campaign ?? undefined,
+    });
     return jsonResponse({ ok: true });
   }),
 );
