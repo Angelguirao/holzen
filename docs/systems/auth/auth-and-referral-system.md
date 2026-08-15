@@ -65,9 +65,9 @@ In `src/App.tsx`:
   - redirects unauthenticated users to `/`
   - renders children only when `user` is present
 - `PublicOnlyRoute`:
-  - shows `AuthLoading` while `loading` is true
-  - redirects authenticated users to `/`
-  - renders children only when `user` is absent
+  - redirects authenticated users to `/home`
+  - shows `AuthLoading` while `loading` is true **only if** a persisted Supabase session hint exists in localStorage
+  - otherwise renders children immediately (waitlist landing / auth) so anonymous visitors are not blocked on “Restoring your session…”
 
 ### 4) Referral recording side-effect (optional)
 

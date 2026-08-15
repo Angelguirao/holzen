@@ -3,6 +3,7 @@
 Port of Figma Make [Animated Background Colors](https://www.figma.com/make/58fanoTVfFFzMrgx4a8jyh/Animated-Background-Colors) into Holzen.
 
 - Route: `/` (`PublicOnlyRoute`); legacy `/welcome` redirects here
+- Anonymous visitors paint this page without waiting on session restore; signed-in users redirect to `/home`
 - Authenticated Home: `/home`
 - Waitlist: `waitlist-api.ts` → edge `waitlist-signup` + `landing-ping`
 - How it works visual: `assets/how-it-works-phone.png` (Landing Design phone-on-rock); hero keeps `PhoneShowcase`

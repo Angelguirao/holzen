@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { LANDING_PATH } from '@/lib/app-routes';
 
 const COOKIE_KEY = 'holzen_cookie_consent';
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const { pathname } = useLocation();
+  const onLanding = pathname === LANDING_PATH;
 
   useEffect(() => {
     const accepted = localStorage.getItem(COOKIE_KEY);
@@ -25,11 +28,13 @@ export function CookieConsent() {
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ y: 80, opacity: 0 }}
+          initial={{ y: onLanding ? -80 : 80, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 80, opacity: 0 }}
+          exit={{ y: onLanding ? -80 : 80, opacity: 0 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed bottom-4 left-4 right-4 z-[60] flex justify-center pointer-events-none"
+          className={`fixed left-4 right-4 z-[60] flex justify-center pointer-events-none ${
+            onLanding ? "top-14 sm:top-16" : "bottom-4"
+          }`}
         >
           <div className="pointer-events-auto w-full max-w-md bg-card border border-border rounded-sm p-4 shadow-lg flex items-start gap-4">
             <p className="text-[11px] font-mono text-muted-foreground leading-relaxed flex-1">

@@ -7,10 +7,10 @@ import { createHolzenQueryClient } from "@/lib/query-client";
 import { setHolzenQueryClient } from "@/features/pause/public-queries";
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { reactRouterFutureFlags } from "@/lib/router-future";
-import { AuthProvider, useAuth } from "@/features/auth/public";
+import { AuthProvider, useAuth, hasPersistedAuthSessionHint } from "@/features/auth/public";
 import { useProfile } from "@/features/user/public-hooks";
 import { HolzenProvider } from "@/app/components/HolzenProvider";
-import { isAppShellPath } from "@/lib/app-routes";
+import { HOME_PATH, isAppShellPath } from "@/lib/app-routes";
 import { holzenLog } from "@/lib/holzen-console";
 import { attachHolzenQueryLogging } from "@/lib/holzen-query-logging";
 import { scheduleCheckoutGuardCleanup } from "@/features/subscription/public";
@@ -58,8 +58,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
-  if (loading) return <AuthLoading />;
-  if (user) return <Navigate to="/home" replace />;
+  if (user) return <Navigate to={HOME_PATH} replace />;
+  // Anonymous visitors should see landing/auth immediately. Only block when
+  // localStorage likely has a session, so returning users do not flash marketing.
+  if (loading && hasPersistedAuthSessionHint()) return <AuthLoading />;
   return <>{children}</>;
 }
 

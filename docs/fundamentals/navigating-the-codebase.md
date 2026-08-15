@@ -52,7 +52,7 @@ Full diagram, metadata, boot-recovery, and domain notes: **[index-html-and-spa-s
 Routes are declared in **`src/App.tsx`**. Screen modules under **`src/screens/`** are **`React.lazy`**-loaded. **`Suspense`** around **`Routes`** shows a small full-screen fallback while a chunk downloads. Two patterns matter:
 
 - **`ProtectedRoute`** — If auth is still loading, show `AuthLoading` (`src/app/components/`). If no user, redirect to `/`. Otherwise render children.
-- **`PublicOnlyRoute`** — Logged-in users are redirected to `/`.
+- **`PublicOnlyRoute`** — Logged-in users are redirected to `/home`. Anonymous visitors see landing/auth immediately; “Restoring your session…” only appears when localStorage likely has a session.
 
 **Main shell (four tabs):** `/`, `/archive`, `/journey`, `/settings` (+ nested `/settings/about`, `/settings/billing-history`, `/settings/:section`) use **`AppLayout`** (`src/app/components/AppLayout.tsx`): max-width column, header (“Holzen” + `NotificationBell` from `features/notifications/public-hooks`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (Home, Archive, Journey, Settings). `AppLayout` uses `useShellProfile` + `ShellPauseChrome` (pause modal/banner; `useHolzen` only inside that component) and passes pause-ready state via outlet context; **`HolzenProvider`** ([`src/app/components/HolzenProvider.tsx`](../../src/app/components/HolzenProvider.tsx)) wraps signed-in routes (`useHolzenHomeContextState` in pause presentation).
 

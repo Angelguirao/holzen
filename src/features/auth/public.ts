@@ -2,6 +2,7 @@
 import type { User } from '@supabase/supabase-js';
 
 export { AuthProvider, useAuth } from './presentation/AuthProvider';
+export { hasPersistedAuthSessionHint } from './infrastructure/persisted-auth-session-hint';
 
 /**
  * Shape exposed by `AuthProvider` / `useAuth`.
