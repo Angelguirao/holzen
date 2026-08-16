@@ -14,7 +14,7 @@
 |-------|----------|
 | Landing page | `src/screens/marketing/welcome/WelcomeLandingScreen.tsx` (SPA `/`; `/welcome` redirects) |
 | Waitlist form | Same screen — wired to `waitlist-signup` / `landing-ping` |
-| Edge: signup | `supabase/functions/waitlist-signup` |
+| Edge: signup | `supabase/functions/waitlist-signup` — inserts row; Slack ping on **new** signups only (`SLACK_WEBHOOK_URL`, no email in the payload) |
 | Edge: page views | `supabase/functions/landing-ping` |
 | DB | `waitlist_signups`, `landing_daily_views` — migration `20260705140000_waitlist_and_landing_views.sql` |
 | Smoke script | `node scripts/smoke-marketing-waitlist.mjs` |

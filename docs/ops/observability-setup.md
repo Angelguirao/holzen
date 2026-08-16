@@ -18,7 +18,7 @@ Click-paths and config for the Holzen observability stack. This is the setup sou
 | **PostHog** | Product analytics, funnels, retention, feature flags | Deliberate events only; autocapture and session recording disabled |
 | **BetterStack (Logtail)** | Edge log aggregation, search, alerting | All structured JSON from `observe.ts` + cron heartbeats |
 | **UptimeRobot** | Uptime monitoring | Frontend root URL + `/functions/v1/health` |
-| **Slack** (`#holzen-alerts`) | Unified alert inbox | All vendor alerts + feedback forwarder summaries |
+| **Slack** (`#holzen-alerts`) | Unified alert inbox | All vendor alerts + feedback summaries + waitlist signups (no email) |
 | **Backup email** (`alerts@...`) | Vendors without Slack integration | Google AI / OpenRouter budget, Supabase usage alerts |
 
 **Division of labor**: Sentry owns error workflow (group, resolve, regress). BetterStack owns log search, rate-based alerting, heartbeats. PostHog owns product signals. Postgres owns audit/compliance.

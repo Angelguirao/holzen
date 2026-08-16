@@ -3,6 +3,8 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { EdgeError } from "../_shared/edge-error.ts";
 import { jsonResponse } from "../_shared/cors.ts";
+import { logDependencyCall } from "../_shared/deps.ts";
+import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -70,6 +72,33 @@ serve(
       utm_source: utm_source ?? undefined,
       utm_campaign: utm_campaign ?? undefined,
     });
+
+    const slackWebhook = Deno.env.get("SLACK_WEBHOOK_URL");
+    if (slackWebhook) {
+      // PII-safe: never include the email. Channel + cid are enough to pivot in Postgres.
+      const slackLines = [
+        "*Waitlist signup*",
+        `source: \`${source}\``,
+        utm_source ? `utm_source: \`${utm_source}\`` : null,
+        utm_campaign ? `utm_campaign: \`${utm_campaign}\`` : null,
+        `cid: \`${cid}\``,
+      ].filter(Boolean);
+      void logDependencyCall(
+        log,
+        "slack",
+        () =>
+          fetch(
+            slackWebhook,
+            fetchInitWithIncomingTrace(req, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text: slackLines.join("\n") }),
+            }),
+          ),
+        { operation: "incoming_webhook" },
+      ).catch(() => { /* swallowed — already logged by logDependencyCall */ });
+    }
+
     return jsonResponse({ ok: true });
   }),
 );

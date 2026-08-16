@@ -44,6 +44,7 @@ Use this for every PR that changes: user-facing components, Sentry wiring, PostH
 ## Slack alerts
 
 - [ ] Feedback forwarder payload **only** sends: category, page path, `cid`, app version. Never message text, never user agent (identifying via fingerprint), never user id.
+- [ ] Waitlist Slack ping (`waitlist-signup`) **only** sends: source, optional `utm_source` / `utm_campaign`, `cid`. Never email. Do not ping on duplicate inserts.
 - [ ] Sentry Slack alerts use the default summary (title, release, count). Custom copy must not include stack frame variables that could carry user text.
 - [ ] BetterStack alert messages are query-driven (level/msg). If you introduce a new rule that templates log fields into the Slack body, double-check that field isn't sensitive.
 
