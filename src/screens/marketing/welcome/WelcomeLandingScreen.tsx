@@ -655,7 +655,7 @@ function ImpulseVsIntention() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
           <ComparisonCard
             title="Without Holzen"
-            items={["The market drops", "Panic sets in", "You sell impulsively", "You regret it later"]}
+            items={["The market drops", "Panic sets in", "You act on impulse", "You regret it later"]}
             dotColor="#a66678"
             lineColor="rgba(166,102,120,0.4)"
             borderColor="rgba(166,102,120,0.35)"
@@ -663,7 +663,7 @@ function ImpulseVsIntention() {
           />
           <ComparisonCard
             title="With Holzen"
-            items={["The market drops", "You pause & feel", "You breathe", "You reflect", "You decide deliberately", "You grow over time"]}
+            items={["The market drops", "You pause & feel", "You breathe", "You reflect", "You decide deliberately"]}
             dotColor="#dbb366"
             lineColor="rgba(219,179,102,0.35)"
             borderColor="rgba(219,179,102,0.35)"
@@ -695,7 +695,7 @@ const HOW_STEPS = [
   {
     number: "04",
     title: "You decide",
-    description: "Log what you chose — for your awareness, not our advice. The full pause guides you through feel, breathe, reflect, frame, a second breath, then a short settle before Decide — six beats in the ritual, so your choices come from clarity, not impulse.",
+    description: "Log what you chose — for your awareness, not our advice. So the choice comes from clarity, not impulse.",
   },
 ];
 
@@ -782,7 +782,7 @@ const WHY_FEATURES = [
   {
     icon: Activity,
     title: "Volatility-triggered pauses",
-    description: "Alerts when Bitcoin crosses your thresholds — or start a pause yourself when you need one.",
+    description: "Alerts when volatility crosses your thresholds. We start with Bitcoin — or start a pause yourself when you need one.",
   },
   {
     icon: Clock,
@@ -1121,7 +1121,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Isn't this just another meditation app?",
-    answer: "Meditation apps are general-purpose. Holzen is triggered by real market events — it meets you in the moment you're most likely to act on impulse. It combines breathing, AI reflections, behavioral science, curated intelligence, and long-term pattern tracking into one practice. Calm doesn't know when Bitcoin just dropped 8%.",
+    answer: "Meditation apps are general-purpose. Holzen is triggered by real market events — it meets you in the moment you're most likely to act on impulse. Calm doesn't know when Bitcoin just dropped 8%.",
   },
 ];
 
@@ -1249,8 +1249,8 @@ export default function WelcomeLandingScreen() {
   return (
     <div className="min-h-screen bg-[#0e1625] relative overflow-hidden font-['Inter',sans-serif]">
       <PageMeta
-        title="Holzen — Pause before you act when Bitcoin moves"
-        description="Volatility-triggered pause practice for Bitcoin investors. Get early access to a science-backed ritual that creates space between impulse and action — not financial advice."
+        title="Holzen — Pause before you act when the market moves"
+        description="Volatility-triggered pause practice for investors. Built first for Bitcoin. A science-backed ritual that creates space between impulse and action — not financial advice."
         path="/"
       />
 
@@ -1291,13 +1291,13 @@ export default function WelcomeLandingScreen() {
           <div className="flex flex-col gap-8 lg:gap-10 w-full">
             <div className="flex flex-col gap-4 sm:gap-5">
               <p className="font-['Newsreader',serif] font-light text-[#dbb366] text-xl sm:text-xl lg:text-2xl tracking-tight leading-snug">
-                For Bitcoin investors
+                For investors who act when the chart moves
               </p>
               <h1 className="font-['Inter',sans-serif] font-bold text-white text-3xl sm:text-3xl lg:text-4xl xl:text-[40px] tracking-tight leading-tight">
-                Pause before impulse trades the move
+                Pause before you act when the market moves
               </h1>
               <p className="font-['Inter',sans-serif] font-normal text-[#c1cbd7] text-base sm:text-base lg:text-lg leading-relaxed tracking-tight">
-                Holzen detects volatility and walks you through a structured ritual — feel, breathe, reflect, decide. You stay in control of every trade.
+                Holzen detects volatility and walks you through a structured ritual — feel, breathe, reflect, decide. You stay in control of the next move.
               </p>
             </div>
 

@@ -12,7 +12,7 @@ export const termsCopy = {
     path: '/terms',
   },
   title: 'Terms of Service',
-  subtitle: 'Last updated: July 5, 2026',
+  subtitle: 'Last updated: August 16, 2026',
   sections: [
     {
       title: '1. Acceptance of Terms',
@@ -23,7 +23,7 @@ export const termsCopy = {
     {
       title: '2. Description of Service',
       paragraphs: [
-        'Holzen monitors price volatility for a user-selected cryptocurrency (from an in-app allowlist) and delivers AI-generated pause prompts when movement exceeds a user-defined threshold. Holzen is not a trading tool, financial advisor, or investment platform. Those prompts are intended solely to encourage pause and self-awareness — never to suggest, recommend, or imply any financial action.',
+        'Holzen monitors price volatility for assets you track in the app. At launch this is Bitcoin. The Service may add other assets later. Pause prompts are delivered when movement exceeds a user-defined threshold. Holzen is not a trading tool, financial advisor, or investment platform. Those prompts are intended solely to encourage pause and self-awareness — never to suggest, recommend, or imply any financial action.',
       ],
     },
     {
