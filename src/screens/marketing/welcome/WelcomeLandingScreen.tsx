@@ -1291,7 +1291,7 @@ export default function WelcomeLandingScreen() {
           <div className="flex flex-col gap-8 lg:gap-10 w-full">
             <div className="flex flex-col gap-4 sm:gap-5">
               <p className="font-['Newsreader',serif] font-light text-[#dbb366] text-xl sm:text-xl lg:text-2xl tracking-tight leading-snug">
-                For investors who act when the chart moves
+                Volatility-triggered pause practice
               </p>
               <h1 className="font-['Inter',sans-serif] font-bold text-white text-3xl sm:text-3xl lg:text-4xl xl:text-[40px] tracking-tight leading-tight">
                 Pause before you act when the market moves
