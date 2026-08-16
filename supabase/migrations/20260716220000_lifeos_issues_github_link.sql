@@ -3,12 +3,20 @@
 -- See holzen/supabase/LIFEOS-LEGACY.md and personal-agent/deploy/LIFEOS-SUPABASE.md
 --
 -- Pluggable GitHub execution adapter — Mesh stays ontology SoT.
+-- Skip on holzen-prod after drop_legacy_lifeos_tables_from_holzen_prod.
 
-alter table public.lifeos_issues
-  add column if not exists github_issue_url text,
-  add column if not exists github_issue_number integer;
+do $$
+begin
+  if to_regclass('public.lifeos_issues') is null then
+    return;
+  end if;
 
-comment on column public.lifeos_issues.github_issue_url is
-  'Optional GitHub issue URL — execution adapter, not source of truth.';
-comment on column public.lifeos_issues.github_issue_number is
-  'Optional GitHub issue number — execution adapter, not source of truth.';
+  alter table public.lifeos_issues
+    add column if not exists github_issue_url text,
+    add column if not exists github_issue_number integer;
+
+  comment on column public.lifeos_issues.github_issue_url is
+    'Optional GitHub issue URL — execution adapter, not source of truth.';
+  comment on column public.lifeos_issues.github_issue_number is
+    'Optional GitHub issue number — execution adapter, not source of truth.';
+end $$;

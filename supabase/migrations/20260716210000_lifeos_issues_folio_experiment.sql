@@ -3,16 +3,24 @@
 -- See holzen/supabase/LIFEOS-LEGACY.md and personal-agent/deploy/LIFEOS-SUPABASE.md
 --
 -- Mesh ontology bridge: Work Items parented under folio Initiative + Experiment.
+-- Skip on holzen-prod after drop_legacy_lifeos_tables_from_holzen_prod.
 
-alter table public.lifeos_issues
-  add column if not exists folio_project_id text,
-  add column if not exists folio_experiment_id text;
+do $$
+begin
+  if to_regclass('public.lifeos_issues') is null then
+    return;
+  end if;
 
-create index if not exists lifeos_issues_by_folio_experiment
-  on public.lifeos_issues (venture_id, folio_experiment_id)
-  where folio_experiment_id is not null;
+  alter table public.lifeos_issues
+    add column if not exists folio_project_id text,
+    add column if not exists folio_experiment_id text;
 
-comment on column public.lifeos_issues.folio_project_id is
-  'Folio PrivateProject.id (Initiative) this Work Item serves.';
-comment on column public.lifeos_issues.folio_experiment_id is
-  'Folio PrivateExperiment.id this Work Item is parented under.';
+  create index if not exists lifeos_issues_by_folio_experiment
+    on public.lifeos_issues (venture_id, folio_experiment_id)
+    where folio_experiment_id is not null;
+
+  comment on column public.lifeos_issues.folio_project_id is
+    'Folio PrivateProject.id (Initiative) this Work Item serves.';
+  comment on column public.lifeos_issues.folio_experiment_id is
+    'Folio PrivateExperiment.id this Work Item is parented under.';
+end $$;
