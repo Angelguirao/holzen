@@ -42,7 +42,7 @@ Links use explicit HTML anchors before each numbered section so jumps behave con
 2. **Reflection** — Short copy (+ optional haiku) anchored to market **context** (e.g. “BTC is down 5.2%…”).
 3. **Persist** — Create or reuse a `pause_instances` row via `pause_create_or_reuse` (manual) or `pause_create_or_reuse_as` (automatic). **`reflection_text`** (+ optional **`haiku`**) upserts happen at **Reflect** in the ritual: the browser invokes edge **`holzen-reflect`** for **both** manual- and cron-created instances (cron does **not** run the reflection LLM on claim). **`check-volatility`** updates **`profiles.last_context`** for delivery (banner / notification subtitle uses **`metadata.context`** from the instance snapshot; reflection body comes from **`pause_ai_artifacts`** after Reflect). **`useHolzenHomeContextState`** (via **`HolzenProvider`**) does **not** write profile fields (the pause row is the manual source of truth). **`profiles.last_trigger_at`** advances on the **automatic** claim path; **silent** manual mode still writes a stub **`reflection_text`** at trigger time (§2.3.B).
 4. **Featured intervention (quarantined)** — Optional headline via `companion-orchestrate` with `useIntervention: true` (mirror / trap / pattern / question). **Not shipped** in pause-first UI — code in `src/legacy/pause-featured-intervention/`; edge selector in `supabase/functions/legacy/featured-intervention/`. See **§7** (reference; UI was `InterventionSection`, removed).
-5. **Companion cards (lazy)** — When the user **taps/expands** a companion card, a **single-slot** `companion-orchestrate` call generates that companion on demand. Each generator tries **library → cache → live → curated** (phase ordering controlled by `COMPANION_PHASE_`* env vars in `_shared/phase-config.ts`).
+5. **Companion cards (lazy)** — When the user **taps/expands** a companion card, a **single-slot** `companion-orchestrate` call generates that companion on demand. Each generator tries **catalog → corpus → cache → live → curated** (phase ordering controlled by `COMPANION_PHASE_`* env vars in `_shared/phase-config.ts`). Corpus is Signal-only today ([holzen-brain-corpus.md](../holzen-brain-corpus.md)).
 6. **Surface** — **`PauseFrame`** hub + companion deep-links (`CompanionSection`); no featured intervention headline in the shipped bundle.
 
 ### Diagram — end-to-end pipeline
@@ -785,7 +785,7 @@ supabase/functions/
 legacy/featured-intervention/
     ├── intervention-selector.ts
     ├── mirror.ts, question.ts
-    ├── phase-config.ts              # library → cache → live phase toggles (COMPANION_PHASE_*)
+    ├── phase-config.ts              # catalog → corpus → cache → live phase toggles (COMPANION_PHASE_*)
     ├── quality.ts, sanitize.ts, cache.ts, content-library.ts, observe.ts, ratelimit.ts, fallbacks.ts
 
 src/features/pause/infrastructure/queries/reflect/generation/load-reflect-recency-hints.ts   # browser holzen-reflect: moodHistory + dedup pools (parity with pauseRecencyInputs on claim)

@@ -1,27 +1,27 @@
 /**
  * Companion generation phase configuration.
  *
- * Shipped order (pause-first strip):
- *   1. Catalog  (companion_catalog — curated essays, papers, events)
- *   2. Cache    (companion_cache — previously generated content)
- *   3. Live     (Perplexity + AI generation)
- *   4. Curated  (static fallback pools — always available as last resort)
+ * Shipped order:
+ *   1. Catalog  (companion_catalog)
+ *   2. Corpus   (holzen_chunks hybrid retrieve)
+ *   3. Cache    (companion_cache)
+ *   4. Live     (Perplexity + AI generation)
+ *   5. Curated  (static fallback pools)
  *
- * Toggle via Supabase Edge Function secrets:
+ * Toggle via Edge secrets:
  *   COMPANION_PHASE_CATALOG  — default: enabled
+ *   COMPANION_PHASE_CORPUS   — default: enabled
  *   COMPANION_PHASE_CACHE    — default: enabled
  *   COMPANION_PHASE_LIVE     — default: enabled
  *
  * Set to "0", "false", or "no" to disable a phase.
- *
- * When DISABLE_COMPANION_FALLBACKS is set, only the live phase runs
- * (existing behaviour for testing live paths without masking failures).
  */
 
-export type CompanionPhase = "catalog" | "cache" | "live";
+export type CompanionPhase = "catalog" | "corpus" | "cache" | "live";
 
 export interface PhaseConfig {
   catalog: boolean;
+  corpus: boolean;
   cache: boolean;
   live: boolean;
 }
@@ -32,20 +32,20 @@ function readBoolEnv(key: string, defaultValue: boolean): boolean {
   return !(v === "0" || v === "false" || v === "no");
 }
 
-/** Read the phase config from env vars. Catalog, cache, and live enabled by default. */
 export function getPhaseConfig(): PhaseConfig {
   return {
     catalog: readBoolEnv("COMPANION_PHASE_CATALOG", true),
+    corpus: readBoolEnv("COMPANION_PHASE_CORPUS", true),
     cache: readBoolEnv("COMPANION_PHASE_CACHE", true),
     live: readBoolEnv("COMPANION_PHASE_LIVE", true),
   };
 }
 
-/** Returns the ordered list of active phases. */
 export function getActivePhases(): CompanionPhase[] {
   const config = getPhaseConfig();
   const phases: CompanionPhase[] = [];
   if (config.catalog) phases.push("catalog");
+  if (config.corpus) phases.push("corpus");
   if (config.cache) phases.push("cache");
   if (config.live) phases.push("live");
   return phases;

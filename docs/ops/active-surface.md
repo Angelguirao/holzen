@@ -129,7 +129,7 @@ Listed in `supabase/config.toml` `[functions.*]` and `src/screens/ops/EdgeCovera
 
 ## Postgres — Tier C (shipped)
 
-`pause_*`, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, **`companion_catalog`** (curated companion pool; renamed from `content_library`), `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, **`signal_sources`** (admin catalog for Signal/Grounding allowlists), Stripe/credits, `market_price_cache`, email infra, `audit_log`, `app_config`.
+`pause_*`, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, **`companion_catalog`** (curated companion pool; renamed from `content_library`), `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, **`signal_sources`** (admin catalog for Signal/Grounding allowlists), **`holzen_works` / `holzen_chunks`** (brain corpus index — [holzen-brain-corpus.md](../systems/holzen-brain-corpus.md)), Stripe/credits, `market_price_cache`, email infra, `audit_log`, `app_config`.
 
 ## Postgres — Tier D dropped (zombie schema cleanup)
 

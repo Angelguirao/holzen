@@ -55,7 +55,7 @@ const corsHeaders = {
  * Cron/pregenerate may enable multiple slots in one request; enabled tasks
  * run in parallel via Promise.allSettled.
  *
- * Generator phase ordering (library → cache → live → curated) is controlled
+ * Generator phase ordering (catalog → corpus → cache → live → curated) is controlled
  * by COMPANION_PHASE_* env vars in _shared/phase-config.ts.
  *
  * Generators are invoked directly (in-process) instead of via HTTP.

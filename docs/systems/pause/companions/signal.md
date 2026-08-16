@@ -38,7 +38,9 @@ If the catalog is **empty**, Perplexity runs **without** a domain allowlist (unr
 
 High-level order (source of truth: **`supabase/functions/_shared/generators/signal.ts`**, **`PROMPT_VERSION`**):
 
-**Phase 1: Library** — `searchLibrary` checks `content_library` for fresh essays this user hasn't seen within `COMPANION_SERVE_FRESHNESS_DAYS` (30 days). If found, returns immediately (`source: "library"`).
+**Phase 1: Catalog** — `searchCompanionCatalog` checks `companion_catalog` for fresh essays this user hasn't seen within `COMPANION_SERVE_FRESHNESS_DAYS` (30 days). If found, returns immediately (`source: "catalog"`).
+
+**Phase 1.5: Corpus** — hybrid FTS + pgvector over `holzen_chunks` (`serve_in` contains `ritual`). Passages are structured into one Signal card (`source: "corpus"`). Vault + extract: sibling `holzen-brain/` — [holzen-brain-corpus.md](../holzen-brain-corpus.md). Toggle `COMPANION_PHASE_CORPUS`.
 
 **Phase 2: Cache (strict)** — `serveFromCache` with `strict: true` checks `companion_cache` for fresh, quality-≥-2 rows with per-user dedup and market direction awareness. If found, returns (`source: "cache"`). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen rows.
 
@@ -53,7 +55,7 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/sign
 
 **Phase 4: Curated** — if all above fail, static fallback pool from `companion_fallbacks` DB / `fallback-seed.json`.
 
-Phase toggles: `COMPANION_PHASE_CATALOG`, `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (all enabled by default; see `_shared/phase-config.ts`).
+Phase toggles: `COMPANION_PHASE_CATALOG`, `COMPANION_PHASE_CORPUS`, `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (all enabled by default; see `_shared/phase-config.ts`).
 
 Admin **Monitor** shows **`live` / `library` / `cache` / `curated`** from **`companion_serves`**. `library` = a hit in the curated **`content_library`** table (Phase 1); `cache` = a hit in the runtime **`companion_cache`** pool (Phase 2). A **live** run can still create a **cache** row for the pool — that is expected.
 
@@ -87,7 +89,7 @@ Signal’s design problem splits into **(a)** “is this a good Bitcoin cognitiv
 | **Citation handling** | When both YouTube and non-YouTube URLs appear in Perplexity output, **non-YouTube URLs are ordered first** before structuring so the model tends to pick a publisher page when one exists. |
 | **Attribution** | **`validateSource`** reconciles stated source with URL hostname rules (best-effort; see limits below). |
 | **Structural quality** | **`qualityGate("signal", …)`** enforces length, banned terms, and Bitcoin-only constraints before the card is served live. |
-| **Fallbacks** | Generators try **library → cache → live → curated**. If live search/structure fails, the curated pool still ships *something* on-theme; those paths have their own diversity characteristics (e.g. smaller fixed sets). |
+| **Fallbacks** | Generators try **catalog → corpus → cache → live → curated**. If live search/structure fails, the curated pool still ships *something* on-theme; those paths have their own diversity characteristics (e.g. smaller fixed sets). |
 | **Operations** | **`companion_serves`**, **`generation_attempts`**, and cache fingerprints support monitoring and later **analytics-driven** tuning (see below). |
 
 Together, these layers aim for **credible citations**, **thematic fit**, and **less repetition** — not a single lever. Improving “quality when pause” usually means moving **several** layers (and the other companion paths), not only adding facets — though a **richer facet list** is a cheap way to diversify retrieval.

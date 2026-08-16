@@ -41,6 +41,7 @@ This folder contains human-readable notes that complement the source code and in
 | **Pause client module** (features/pause layout, ritual folders, public barrels, collections → legacy) | [systems/pause-client-architecture.md](systems/pause-client-architecture.md) | Pairs with pause-system (server) and [screens/pause.md](screens/pause.md); template for other contexts §9. |
 | **Full client `src/` rings + per-context client targets** | [fundamentals/client-architecture-overview.md](fundamentals/client-architecture-overview.md) | Index of `*-client-architecture.md` (subscription, auth, market, user, notifications); pairs with [client-src-layout.md](fundamentals/client-src-layout.md). |
 | Pause AI pipeline (triggers, edge functions, generators, storage, hooks) | [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md) | **Current** Pause V2 pipeline narrative; complements `pause-system.md` (starts with a V2 banner — not a pre‑V2 archive). |
+| **Holzen brain corpus** (wiki, extract, hybrid RAG) | [systems/holzen-brain-corpus.md](systems/holzen-brain-corpus.md) | Vault is sibling `holzen-brain/`. Tables `holzen_works` / `holzen_chunks`. |
 | How a subsystem behaves (contracts, flows) | [systems/](systems/) | One primary doc per concern; cross-link related systems. |
 | Irreversible or costly-to-reverse choices | [decisions/](decisions/) | Short ADR-style notes; see [decisions/README.md](decisions/README.md). |
 | Incidents, invariants, “why we hardened X” | [postmortems/](postmortems/) | |

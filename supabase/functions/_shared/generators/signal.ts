@@ -40,11 +40,13 @@ import {
 } from "../companion-catalog.ts";
 import { preferNonYoutubeCitationsFirst } from "../recent-signal-urls.ts";
 import { getPhaseConfig } from "../phase-config.ts";
+import { embedQueryOpenRouter } from "../openrouter-embed.ts";
+import { formatCorpusPassages, searchCorpusChunks } from "../corpus-retrieve.ts";
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 import { normalizeSignalKeyIdeas } from "../signal-key-ideas.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
-export const PROMPT_VERSION = "v10";
+export const PROMPT_VERSION = "v11";
 
 /**
  * Optional Perplexity denylist entries (leading `-`, e.g. `-example.com`).
@@ -143,8 +145,8 @@ export interface SignalResult {
     quote?: string;
     keyIdeas?: string[];
   } | null;
-  /** `catalog` = `companion_catalog`; `cache` = `companion_cache` — distinct pools and invalidation. */
-  source: "live" | "catalog" | "library" | "cache" | "curated" | "empty";
+  /** `catalog` = `companion_catalog`; `corpus` = `holzen_chunks`; `cache` = `companion_cache`. */
+  source: "live" | "catalog" | "corpus" | "library" | "cache" | "curated" | "empty";
   cacheId: string | null;
   /** Set when `serveFromCache` served this row (not library / curated). */
   cacheRelaxation?: CacheServeRelaxation;
@@ -201,6 +203,121 @@ async function tryCatalog(
   return null;
 }
 
+async function tryCorpus(
+  svcClient: SupabaseClient,
+  queryText: string,
+  _userId: string | undefined,
+  budgetTier: LlmBudgetTier,
+  log: GenerateSignalParams["log"],
+  incomingRequest?: Request,
+): Promise<SignalResult | null> {
+  const embedding = await embedQueryOpenRouter(queryText, incomingRequest);
+  const hits = await searchCorpusChunks(svcClient, {
+    queryText,
+    queryEmbedding: embedding,
+    serveFilter: "ritual",
+    matchCount: 8,
+  });
+  if (hits.length === 0) return null;
+
+  const passages = formatCorpusPassages(hits);
+  const citationUrls = hits.map((h) => h.cite_url).filter((u): u is string => Boolean(u));
+  const citationList = citationUrls.length
+    ? citationUrls.map((c, i) => `[${i + 1}] ${c}`).join("\n")
+    : "(Book/paper — use the work title as source; copy cite_url if present)";
+
+  const aiBody = {
+    messages: [
+      {
+        role: "system",
+        content: `Extract ONE Bitcoin insight from the LIBRARY PASSAGES for COGNITIVE REAPPRAISAL. Not trading advice.
+TONE: Profound, calm, grounding.
+TITLE: 5-10 words, chapter-like.
+BODY: 2-3 sentences of essence.
+KEY IDEAS: 3-4 short takeaways under 120 characters.
+QUOTE: only a real sentence from the passages — else empty.
+BITCOIN ONLY — never crypto/altcoin/token/Web3/DeFi.
+BANNED: dive into, game-changer, paradigm shift, revolutionary, unprecedented, navigate the, leverage, synergy, ecosystem.
+URL: copy a citation URL character-for-character if listed; else "".`,
+      },
+      {
+        role: "user",
+        content: `Passages:\n${passages}\n\nCitation URLs:\n${citationList}`,
+      },
+    ],
+    tools: [{
+      type: "function" as const,
+      function: {
+        name: "return_signal",
+        description: "Return a single philosophical Bitcoin insight",
+        parameters: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            body: { type: "string" },
+            source: { type: "string" },
+            url: { type: "string" },
+            quote: { type: "string" },
+            keyIdeas: { type: "array", items: { type: "string" } },
+          },
+          required: ["title", "body", "source", "url", "keyIdeas"],
+          additionalProperties: false,
+        },
+      },
+    }],
+    tool_choice: { type: "function" as const, function: { name: "return_signal" } },
+    temperature: 0.35,
+  };
+
+  const models = resolveModelsForTask("structure", budgetTier);
+  type SignalLiveData = NonNullable<SignalResult["data"]>;
+  let signal: SignalLiveData | null = null;
+
+  for (const model of models) {
+    try {
+      const { response } = await llmChatCompletionsWithFallback({
+        model,
+        body: aiBody,
+        incomingRequest,
+      });
+      if (!response.ok) {
+        await response.text();
+        continue;
+      }
+      const structureData = await response.json();
+      const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
+      const content = toolCall?.function?.arguments || structureData.choices?.[0]?.message?.content;
+      if (!content) continue;
+      try {
+        signal = (typeof content === "string" ? JSON.parse(content) : content) as SignalLiveData;
+      } catch {
+        const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
+        if (m) signal = JSON.parse(m[0]) as SignalLiveData;
+      }
+      if (signal) break;
+    } catch {
+      continue;
+    }
+  }
+
+  const qg = qualityGate("signal", signal);
+  if (!signal || !qg.pass) {
+    log(`corpus quality gate failed: ${!signal ? "no_structured_output" : (qg.reason ?? "unknown")}`);
+    return null;
+  }
+
+  if (!signal.url && citationUrls[0]) signal.url = citationUrls[0];
+  if (signal.url && citationUrls.length) {
+    const exact = citationUrls.find((c) => c === signal!.url);
+    if (!exact) signal.url = citationUrls[0] ?? signal.url;
+  }
+  signal.source = signal.source || hits[0]?.title || "Holzen library";
+  signal.keyIdeas = normalizeSignalKeyIdeas({ body: signal.body, keyIdeas: signal.keyIdeas });
+
+  log("signal resolved from corpus");
+  return { data: signal, source: "corpus", cacheId: null };
+}
+
 /**
  * Try companion_cache for signal.
  *
@@ -240,13 +357,14 @@ async function serveCurated(svcClient: SupabaseClient): Promise<SignalResult> {
   return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
-/** Resolve from non-live phases in order (catalog → cache → curated). */
+/** Resolve from non-live phases in order (catalog → corpus → cache → curated). */
 async function serveFallback(
   svcClient: SupabaseClient,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
   structuredLog?: GenerateSignalParams["log"],
+  incomingRequest?: Request,
 ): Promise<SignalResult> {
   if (companionFallbacksDisabled()) {
     return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
@@ -255,6 +373,17 @@ async function serveFallback(
   if (phases.catalog) {
     const cat = await tryCatalog(svcClient, userId);
     if (cat) return cat;
+  }
+  if (phases.corpus && structuredLog) {
+    const corp = await tryCorpus(
+      svcClient,
+      "Bitcoin time preference patience volatility pause",
+      userId,
+      "normal",
+      structuredLog,
+      incomingRequest,
+    );
+    if (corp) return corp;
   }
   if (phases.cache) {
     const cached = await tryCache(svcClient, userId, marketDirection, excludeIds, false, structuredLog);
@@ -310,6 +439,22 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     if (cat) {
       log("signal resolved from catalog (phase 1)");
       return cat;
+    }
+  }
+
+  if (phases.corpus) {
+    const corpusQuery = (searchAngle?.trim() || context || "Bitcoin time preference patience volatility pause").slice(0, 500);
+    const corp = await tryCorpus(
+      svcClient,
+      corpusQuery,
+      userId,
+      budgetTier,
+      log,
+      incomingRequest,
+    );
+    if (corp) {
+      log("signal resolved from corpus (phase 1.5)");
+      return corp;
     }
   }
 

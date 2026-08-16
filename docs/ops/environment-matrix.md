@@ -290,7 +290,9 @@ These exist in hosted Edge Functions without you creating matching secrets manua
 | `GOOGLE_AI_API_KEY` | Direct Gemini (`google` in `LLM_PROVIDER_ORDER` only) | Google AI Studio | **Remove from Edge secrets** when OpenRouter-only. Code still reads it if order includes `google`. |
 | `GEMINI_API_KEY` | Alias for `GOOGLE_AI_API_KEY` in `llm-gateway.ts` | Same as Google key | Same; not used on default OpenRouter-only deploys. |
 | `PERPLEXITY_API_KEY` | Companion generation and feed ingest | Perplexity dashboard | Optional but recommended for the current AI stack. |
+| `EMBED_MODEL` | OpenRouter embedding slug for corpus retrieve | Manual | Default `openai/text-embedding-3-small` (1536-d). |
 | `COMPANION_PHASE_CATALOG` | Enable catalog phase | Manual flag (`1`/`0`) | Default on. |
+| `COMPANION_PHASE_CORPUS` | Enable holzen-brain chunk retrieve | Manual flag (`1`/`0`) | Default on. Empty tables miss through to cache/live. |
 | `COMPANION_PHASE_CACHE` | Enable cache phase | Manual flag (`1`/`0`) | Default on. |
 | `COMPANION_PHASE_LIVE` | Enable live phase | Manual flag (`1`/`0`) | Default on. |
 | `DISABLE_COMPANION_FALLBACKS` | Force strict live-only behavior on Edge | Manual flag (`1`) | Testing/QA only; pairs with `VITE_DISABLE_COMPANION_FALLBACKS`. |
